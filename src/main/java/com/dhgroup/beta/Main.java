@@ -7,9 +7,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 public class Main {
     public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(SpringConfig.class);
-        BoardService service = context.getBean("boardService", BoardService.class);
-        BoardDto boardDto = new BoardDto();
-        service.write(boardDto);
+
     }
 }

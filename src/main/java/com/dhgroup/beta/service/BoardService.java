@@ -11,8 +11,8 @@ public class BoardService {
         this.boardRepository = boardRepository;
     }
 
-    public BoardDto write(BoardDto boardDto) {
-        BoardDto boardDto1 =boardRepository.save(boardDto);
-        return boardDto1;
-    }
+//    public BoardDto write(BoardDto boardDto) {
+//        BoardDto boardDto1 =boardRepository.save(boardDto);
+//        return boardDto1;
+//    }
 }
