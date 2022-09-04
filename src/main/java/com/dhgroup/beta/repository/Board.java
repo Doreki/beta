@@ -35,4 +35,10 @@ public class Board {
         this.content = content;
         this.writer = writer;
     }
+
+    //updateDto에서 받은 내용으로 글을 수정해줌
+    public void update(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }

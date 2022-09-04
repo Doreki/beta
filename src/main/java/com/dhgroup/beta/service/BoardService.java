@@ -26,8 +26,12 @@ public class BoardService {
     }
 
     @Transactional
-    public void update(BoardUpdateDto boardUpdateDto) {
+    public void update(Long id, BoardUpdateDto boardUpdateDto) {
 
-            boardRepository.
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. no="+id));
+        //DB에서 해당 게시글을 찾아오고 없으면 예외 던짐
+        board.update(boardUpdateDto.getTitle(),boardUpdateDto.getContent());
+        //게시글이 있으면 글 내용을 수정
     }
 }
