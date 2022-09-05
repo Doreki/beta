@@ -23,9 +23,4 @@ public class SpringConfig {
     }
 
 
-//    @Bean
-//    BoardRepository boardRepository() {
-//        return boardRepository();
-//    }
-
 }
