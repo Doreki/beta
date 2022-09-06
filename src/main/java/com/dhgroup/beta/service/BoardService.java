@@ -17,14 +17,20 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
 
+    public Board findById(Long id) {
+        return boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        //시간 차로 인해 게시글이 없을 수도 있기 때문에 예외 던져줌
+        //DB에서 해당 게시글을 찾아오고 없으면 예외 던짐
+        //자주 사용되는 메서드이기 때문에 메서드로 분리
+    }
+
 //    @Autowired
     public BoardService(BoardRepository boardRepository) {
         this.boardRepository = boardRepository;
     }
 
 
-
-    @Transactional
     public Long write(BoardPostDto boardPostDto) {
             return boardRepository.save(boardPostDto.toEntity()).getId(); //반환값 BoardRepository
     }
@@ -32,10 +38,7 @@ public class BoardService {
     @Transactional
     public Long update(Long id, BoardUpdateDto boardUpdateDto) {
 
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
-        //시간 차로 인해 게시글이 없을 수도 있기 때문에 예외 던져줌
-        //DB에서 해당 게시글을 찾아오고 없으면 예외 던짐
+        Board board = findById(id);
         board.update(boardUpdateDto.getTitle(),boardUpdateDto.getContent());
         //게시글이 있으면 글 내용을 수정
         return id;
@@ -44,8 +47,7 @@ public class BoardService {
 
     @Transactional
     public Long delete(Long id,String writer) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        Board board = findById(id);
         if(board.getWriter() == writer) //게시글 작성자와 session의 작성자가 똑같다면
         boardRepository.delete(board);
         return id;
@@ -53,15 +55,34 @@ public class BoardService {
 
     @Transactional
     public BoardResponseDto read(Long id) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        Board board = findById(id);
         //Entity의 내용을 Dto에 담는다
         return BoardResponseDto.builder()
                 .title(board.getTitle())
                 .content(board.getContent())
                 .writer(board.getWriter())
-                .viewCnt(board.getViewCnt())
+                .likeCnt(board.getLikeCnt())
                 .commentCnt(board.getCommentCnt())
                 .build();
     }
+
+    @Transactional
+    public Integer likeIncrease(Long id) {
+        Board board = findById(id);
+        board.likeIncrease();
+
+        return board.getLikeCnt();
+    }
+
+    //프론트 단에서 기능 구현해야함
+    @Transactional
+    public Integer likeRollback(Long id) {
+        Board board = findById(id);
+        board.likeCancle();
+
+        return board.getLikeCnt();
+    }
+
+//    @Transactional
+//    public Integer comment
 }

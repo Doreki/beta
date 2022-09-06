@@ -106,4 +106,38 @@ public class BoardServiceTest {
         BoardResponseDto responseDto = boardService.read(id);
         assertThat(responseDto.getTitle()).isEqualTo("글 제목");
     }
+
+    @Test
+    public void 좋아요버튼() {
+        //given
+        boardService.likeIncrease(id);
+        boardService.likeIncrease(id);
+        //when
+        Board board = boardRepository.findById(id).get();
+        //then
+        assertThat(board.getLikeCnt()).isEqualTo(2);
+    }
+
+    @Test
+    public void 좋아요취소() {
+        //given
+        boardService.likeIncrease(id);
+        boardService.likeIncrease(id);
+        boardService.likeRollback(id);
+        boardService.likeRollback(id);
+
+        Board board = boardRepository.findById(id).get();
+        //when
+        //then
+        assertThat(board.getLikeCnt()).isEqualTo(0);
+    }
+
+    @Test
+    public void 좋아요취소실패() {
+        boardService.likeRollback(id);
+
+        Board board = boardRepository.findById(id).get();
+
+        assertThat(board.getLikeCnt()).isEqualTo(0);
+    }
 }

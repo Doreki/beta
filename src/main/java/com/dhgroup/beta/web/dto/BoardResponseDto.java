@@ -10,16 +10,16 @@ public class BoardResponseDto {
     private String title;
     private String content;
     private String writer;
-    private Integer viewCnt;
+    private Integer likeCnt;
     private Integer commentCnt;
 
     @Builder
 
-    public BoardResponseDto(String title, String content, String writer, Integer viewCnt, Integer commentCnt) {
+    public BoardResponseDto(String title, String content, String writer, Integer likeCnt, Integer commentCnt) {
         this.title = title;
         this.content = content;
         this.writer = writer;
-        this.viewCnt = viewCnt;
+        this.likeCnt = likeCnt;
         this.commentCnt = commentCnt;
     }
 }
