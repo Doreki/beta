@@ -63,6 +63,7 @@ public class BoardService {
                 .writer(board.getWriter())
                 .likeCnt(board.getLikeCnt())
                 .commentCnt(board.getCommentCnt())
+                .createdDate(board.getCreatedDate())
                 .build();
     }
 

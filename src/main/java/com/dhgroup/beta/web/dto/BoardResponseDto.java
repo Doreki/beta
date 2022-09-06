@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 @Getter
 public class BoardResponseDto {
@@ -13,13 +15,15 @@ public class BoardResponseDto {
     private Integer likeCnt;
     private Integer commentCnt;
 
-    @Builder
+    private LocalDateTime createdDate;
 
-    public BoardResponseDto(String title, String content, String writer, Integer likeCnt, Integer commentCnt) {
+    @Builder
+    public BoardResponseDto(String title, String content, String writer, Integer likeCnt, Integer commentCnt, LocalDateTime createdDate) {
         this.title = title;
         this.content = content;
         this.writer = writer;
         this.likeCnt = likeCnt;
         this.commentCnt = commentCnt;
+        this.createdDate = createdDate;
     }
 }

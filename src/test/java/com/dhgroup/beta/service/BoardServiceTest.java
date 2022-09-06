@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
@@ -54,16 +55,22 @@ public class BoardServiceTest {
     @Test
     public void 글_수정() {
 
+                LocalDateTime now = LocalDateTime.now(); //글 수정전
+                BoardUpdateDto updateDto = BoardUpdateDto0
+                        .builder()
+                        .title("글제목 수정")
+                        .content("글내용 수정")
+                        .build();
         //when - 실행
-                boardService.update(id, BoardUpdateDto
-                .builder()
-                .title("글제목 수정")
-                .content("글내용 수정")
-                .build()); //repositroy 내용 수정
+                boardService.update(id,updateDto); //repositroy 내용 수정
+            Board board = boardService.findById(id); //DB에서 수정된 시간을 가져옴
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
         assertThat(boardRepository.findById(id).get().getWriter()).isEqualTo("작성자");
+        assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
+        System.out.println("now = " + now);
+        System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
     }
 
     @Test
@@ -103,8 +110,10 @@ public class BoardServiceTest {
 
     @Test
     public void 글조회() {
+        LocalDateTime now = LocalDateTime.now();
         BoardResponseDto responseDto = boardService.read(id);
         assertThat(responseDto.getTitle()).isEqualTo("글 제목");
+        assertThat(responseDto.getCreatedDate()).isBefore(now); //Dto에 생성시간 잘 들어갔는지 확인,생성이 먼저이기 때문에 생성 시간이 지금보다 더 전이어야함
     }
 
     @Test
