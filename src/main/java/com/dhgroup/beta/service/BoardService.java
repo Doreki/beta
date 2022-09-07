@@ -6,9 +6,11 @@ import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -16,7 +18,11 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
 
+    public BoardService(BoardRepository boardRepository) {
+        this.boardRepository = boardRepository;
+    }
 
+    @Transactional
     public Board findById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
@@ -26,11 +32,9 @@ public class BoardService {
     }
 
 //    @Autowired
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
 
 
+    @Transactional
     public Long write(BoardPostDto boardPostDto) {
             return boardRepository.save(boardPostDto.toEntity()).getId(); //반환값 BoardRepository
     }
@@ -57,14 +61,7 @@ public class BoardService {
     public BoardResponseDto read(Long id) {
         Board board = findById(id);
         //Entity의 내용을 Dto에 담는다
-        return BoardResponseDto.builder()
-                .title(board.getTitle())
-                .content(board.getContent())
-                .writer(board.getWriter())
-                .likeCnt(board.getLikeCnt())
-                .commentCnt(board.getCommentCnt())
-                .createdDate(board.getCreatedDate())
-                .build();
+        return new BoardResponseDto(board);
     }
 
     @Transactional
@@ -84,6 +81,9 @@ public class BoardService {
         return board.getLikeCnt();
     }
 
-//    @Transactional
-//    public Integer comment
+    @Transactional
+    public List<Board> viewList() {
+        List<Board> boardList = boardRepository.findAll(Sort.by(Sort.Direction.DESC,"id"));
+        return boardList;
+    }
 }

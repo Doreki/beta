@@ -1,29 +1,22 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.SpringConfig;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
-import org.apache.catalina.core.ApplicationContext;
-import org.assertj.core.api.Assertions;
-import org.junit.After;
-import org.junit.Before;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertThrows;
 
 @SpringBootTest
@@ -47,6 +40,7 @@ public class BoardServiceTest {
     public void cleanUp() {
         boardRepository.deleteAll();
     }
+
     @Test
     public void 글작성() {
         assertThat(boardRepository.findById(id).get().getId()).isEqualTo(id);
@@ -56,7 +50,7 @@ public class BoardServiceTest {
     public void 글_수정() {
 
                 LocalDateTime now = LocalDateTime.now(); //글 수정전
-                BoardUpdateDto updateDto = BoardUpdateDto0
+                BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
                         .title("글제목 수정")
                         .content("글내용 수정")
@@ -148,5 +142,27 @@ public class BoardServiceTest {
         Board board = boardRepository.findById(id).get();
 
         assertThat(board.getLikeCnt()).isEqualTo(0);
+    }
+
+    @Test
+    public void 글전체불러오기() {
+        //given 총 글 3개추가
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목2")
+                .content("글 내용")
+                .writer("작성자").build());
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목3")
+                .content("글 내용")
+                .writer("작성자").build());
+        //when
+        List<Board> boardList = boardService.viewList();
+        //then
+        assertThat(boardList.size()).isEqualTo(3);
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목3");
+        assertThat(boardList.get(1).getTitle()).isEqualTo("글 제목2");
+        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목");
     }
 }

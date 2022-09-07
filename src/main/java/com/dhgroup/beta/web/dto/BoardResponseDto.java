@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.dto;
 
+import com.dhgroup.beta.repository.Board;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,13 +18,12 @@ public class BoardResponseDto {
 
     private LocalDateTime createdDate;
 
-    @Builder
-    public BoardResponseDto(String title, String content, String writer, Integer likeCnt, Integer commentCnt, LocalDateTime createdDate) {
-        this.title = title;
-        this.content = content;
-        this.writer = writer;
-        this.likeCnt = likeCnt;
-        this.commentCnt = commentCnt;
-        this.createdDate = createdDate;
+    public BoardResponseDto(Board board) {
+        this.title = board.getTitle();
+        this.content = board.getContent();
+        this.writer = board.getWriter();
+        this.likeCnt = board.getLikeCnt();
+        this.commentCnt = board.getCommentCnt();
+        this.createdDate = board.getCreatedDate();
     }
 }
