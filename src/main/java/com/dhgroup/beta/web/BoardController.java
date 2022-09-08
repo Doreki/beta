@@ -19,8 +19,9 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping("/list")
-    public List<Board> viewList() {
-        return boardService.viewList();
+    public List<Board> viewList(Integer start) {
+        return boardService.viewList(start);
+
     }
 
 }

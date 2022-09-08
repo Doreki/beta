@@ -8,10 +8,8 @@ import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -85,10 +83,10 @@ public class BoardServiceTest {
         String writer = "작성자"; //session으로 부터 얻어온 이름
         //when
         boardService.delete(id,writer);
-        NoSuchElementException e = assertThrows(NoSuchElementException.class,() -> boardRepository.findById(id).get());
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> boardService.findById(id));
         //글을 찾을때 글이 없으면 삭제가 성공한 것
         //then
-        assertThat(e.getMessage()).isEqualTo("No value present");
+        assertThat(e.getMessage()).isEqualTo("해당 게시글이 없습니다.");
     }
 
     @Test
@@ -145,7 +143,7 @@ public class BoardServiceTest {
     }
 
     @Test
-    public void 글전체불러오기() {
+    public void 글목록불러오기() {
         //given 총 글 3개추가
         boardService.write(BoardPostDto
                 .builder()
@@ -157,12 +155,59 @@ public class BoardServiceTest {
                 .title("글 제목3")
                 .content("글 내용")
                 .writer("작성자").build());
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목4")
+                .content("글 내용")
+                .writer("작성자").build());
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목5")
+                .content("글 내용")
+                .writer("작성자").build());
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목6")
+                .content("글 내용")
+                .writer("작성자").build());
+
         //when
-        List<Board> boardList = boardService.viewList();
+        List<Board> boardList = boardService.viewList(0);
         //then
         assertThat(boardList.size()).isEqualTo(3);
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목6");
+        assertThat(boardList.get(1).getTitle()).isEqualTo("글 제목5");
+        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목4");
+
+        //when
+        Integer scroll =1; //프론트 단에서 자동으로 스크롤 횟수가 저장되도록 구현해야함
+        //then
+        boardList = boardService.viewList(scroll);
         assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목3");
         assertThat(boardList.get(1).getTitle()).isEqualTo("글 제목2");
         assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목");
+//        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목");
+    }
+
+    @Test
+    public void 글목록불러오기_마지막_페이지() {
+        //given - 글이 하나만 있는 상태
+
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목2")
+                .content("글 내용")
+                .writer("작성자").build());
+        boardService.write(BoardPostDto
+                .builder()
+                .title("글 제목3")
+                .content("글 내용")
+                .writer("작성자").build());
+        List<Board> boardList = boardService.viewList(0);
+        //when
+        RuntimeException e = assertThrows(RuntimeException.class,() ->boardService.viewList(1));
+
+        //then
+        assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
     }
 }

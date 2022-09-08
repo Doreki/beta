@@ -6,6 +6,7 @@ import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,8 +83,13 @@ public class BoardService {
     }
 
     @Transactional
-    public List<Board> viewList() {
-        List<Board> boardList = boardRepository.findAll(Sort.by(Sort.Direction.DESC,"id"));
+    public List<Board> viewList(Integer scroll) {
+
+        Board board = boardRepository.findTopByOrderByIdDesc();  //3,2,1 -> 3
+        Long startId = board.getId()-scroll*3;
+        List<Board> boardList = boardRepository.findFirst3ByIdLessThanEqualOrderByIdDesc(startId);
+        if(boardList.size() <3)
+            throw new RuntimeException("마지막 게시글 입니다.");
         return boardList;
     }
 }
