@@ -172,7 +172,7 @@ public class BoardServiceTest {
                 .writer("작성자").build());
 
         //when
-        List<Board> boardList = boardService.viewList(0);
+        List<BoardResponseDto> boardList = boardService.viewList(0);
         //then
         assertThat(boardList.size()).isEqualTo(3);
         assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목6");
@@ -203,9 +203,9 @@ public class BoardServiceTest {
                 .title("글 제목3")
                 .content("글 내용")
                 .writer("작성자").build());
-        List<Board> boardList = boardService.viewList(0);
+        List<BoardResponseDto> boardList = boardService.viewList(0);
         //when
-        RuntimeException e = assertThrows(RuntimeException.class,() ->boardService.viewList(1));
+        RuntimeException e = assertThrows(IllegalStateException.class,() ->boardService.viewList(1));
 
         //then
         assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");

@@ -5,6 +5,7 @@ import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,14 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-
+@RequiredArgsConstructor
 public class BoardService {
 
     private final BoardRepository boardRepository;
-
-    public BoardService(BoardRepository boardRepository) {
-        this.boardRepository = boardRepository;
-    }
 
     @Transactional
     public Board findById(Long id) {
@@ -83,13 +80,14 @@ public class BoardService {
     }
 
     @Transactional
-    public List<Board> viewList(Integer scroll) {
+    public List<BoardResponseDto> viewList(Integer scroll) {
 
         Board board = boardRepository.findTopByOrderByIdDesc();  //3,2,1 -> 3
         Long startId = board.getId()-scroll*3;
-        List<Board> boardList = boardRepository.findFirst3ByIdLessThanEqualOrderByIdDesc(startId);
+        List<BoardResponseDto> boardList = boardRepository.findFirst3ByIdLessThanEqualOrderByIdDesc(startId);
+//        new BoardResponseDto(boardList);
         if(boardList.size() <3)
-            throw new RuntimeException("마지막 게시글 입니다.");
+            throw new IllegalStateException("마지막 게시글 입니다.");
         return boardList;
     }
 }
