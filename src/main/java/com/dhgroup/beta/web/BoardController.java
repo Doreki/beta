@@ -12,18 +12,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/board")
 @RestController
 public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/{scroll}")
-    public List<BoardResponseDto> viewList(Integer scroll) {
+    @GetMapping("/api/v1/board/{scroll}")
+    public List<BoardResponseDto> viewList(@PathVariable Integer scroll) {
         return boardService.viewList(scroll);
     }
 
-    @PostMapping
+    @PostMapping("/api/v1/board")
     public Long write(@RequestBody BoardPostDto boardPostDto) {
         return boardService.write(boardPostDto);
     }

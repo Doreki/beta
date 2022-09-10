@@ -15,7 +15,6 @@ public class BoardResponseDto {
     private String writer;
     private Integer likeCnt;
     private Integer commentCnt;
-
     private LocalDateTime createdDate;
 
     public BoardResponseDto(Board board) {
