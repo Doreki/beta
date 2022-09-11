@@ -28,11 +28,7 @@ public class BoardServiceTest {
     Long id;
     @BeforeEach
     public void setUp() {
-         id = boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목")
-                .content("글 내용")
-                .writer("작성자").build());
+        id= boardWrite("글제목","글내용","글쓴이");
     }
     @AfterEach
     public void cleanUp() {
@@ -46,7 +42,6 @@ public class BoardServiceTest {
 
     @Test
     public void 글_수정() {
-
                 LocalDateTime now = LocalDateTime.now(); //글 수정전
                 BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
@@ -59,7 +54,7 @@ public class BoardServiceTest {
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
-        assertThat(boardRepository.findById(id).get().getWriter()).isEqualTo("작성자");
+        assertThat(boardRepository.findById(id).get().getWriter()).isEqualTo("글쓴이");
         assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
         System.out.println("now = " + now);
         System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
@@ -80,7 +75,7 @@ public class BoardServiceTest {
     @Test
     public void 글삭제() {
         //given
-        String writer = "작성자"; //session으로 부터 얻어온 이름
+        String writer = "글쓴이"; //session으로 부터 얻어온 이름
         //when
         boardService.delete(id,writer);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> boardService.findById(id));
@@ -97,14 +92,14 @@ public class BoardServiceTest {
         boardService.delete(id,writer);
         //then - 검증, 글이 존재한다면 삭제 실패한 것
         Board board = boardRepository.findById(id).get();
-        assertThat(board.getWriter()).isEqualTo("작성자");
+        assertThat(board.getWriter()).isEqualTo("글쓴이");
     }
 
     @Test
     public void 글조회() {
         LocalDateTime now = LocalDateTime.now();
         BoardResponseDto responseDto = boardService.read(id);
-        assertThat(responseDto.getTitle()).isEqualTo("글 제목");
+        assertThat(responseDto.getTitle()).isEqualTo("글제목");
         assertThat(responseDto.getCreatedDate()).isBefore(now); //Dto에 생성시간 잘 들어갔는지 확인,생성이 먼저이기 때문에 생성 시간이 지금보다 더 전이어야함
     }
 
@@ -145,69 +140,45 @@ public class BoardServiceTest {
     @Test
     public void 글목록불러오기() {
         //given 총 글 3개추가
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목2")
-                .content("글 내용")
-                .writer("작성자").build());
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목3")
-                .content("글 내용")
-                .writer("작성자").build());
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목4")
-                .content("글 내용")
-                .writer("작성자").build());
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목5")
-                .content("글 내용")
-                .writer("작성자").build());
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목6")
-                .content("글 내용")
-                .writer("작성자").build());
+        for(int i=1;i<=10;i++) {
+        boardWrite("글제목"+i,"글내용"+i,"글쓴이");
+        }
 
         //when
         List<BoardResponseDto> boardList = boardService.viewList(0);
         //then
-        assertThat(boardList.size()).isEqualTo(3);
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목6");
-        assertThat(boardList.get(1).getTitle()).isEqualTo("글 제목5");
-        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목4");
+        assertThat(boardList.size()).isEqualTo(10);
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목10");
+        assertThat(boardList.get(9).getTitle()).isEqualTo("글제목1");
 
-        //when
+       // when
         Integer scroll =1; //프론트 단에서 자동으로 스크롤 횟수가 저장되도록 구현해야함
         //then
         boardList = boardService.viewList(scroll);
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글 제목3");
-        assertThat(boardList.get(1).getTitle()).isEqualTo("글 제목2");
-        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목");
-//        assertThat(boardList.get(2).getTitle()).isEqualTo("글 제목");
+        assertThat(boardList.size()).isEqualTo(1);
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목");
     }
 
     @Test
     public void 글목록불러오기_마지막_페이지() {
         //given - 글이 하나만 있는 상태
 
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목2")
-                .content("글 내용")
-                .writer("작성자").build());
-        boardService.write(BoardPostDto
-                .builder()
-                .title("글 제목3")
-                .content("글 내용")
-                .writer("작성자").build());
+        boardWrite("글제목2","글내용2","작성자");
+        boardWrite("글제목3","글내용3","작성자");
+
         List<BoardResponseDto> boardList = boardService.viewList(0);
         //when
         RuntimeException e = assertThrows(IllegalStateException.class,() ->boardService.viewList(1));
 
         //then
         assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
+    }
+
+    public Long boardWrite(String title,String content,String writer) {
+        return boardService.write(BoardPostDto
+                .builder()
+                .title(title)
+                .content(content)
+                .writer(writer).build());
     }
 }

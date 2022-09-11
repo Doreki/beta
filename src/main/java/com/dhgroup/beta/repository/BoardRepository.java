@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board,Long> {
 
-    List<Board> findFirst3ByIdLessThanEqualOrderByIdDesc(Long id);
+    List<Board> findFirst10ByIdLessThanEqualOrderByIdDesc(Long id);
     Board findTopByOrderByIdDesc();
 }

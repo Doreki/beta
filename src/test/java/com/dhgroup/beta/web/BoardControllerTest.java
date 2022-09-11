@@ -15,6 +15,9 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 
 import java.util.List;
@@ -23,8 +26,6 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BoardControllerTest {
-
-
     @LocalServerPort
     private int port;
 
@@ -34,25 +35,24 @@ public class BoardControllerTest {
     @Autowired
     private BoardRepository boardRepository;
 
-
     @After
     public void tearDown() throws Exception {
         boardRepository.deleteAll();
     }
-
-
+    
     @Test
     public void 게시글목록() {
         String url = "http://localhost:" + port + "/api/v1/board";
 
-        BoardWrite("글1","글쓴이1","글내용1");
-        BoardWrite("글2","글쓴이2","글내용2");
-        BoardWrite("글3","글쓴이3","글내용3");
+        for(int i=1;i<=10;i++) {
+            boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
+        }
 
-        ResponseEntity<BoardResponseDto> responseEntity = testRestTemplate.getForEntity(url+"/{scroll}",BoardResponseDto.class, 0);
+        ResponseEntity<BoardResponseDto[]> responseEntity = testRestTemplate.getForEntity(url+"/{scroll}",BoardResponseDto[].class, 0);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-//        responseEntity.
-//        assertThat(responseEntity.getBody()).isGreaterThan(0L);
+        BoardResponseDto[] boardResponseDtos = responseEntity.getBody(); //response 바디에 담긴 내용을 객체로 받아온다.
+        assertThat(boardResponseDtos[0].getTitle()).isEqualTo("글제목10");
+        assertThat(boardResponseDtos[9].getTitle()).isEqualTo("글제목1");
     }
 
     @Test
@@ -62,7 +62,7 @@ public class BoardControllerTest {
         String writer = "글쓴이";
         String content = "글내용";
 
-        ResponseEntity<Long> responseEntity = BoardWrite(title,writer,content);
+        ResponseEntity<Long> responseEntity = boardWrite(title,writer,content);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isGreaterThan(0L);
@@ -75,7 +75,7 @@ public class BoardControllerTest {
         assertThat(all.get(0).getWriter()).isEqualTo(writer);
     }
 
-    public ResponseEntity<Long> BoardWrite(String title,String writer, String content) {
+    public ResponseEntity<Long> boardWrite(String title,String writer, String content) {
 
         String url = "http://localhost:" + port + "/api/v1/board";
 

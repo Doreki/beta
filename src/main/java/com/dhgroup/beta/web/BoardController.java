@@ -17,9 +17,12 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    @GetMapping("/api/v1/board/{scroll}")
-    public List<BoardResponseDto> viewList(@PathVariable Integer scroll) {
+    @GetMapping(value = {"/api/v1/board/{scroll}", "api/v1/board"})
+    public List<BoardResponseDto> viewList(@PathVariable(required = false) Integer scroll) {
+            if(scroll==null)
+                scroll=0;
         return boardService.viewList(scroll);
+
     }
 
     @PostMapping("/api/v1/board")

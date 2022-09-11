@@ -84,11 +84,11 @@ public class BoardService {
     public List<BoardResponseDto> viewList(Integer scroll) {
 
         Board board = boardRepository.findTopByOrderByIdDesc();  //3,2,1 -> 3
-        Long startId = board.getId()-scroll*3;
-        List<BoardResponseDto> boardList = boardRepository.findFirst3ByIdLessThanEqualOrderByIdDesc(startId)
+        Long startId = board.getId()-scroll*10;
+        List<BoardResponseDto> boardList = boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)
                 .stream().map(BoardResponseDto::new).collect(Collectors.toList());
         //Board형태의 데이터를 BoardResponseDto로 변환시켜서 List에 담아서 보냄
-        if(boardList.size() <3)
+        if(boardList.size()==0)
             throw new IllegalStateException("마지막 게시글 입니다.");
         return boardList;
     }
