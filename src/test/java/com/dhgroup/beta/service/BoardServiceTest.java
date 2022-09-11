@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.Exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
@@ -20,16 +21,16 @@ import static org.junit.Assert.assertThrows;
 @SpringBootTest
 public class BoardServiceTest {
 
+    final static Integer LIMIT=10; //
+    final static Long INITIAL_VALUE=11L;
+    final static Long START_ID=INITIAL_VALUE+1;
+    final static Long LAST_VALUE=INITIAL_VALUE-LIMIT+1;
     @Autowired
     BoardRepository boardRepository;
     @Autowired
     BoardService boardService;
 
     Long id;
-    @BeforeEach
-    public void setUp() {
-        id= boardWrite("글제목","글내용","글쓴이");
-    }
     @AfterEach
     public void cleanUp() {
         boardRepository.deleteAll();
@@ -37,11 +38,13 @@ public class BoardServiceTest {
 
     @Test
     public void 글작성() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         assertThat(boardRepository.findById(id).get().getId()).isEqualTo(id);
     }
 
     @Test
     public void 글_수정() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
                 LocalDateTime now = LocalDateTime.now(); //글 수정전
                 BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
@@ -62,6 +65,7 @@ public class BoardServiceTest {
 
     @Test
     public void 글수정_실패() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         Long wrongId = id+1;
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> boardService.update(wrongId, BoardUpdateDto
                 .builder()
@@ -74,6 +78,7 @@ public class BoardServiceTest {
 
     @Test
     public void 글삭제() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         //given
         String writer = "글쓴이"; //session으로 부터 얻어온 이름
         //when
@@ -86,6 +91,7 @@ public class BoardServiceTest {
 
     @Test
     public void 글삭제_실패() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         //given - 상황
         String writer = "작성자 아님";
         //when - 실행
@@ -97,6 +103,7 @@ public class BoardServiceTest {
 
     @Test
     public void 글조회() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         LocalDateTime now = LocalDateTime.now();
         BoardResponseDto responseDto = boardService.read(id);
         assertThat(responseDto.getTitle()).isEqualTo("글제목");
@@ -105,6 +112,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요버튼() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         //given
         boardService.likeIncrease(id);
         boardService.likeIncrease(id);
@@ -116,6 +124,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요취소() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         //given
         boardService.likeIncrease(id);
         boardService.likeIncrease(id);
@@ -130,6 +139,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요취소실패() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
         boardService.likeRollback(id);
 
         Board board = boardRepository.findById(id).get();
@@ -139,36 +149,38 @@ public class BoardServiceTest {
 
     @Test
     public void 글목록불러오기() {
-        //given 총 글 3개추가
-        for(int i=1;i<=10;i++) {
+        //given 총 글 11개추가
+        for(int i=1;i<=INITIAL_VALUE;i++) {
         boardWrite("글제목"+i,"글내용"+i,"글쓴이");
         }
 
         //when
-        List<BoardResponseDto> boardList = boardService.viewList(0);
+        List<BoardResponseDto> boardList = boardService.viewList(START_ID); //초기값 밑에부터 찾기 때문
         //then
         assertThat(boardList.size()).isEqualTo(10);
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목10");
-        assertThat(boardList.get(9).getTitle()).isEqualTo("글제목1");
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목"+INITIAL_VALUE);
+        assertThat(boardList.get(LIMIT-1).getTitle()).isEqualTo("글제목"+(LAST_VALUE));
 
-       // when
-        Integer scroll =1; //프론트 단에서 자동으로 스크롤 횟수가 저장되도록 구현해야함
+
         //then
-        boardList = boardService.viewList(scroll);
-        assertThat(boardList.size()).isEqualTo(1);
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목");
+        boardList = boardService.viewList(boardList.get(LIMIT-1).getId());
+        assertThat(boardList.size()).isEqualTo(INITIAL_VALUE-LIMIT); 
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목"+(LAST_VALUE-1));
     }
 
     @Test
     public void 글목록불러오기_마지막_페이지() {
-        //given - 글이 하나만 있는 상태
+        //given
+        //게시글이 아무 것도 없을때
+        NotFoundBoardException e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(INITIAL_VALUE+1));
+        assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
 
-        boardWrite("글제목2","글내용2","작성자");
-        boardWrite("글제목3","글내용3","작성자");
+        for(int i=1;i<=INITIAL_VALUE;i++) {
+            boardWrite("글제목"+i,"글내용"+i,"글쓴이");
+        }
 
-        List<BoardResponseDto> boardList = boardService.viewList(0);
-        //when
-        RuntimeException e = assertThrows(IllegalStateException.class,() ->boardService.viewList(1));
+        //when 마지막 게시글을 불러올때
+        e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(1L));
 
         //then
         assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");

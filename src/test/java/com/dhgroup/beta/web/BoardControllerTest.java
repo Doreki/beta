@@ -1,12 +1,15 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.Exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import org.junit.After;
 import org.junit.Before;
+//import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +23,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -48,12 +53,30 @@ public class BoardControllerTest {
             boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
         }
 
-        ResponseEntity<BoardResponseDto[]> responseEntity = testRestTemplate.getForEntity(url+"/{scroll}",BoardResponseDto[].class, 0);
+        ResponseEntity<Map> responseEntity = testRestTemplate.getForEntity(url+"/{lastIndex}",Map.class, 0);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        BoardResponseDto[] boardResponseDtos = responseEntity.getBody(); //response 바디에 담긴 내용을 객체로 받아온다.
-        assertThat(boardResponseDtos[0].getTitle()).isEqualTo("글제목10");
-        assertThat(boardResponseDtos[9].getTitle()).isEqualTo("글제목1");
+        Map pageHandler = responseEntity.getBody(); //response 바디에 담긴 내용을 객체로 받아온다.
+        assertThat(pageHandler.get("boardResponseDtos").getClass()).isEqualTo(ArrayList.class);
+        assertThat(pageHandler.get("total")).isEqualTo((int)(boardRepository.count())); //타입불일치로 테스트실패해서 형변환
     }
+
+    @Test
+    public void 마지막게시글_테스트() {
+        String url = "http://localhost:" + port + "/api/v1/board";
+
+//        for(int i=1;i<=10;i++) {
+//            boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
+//        }
+
+        ResponseEntity<Map> responseEntity = testRestTemplate.getForEntity(url+"/{lastIndex}",Map.class, 1L);
+//        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.)
+        Map exceptions = responseEntity.getBody();
+        exceptions.forEach((key, value)
+                -> System.out.println("key: " + key + ", value: " + value));
+        assertThat(exceptions.size()).isEqualTo(1);
+        assertThat(exceptions.get("msg")).isEqualTo("LIST_ERR");
+    }
+
 
     @Test
     public void 게시글등록() {
