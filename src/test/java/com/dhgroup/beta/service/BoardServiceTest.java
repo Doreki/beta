@@ -20,10 +20,10 @@ import static org.junit.Assert.assertThrows;
 @SpringBootTest
 public class BoardServiceTest {
 
-    final static Integer LIMIT=10; //
-    final static Long INITIAL_VALUE=11L;
-    final static Long START_ID=INITIAL_VALUE+1;
-    final static Long LAST_VALUE=INITIAL_VALUE-LIMIT+1;
+    private final static Integer LIMIT=10; //
+    private final static Long INITIAL_VALUE=11L;
+    private final static Long START_ID=INITIAL_VALUE+1;
+    private final static Long LAST_VALUE=INITIAL_VALUE-LIMIT+1;
     @Autowired
     BoardRepository boardRepository;
     @Autowired

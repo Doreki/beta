@@ -3,25 +3,32 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
-import org.junit.After;
-//import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-
-import java.util.ArrayList;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BoardControllerTest {
+    private final static Long INITIAL_VALUE=10L;
+    private final static Long START_ID=INITIAL_VALUE+1;
     @LocalServerPort
     private int port;
 
@@ -31,66 +38,73 @@ public class BoardControllerTest {
     @Autowired
     private BoardRepository boardRepository;
 
-    @After
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @BeforeEach
+    public void setUp() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .build();
+    }
+    @AfterEach
     public void tearDown() throws Exception {
         boardRepository.deleteAll();
     }
     
     @Test
-    public void 게시글목록() {
-        String url = "http://localhost:" + port + "/api/v1/board";
+    public void 게시글목록() throws Exception {
+        //given
+        String url = "http://localhost:" + port + "/api/v1/board/{lastIndex}";
 
-        for(int i=1;i<=10;i++) {
+        for(int i=1;i<=INITIAL_VALUE;i++) {
             boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
         }
 
-        ResponseEntity<Map> responseEntity = testRestTemplate.getForEntity(url+"/{lastIndex}",Map.class, 0);
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        Map pageHandler = responseEntity.getBody(); //response 바디에 담긴 내용을 객체로 받아온다.
-        assertThat(pageHandler.get("boardResponseDtos").getClass()).isEqualTo(ArrayList.class);
-        assertThat(pageHandler.get("total")).isEqualTo((int)(boardRepository.count())); //타입불일치로 테스트실패해서 형변환
+        int total = (int)boardRepository.count();
+        //when
+        mockMvc.perform(get(url,0L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total",is(total)))
+                .andExpect(jsonPath("$.limit",is(10)))
+                .andExpect(jsonPath("$.boardResponseDtos[0].title",is("글제목10")))
+                .andExpect(jsonPath("$.boardResponseDtos[9].title",is("글제목1")));
     }
 
     @Test
-    public void 마지막게시글_테스트() {
-        String url = "http://localhost:" + port + "/api/v1/board";
+    public void 마지막게시글_테스트() throws Exception {
+        String url = "http://localhost:" + port + "/api/v1/board/{lastIndex}";
 
-//        for(int i=1;i<=10;i++) {
-//            boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
-//        }
-
-        ResponseEntity<Map> responseEntity = testRestTemplate.getForEntity(url+"/{lastIndex}",Map.class, 1L);
-//        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.)
-        Map exceptions = responseEntity.getBody();
-        exceptions.forEach((key, value)
-                -> System.out.println("key: " + key + ", value: " + value));
-        assertThat(exceptions.size()).isEqualTo(1);
-        assertThat(exceptions.get("msg")).isEqualTo("LIST_ERR");
+        //불러올 게시글이 없음
+        mockMvc.perform(get(url,0L)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.msg",is("LIST_ERR")));
     }
 
 
+
     @Test
-    public void 게시글등록() {
-//        //given
+    public void 게시글등록() throws Exception{
+       //given
         String title = "글쓴이";
         String writer = "글쓴이";
         String content = "글내용";
 
-        ResponseEntity<Long> responseEntity = boardWrite(title,writer,content);
+        boardWrite(title,writer,content);
 
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isGreaterThan(0L);
-
-        //첫번째 등록된 게시물 가져옴
-        //id값으로 찾으면 AutoIncrement로 인해 DB의 영향을 받기 때문에 리스트로 가져와야함
+        //when
         List<Board> all = boardRepository.findAll();
+        //then
         assertThat(all.get(0).getTitle()).isEqualTo(title);
         assertThat(all.get(0).getContent()).isEqualTo(content);
         assertThat(all.get(0).getWriter()).isEqualTo(writer);
     }
 
-    public ResponseEntity<Long> boardWrite(String title,String writer, String content) {
-
+    public void boardWrite(String title,String writer, String content) throws Exception {
         String url = "http://localhost:" + port + "/api/v1/board";
 
         BoardPostDto postDto = BoardPostDto.builder()
@@ -99,8 +113,9 @@ public class BoardControllerTest {
                 .content(content)
                 .build();
 
-        ResponseEntity<Long> responseEntity = testRestTemplate.postForEntity(url, postDto, Long.class);
-
-        return responseEntity;
+        mockMvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(new ObjectMapper().writeValueAsString(postDto)))
+                .andExpect(status().isOk());
     }
 }

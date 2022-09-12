@@ -27,6 +27,7 @@ public class BoardController {
         Map<String,Object> pageHandler = new HashMap<>();
         pageHandler.put("boardResponseDtos",boardResponseDtos);
         pageHandler.put("total",total);
+        pageHandler.put("limit",boardResponseDtos.size());
 
 
         return pageHandler;
