@@ -1,26 +1,17 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.Exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
-import com.dhgroup.beta.web.dto.BoardResponseDto;
 import org.junit.After;
-import org.junit.Before;
 //import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 
 import java.util.ArrayList;

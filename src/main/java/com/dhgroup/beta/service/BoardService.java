@@ -1,6 +1,6 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.Exception.NotFoundBoardException;
+import com.dhgroup.beta.exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.repository.BoardRepository;
@@ -8,20 +8,16 @@ import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class BoardService {
 
+    @Autowired
     private final BoardRepository boardRepository;
 
     @Transactional
@@ -86,10 +82,17 @@ public class BoardService {
     @Transactional
     public List<BoardResponseDto> viewList(Long startId) {
 
-        if(startId<=0)
+        Long recentTopId = findRecentBoardId().orElse(0L);
+
+        if(startId<=0) {
             throw new NotFoundBoardException("마지막 게시글 입니다.");
-        else
+        } else if(startId==recentTopId) {
+            if(recentTopId==0L)
+                throw new NotFoundBoardException("마지막 게시글 입니다.");
+        }
+        else {
             startId-=1;
+        }
 
         List<BoardResponseDto> boardList = boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)
                 .stream().map(BoardResponseDto::new).collect(Collectors.toList());
@@ -103,7 +106,9 @@ public class BoardService {
 
     @Transactional
     public Optional<Long> findRecentBoardId() {
-        return Optional.of(boardRepository.findTopByOrderByIdDesc().getId()); //null값 반환될 수 있기 때문
+        Optional<Board> opt = Optional.ofNullable(boardRepository.findTopByOrderByIdDesc());
+                opt.orElseThrow(() -> new NotFoundBoardException("마지막 게시글 입니다."));
+        return Optional.of(opt.get().getId()); //null값 반환될 수 있기 때문
     }
 
     @Transactional

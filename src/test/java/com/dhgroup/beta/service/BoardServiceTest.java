@@ -1,20 +1,19 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.Exception.NotFoundBoardException;
+import com.dhgroup.beta.exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertThrows;
 
@@ -172,6 +171,7 @@ public class BoardServiceTest {
     public void 글목록불러오기_마지막_페이지() {
         //given
         //게시글이 아무 것도 없을때
+        System.out.println("boardRepository.findTopByOrderByIdDesc() = " + boardRepository.findTopByOrderByIdDesc());
         NotFoundBoardException e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(INITIAL_VALUE+1));
         assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
 
