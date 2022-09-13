@@ -3,6 +3,7 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.service.BoardService;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
+import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,12 +23,15 @@ public class BoardController {
                 lastIndex = boardService.findRecentBoardId().orElse(0L); //게시글이 하나도 없을때 예외를 던져주기위함
 
         Long total = boardService.boardCount();
-        List<BoardResponseDto> boardResponseDtos = boardService.viewList(lastIndex);
+        List<BoardResponseDto> posts = boardService.viewList(lastIndex);
+        lastIndex = posts.get(posts.size()-1).getId(); //List index가 0부터 시작하기때문
+
 
         Map<String,Object> pageHandler = new HashMap<>();
-        pageHandler.put("boardResponseDtos",boardResponseDtos);
+        pageHandler.put("posts",posts);
         pageHandler.put("total",total);
-        pageHandler.put("limit",boardResponseDtos.size());
+        pageHandler.put("lastIndex",lastIndex);
+        pageHandler.put("limit",posts.size());
 
 
         return pageHandler;
@@ -36,5 +40,10 @@ public class BoardController {
     @PostMapping("/api/v1/board")
     public Long write(@RequestBody BoardPostDto boardPostDto) {
         return boardService.write(boardPostDto);
+    }
+
+    @PatchMapping("/api/v1/board/{id}")
+    public Long update(@PathVariable Long id,@RequestBody BoardUpdateDto boardUpdateDto) {
+        return boardService.update(id,boardUpdateDto);
     }
 }

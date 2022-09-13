@@ -1,6 +1,6 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.exception.NotFoundBoardException;
+import com.dhgroup.beta.domain.exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.repository.BoardRepository;
@@ -82,16 +82,10 @@ public class BoardService {
     @Transactional
     public List<BoardResponseDto> viewList(Long startId) {
 
-        Long recentTopId = findRecentBoardId().orElse(0L);
+//        Long recentTopId = findRecentBoardId().orElse(0L);
 
         if(startId<=0) {
             throw new NotFoundBoardException("마지막 게시글 입니다.");
-        } else if(startId==recentTopId) {
-            if(recentTopId==0L)
-                throw new NotFoundBoardException("마지막 게시글 입니다.");
-        }
-        else {
-            startId-=1;
         }
 
         List<BoardResponseDto> boardList = boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)

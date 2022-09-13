@@ -1,6 +1,6 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.exception.NotFoundBoardException;
+import com.dhgroup.beta.domain.exception.NotFoundBoardException;
 import com.dhgroup.beta.repository.Board;
 import com.dhgroup.beta.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
@@ -21,9 +21,9 @@ import static org.junit.Assert.assertThrows;
 public class BoardServiceTest {
 
     private final static Integer LIMIT=10; //
-    private final static Long INITIAL_VALUE=11L;
-    private final static Long START_ID=INITIAL_VALUE+1;
-    private final static Long LAST_VALUE=INITIAL_VALUE-LIMIT+1;
+    private final static Long START_ID=11L;
+//    private final static Long START_ID=INITIAL_VALUE+1;
+    private final static Long LAST_VALUE=START_ID-LIMIT+1;
     @Autowired
     BoardRepository boardRepository;
     @Autowired
@@ -149,22 +149,23 @@ public class BoardServiceTest {
     @Test
     public void 글목록불러오기() {
         //given 총 글 11개추가
-        for(int i=1;i<=INITIAL_VALUE;i++) {
+        for(int i=1;i<=11;i++) {
         boardWrite("글제목"+i,"글내용"+i,"글쓴이");
         }
 
         //when
-        List<BoardResponseDto> boardList = boardService.viewList(START_ID); //초기값 밑에부터 찾기 때문
+        List<BoardResponseDto> boardList = boardService.viewList(START_ID);
+        BoardResponseDto firstBoard = boardList.get(0);
+        BoardResponseDto lastBoard = boardList.get(9);
         //then
-        assertThat(boardList.size()).isEqualTo(10);
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목"+INITIAL_VALUE);
-        assertThat(boardList.get(LIMIT-1).getTitle()).isEqualTo("글제목"+(LAST_VALUE));
-
+        assertThat(boardList.size()).isEqualTo(LIMIT);
+        assertThat(firstBoard.getTitle()).isEqualTo("글제목"+START_ID);
+        assertThat(lastBoard.getTitle()).isEqualTo("글제목"+(START_ID-9));
 
         //then
-        boardList = boardService.viewList(boardList.get(LIMIT-1).getId());
-        assertThat(boardList.size()).isEqualTo(INITIAL_VALUE-LIMIT); 
-        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목"+(LAST_VALUE-1));
+        boardList = boardService.viewList(lastBoard.getId()-1);
+        assertThat(boardList.size()).isEqualTo(START_ID-10);
+        assertThat(boardList.get(0).getTitle()).isEqualTo("글제목"+(START_ID-10));
     }
 
     @Test
@@ -172,10 +173,10 @@ public class BoardServiceTest {
         //given
         //게시글이 아무 것도 없을때
         System.out.println("boardRepository.findTopByOrderByIdDesc() = " + boardRepository.findTopByOrderByIdDesc());
-        NotFoundBoardException e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(INITIAL_VALUE+1));
+        NotFoundBoardException e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(START_ID));
         assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
 
-        for(int i=1;i<=INITIAL_VALUE;i++) {
+        for(int i=1;i<=START_ID;i++) {
             boardWrite("글제목"+i,"글내용"+i,"글쓴이");
         }
 

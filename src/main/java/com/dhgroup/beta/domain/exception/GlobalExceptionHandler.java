@@ -1,4 +1,4 @@
-package com.dhgroup.beta.exception;
+package com.dhgroup.beta.domain.exception;
 
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,4 +18,10 @@ public class GlobalExceptionHandler {
         return map;
     }
 
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public Map<String, String> handleException(IllegalArgumentException e) {
+        Map<String, String> map = new HashMap<>();
+        map.put("msg","NOT_EXIST");
+        return map;
+    }
 }
