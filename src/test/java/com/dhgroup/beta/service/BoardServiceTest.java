@@ -45,13 +45,16 @@ public class BoardServiceTest {
     public void 글_수정() {
         Long id= boardWrite("글제목","글내용","글쓴이");
                 LocalDateTime now = LocalDateTime.now(); //글 수정전
+
+                String writer="글쓴이"; //세션으로부터 얻어온 이름
+
                 BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
                         .title("글제목 수정")
                         .content("글내용 수정")
                         .build();
         //when - 실행
-                boardService.update(id,updateDto); //repositroy 내용 수정
+                boardService.update(id, updateDto); //repositroy 내용 수정
             Board board = boardService.findById(id); //DB에서 수정된 시간을 가져옴
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
@@ -66,6 +69,7 @@ public class BoardServiceTest {
     public void 글수정_실패() {
         Long id= boardWrite("글제목","글내용","글쓴이");
         Long wrongId = id+1;
+        String writer="글쓴이"; //세션으로부터 얻어온 이름
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> boardService.update(wrongId, BoardUpdateDto
                 .builder()
                 .title("글제목 수정")
@@ -81,24 +85,24 @@ public class BoardServiceTest {
         //given
         String writer = "글쓴이"; //session으로 부터 얻어온 이름
         //when
-        boardService.delete(id,writer);
+        boardService.delete(id);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> boardService.findById(id));
         //글을 찾을때 글이 없으면 삭제가 성공한 것
         //then
         assertThat(e.getMessage()).isEqualTo("해당 게시글이 없습니다.");
     }
 
-    @Test
-    public void 글삭제_실패() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
-        //given - 상황
-        String writer = "작성자 아님";
-        //when - 실행
-        boardService.delete(id,writer);
-        //then - 검증, 글이 존재한다면 삭제 실패한 것
-        Board board = boardRepository.findById(id).get();
-        assertThat(board.getWriter()).isEqualTo("글쓴이");
-    }
+//    @Test
+//    public void 글삭제_실패() {
+//        Long id= boardWrite("글제목","글내용","글쓴이");
+//        //given - 상황
+//        String writer = "작성자 아님";
+//        //when - 실행
+//        boardService.delete(id);
+//        //then - 검증, 글이 존재한다면 삭제 실패한 것
+//        Board board = boardRepository.findById(id).get();
+//        assertThat(board.getWriter()).isEqualTo("글쓴이");
+//    }
 
     @Test
     public void 글조회() {
@@ -174,7 +178,7 @@ public class BoardServiceTest {
         //게시글이 아무 것도 없을때
         System.out.println("boardRepository.findTopByOrderByIdDesc() = " + boardRepository.findTopByOrderByIdDesc());
         NotFoundBoardException e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(START_ID));
-        assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
+        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
 
         for(int i=1;i<=START_ID;i++) {
             boardWrite("글제목"+i,"글내용"+i,"글쓴이");
@@ -184,14 +188,17 @@ public class BoardServiceTest {
         e = assertThrows(NotFoundBoardException.class,() ->boardService.viewList(1L));
 
         //then
-        assertThat(e.getMessage()).isEqualTo("마지막 게시글 입니다.");
+        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
     }
 
     public Long boardWrite(String title,String content,String writer) {
-        return boardService.write(BoardPostDto
+        BoardPostDto boardPostDto = BoardPostDto
                 .builder()
                 .title(title)
                 .content(content)
-                .writer(writer).build());
+                .build();
+        boardPostDto.setWriter(writer);
+
+        return boardService.write(boardPostDto);
     }
 }

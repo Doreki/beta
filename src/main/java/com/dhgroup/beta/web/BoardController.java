@@ -7,6 +7,7 @@ import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,24 +27,40 @@ public class BoardController {
         List<BoardResponseDto> posts = boardService.viewList(lastIndex);
         lastIndex = posts.get(posts.size()-1).getId(); //List index가 0부터 시작하기때문
 
-
         Map<String,Object> pageHandler = new HashMap<>();
         pageHandler.put("posts",posts);
         pageHandler.put("total",total);
         pageHandler.put("lastIndex",lastIndex);
         pageHandler.put("limit",posts.size());
 
-
         return pageHandler;
     }
 
     @PostMapping("/api/v1/board")
     public Long write(@RequestBody BoardPostDto boardPostDto) {
+//        String writer = (String)session.getAttribute("name");
+//        boardPostDto.setWriter(writer);
         return boardService.write(boardPostDto);
     }
 
     @PatchMapping("/api/v1/board/{id}")
-    public Long update(@PathVariable Long id,@RequestBody BoardUpdateDto boardUpdateDto) {
-        return boardService.update(id,boardUpdateDto);
+    public void update(@PathVariable Long id,@RequestBody BoardUpdateDto boardUpdateDto) {
+//        String writer = (String)session.getAttribute("name");
+        boardService.update(id,boardUpdateDto);
+    }
+
+    @DeleteMapping("/api/v1/board/{id}")
+    public void delete(@PathVariable Long id) {
+        boardService.delete(id);
+    }
+
+    @PatchMapping("/api/v1/board/like/{id}")
+    public void like(@PathVariable Long id) {
+        boardService.likeIncrease(id);
+    }
+
+    @PatchMapping("/api/v1/board/likeRollback/{id}")
+    public void likeRollback(@PathVariable Long id) {
+        boardService.likeRollback(id);
     }
 }

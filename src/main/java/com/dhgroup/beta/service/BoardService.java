@@ -38,21 +38,20 @@ public class BoardService {
     }
 
     @Transactional
-    public Long update(Long id, BoardUpdateDto boardUpdateDto) {
+    public void update(Long id, BoardUpdateDto boardUpdateDto) {
 
         Board board = findById(id);
+//        if(board.getWriter() == writer)
         board.update(boardUpdateDto.getTitle(),boardUpdateDto.getContent());
         //게시글이 있으면 글 내용을 수정
-        return id;
     }
 
 
     @Transactional //삭제할 게시물이 없을 경우 예외처리해줘야함
-    public Long delete(Long id,String writer) {
+    public void delete(Long id) {
         Board board = findById(id);
-        if(board.getWriter() == writer) //게시글 작성자와 session의 작성자가 똑같다면
+//        if(board.getWriter() == writer) //게시글 작성자와 session의 작성자가 똑같다면
         boardRepository.delete(board);
-        return id;
     }
 
     @Transactional
@@ -63,29 +62,22 @@ public class BoardService {
     }
 
     @Transactional
-    public Integer likeIncrease(Long id) {
+    public void likeIncrease(Long id) {
         Board board = findById(id);
         board.likeIncrease();
-
-        return board.getLikeCnt();
     }
 
     //프론트 단에서 기능 구현해야함
     @Transactional
-    public Integer likeRollback(Long id) {
+    public void likeRollback(Long id) {
         Board board = findById(id);
         board.likeCancle();
-
-        return board.getLikeCnt();
     }
 
     @Transactional
     public List<BoardResponseDto> viewList(Long startId) {
-
-//        Long recentTopId = findRecentBoardId().orElse(0L);
-
         if(startId<=0) {
-            throw new NotFoundBoardException("마지막 게시글 입니다.");
+            throw new NotFoundBoardException("더 이상 불러들일 게시글이 없습니다.");
         }
 
         List<BoardResponseDto> boardList = boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)
@@ -93,7 +85,7 @@ public class BoardService {
         //Board형태의 데이터를 BoardResponseDto로 변환시켜서 List에 담아서 보냄
 
         if(boardList.size()==0)
-            throw new NotFoundBoardException("마지막 게시글 입니다.");
+            throw new NotFoundBoardException("더 이상 불러들일 게시글이 없습니다.");
 
         return boardList;
     }
