@@ -8,11 +8,13 @@ import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @RequiredArgsConstructor
 public class BoardService {
@@ -28,9 +30,6 @@ public class BoardService {
         //DB에서 해당 게시글을 찾아오고 없으면 예외 던짐
         //자주 사용되는 메서드이기 때문에 메서드로 분리
     }
-
-//    @Autowired
-
 
     @Transactional
     public Long write(BoardPostDto boardPostDto) {
