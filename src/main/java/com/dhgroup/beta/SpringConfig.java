@@ -16,11 +16,4 @@ public class SpringConfig {
     BoardService boardService() {
         return new BoardService(boardRepository);
     }
-
-    @Bean
-    Board board() {
-        return new Board();
-    }
-
-
 }
