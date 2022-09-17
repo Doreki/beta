@@ -1,7 +1,6 @@
-package com.dhgroup.beta.repository;
+package com.dhgroup.beta.domain.repository;
 
-import com.dhgroup.beta.web.dto.BoardResponseDto;
-import org.springframework.data.domain.Pageable;
+import com.dhgroup.beta.domain.Board;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

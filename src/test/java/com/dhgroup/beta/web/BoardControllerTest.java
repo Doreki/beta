@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.repository.Board;
-import com.dhgroup.beta.repository.BoardRepository;
+import com.dhgroup.beta.domain.Board;
+import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;

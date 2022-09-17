@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.dto;
 
-import com.dhgroup.beta.repository.Board;
+import com.dhgroup.beta.domain.Board;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,14 +1,13 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.domain.exception.NotFoundBoardException;
-import com.dhgroup.beta.repository.Board;
+import com.dhgroup.beta.exception.NotFoundBoardException;
+import com.dhgroup.beta.domain.Board;
 import com.dhgroup.beta.web.dto.BoardPostDto;
-import com.dhgroup.beta.repository.BoardRepository;
+import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

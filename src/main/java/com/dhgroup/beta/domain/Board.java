@@ -1,4 +1,4 @@
-package com.dhgroup.beta.repository;
+package com.dhgroup.beta.domain;
 
 import com.dhgroup.beta.BaseTimeEntity;
 import lombok.Builder;
@@ -13,7 +13,7 @@ public class Board extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Auto_increment 설정
-    private Long id;
+    private Long board_id;
 
     @Column(nullable = false)
     private String title;

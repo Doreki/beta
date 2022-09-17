@@ -1,11 +1,8 @@
 package com.dhgroup.beta.web.dto;
 
-import com.dhgroup.beta.repository.Board;
-import com.dhgroup.beta.repository.BoardRepository;
-import lombok.Builder;
+import com.dhgroup.beta.domain.Board;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 

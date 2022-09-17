@@ -1,4 +1,4 @@
-package com.dhgroup.beta.domain.exception;
+package com.dhgroup.beta.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

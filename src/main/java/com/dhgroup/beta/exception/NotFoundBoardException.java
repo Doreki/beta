@@ -1,4 +1,4 @@
-package com.dhgroup.beta.domain.exception;
+package com.dhgroup.beta.exception;
 
 public class NotFoundBoardException extends RuntimeException{
     public NotFoundBoardException() {
