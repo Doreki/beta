@@ -13,7 +13,8 @@ public class Board extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Auto_increment 설정
-    private Long board_id;
+    @Column(name = "board_id")
+    private Long id;
 
     @Column(nullable = false)
     private String title;

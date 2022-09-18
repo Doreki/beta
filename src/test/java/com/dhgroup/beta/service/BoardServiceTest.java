@@ -10,6 +10,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.Assert.assertThrows;
 
 @SpringBootTest
+@Transactional
 public class BoardServiceTest {
 
     private final static Integer LIMIT=10; //
@@ -60,9 +62,9 @@ public class BoardServiceTest {
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
         assertThat(boardRepository.findById(id).get().getWriter()).isEqualTo("글쓴이");
-        assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
         System.out.println("now = " + now);
         System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
+        assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
     }
 
     @Test
@@ -92,17 +94,17 @@ public class BoardServiceTest {
         assertThat(e.getMessage()).isEqualTo("해당 게시글이 없습니다.");
     }
 
-//    @Test
-//    public void 글삭제_실패() {
-//        Long id= boardWrite("글제목","글내용","글쓴이");
-//        //given - 상황
-//        String writer = "작성자 아님";
-//        //when - 실행
-//        boardService.delete(id);
-//        //then - 검증, 글이 존재한다면 삭제 실패한 것
-//        Board board = boardRepository.findById(id).get();
-//        assertThat(board.getWriter()).isEqualTo("글쓴이");
-//    }
+    @Test
+    public void 글삭제_실패() {
+        Long id= boardWrite("글제목","글내용","글쓴이");
+        //given - 상황
+        String writer = "작성자 아님";
+        //when - 실행
+        boardService.delete(id);
+        //then - 검증, 글이 존재한다면 삭제 실패한 것
+        Board board = boardRepository.findById(id).get();
+        assertThat(board.getWriter()).isEqualTo("글쓴이");
+    }
 
     @Test
     public void 글조회() {
