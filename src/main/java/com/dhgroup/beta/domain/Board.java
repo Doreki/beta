@@ -36,7 +36,7 @@ public class Board extends BaseTimeEntity {
     private Integer likeCnt;
     private Integer commentCnt;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Comment> commentList = new ArrayList<>();
 
     /*
@@ -47,12 +47,9 @@ public class Board extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.user = user;
-        this.
         likeCnt=0;
         commentCnt=0;
     }
-
-
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {

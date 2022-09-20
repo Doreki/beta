@@ -8,20 +8,21 @@ import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Service
 public class BoardService {
 
     @Autowired
     private final BoardRepository boardRepository;
 
-    @Transactional
     public Board findById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
@@ -46,13 +47,12 @@ public class BoardService {
 
 
     @Transactional //삭제할 게시물이 없을 경우 예외처리해줘야함
-    public void delete(Long id) {
+    public void delete(Long id,String nickName) {
         Board board = findById(id);
-//        if(board.getWriter() == writer) //게시글 작성자와 session의 작성자가 똑같다면
+        if(board.getUser().getNickName() == nickName) //게시글 작성자와 session의 작성자가 똑같다면
         boardRepository.delete(board);
     }
 
-    @Transactional
     public BoardResponseDto read(Long id) {
         Board board = findById(id);
         //Entity의 내용을 Dto에 담는다
@@ -72,7 +72,6 @@ public class BoardService {
         board.likeCancle();
     }
 
-    @Transactional
     public List<BoardResponseDto> viewList(Long startId) {
         if(startId<=0) {
             throw new NotFoundBoardException("더 이상 불러들일 게시글이 없습니다.");
@@ -88,14 +87,12 @@ public class BoardService {
         return boardList;
     }
 
-    @Transactional
     public Optional<Long> findRecentBoardId() {
         Optional<Board> opt = Optional.ofNullable(boardRepository.findTopByOrderByIdDesc());
                 opt.orElseThrow(() -> new NotFoundBoardException("마지막 게시글 입니다."));
         return Optional.of(opt.get().getId()); //null값 반환될 수 있기 때문
     }
 
-    @Transactional
     public Long boardCount() {
         return boardRepository.count();
     }

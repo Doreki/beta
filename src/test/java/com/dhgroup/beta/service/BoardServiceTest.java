@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.User;
 import com.dhgroup.beta.exception.NotFoundBoardException;
 import com.dhgroup.beta.domain.Board;
 import com.dhgroup.beta.domain.repository.BoardRepository;
@@ -24,7 +25,6 @@ public class BoardServiceTest {
 
     private final static Integer LIMIT=10; //
     private final static Long START_ID=11L;
-//    private final static Long START_ID=INITIAL_VALUE+1;
     private final static Long LAST_VALUE=START_ID-LIMIT+1;
     @Autowired
     BoardRepository boardRepository;
@@ -32,20 +32,20 @@ public class BoardServiceTest {
     BoardService boardService;
 
     Long id;
-    @AfterEach
-    public void cleanUp() {
-        boardRepository.deleteAll();
-    }
+//    @AfterEach
+//    public void cleanUp() {
+//        boardRepository.deleteAll();
+//    }
 
     @Test
     public void 글작성() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         assertThat(boardRepository.findById(id).get().getId()).isEqualTo(id);
     }
 
     @Test
     public void 글_수정() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
                 LocalDateTime now = LocalDateTime.now(); //글 수정전
 
                 String writer="글쓴이"; //세션으로부터 얻어온 이름
@@ -61,7 +61,7 @@ public class BoardServiceTest {
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
-        assertThat(boardRepository.findById(id).get().getWriter()).isEqualTo("글쓴이");
+        assertThat(boardRepository.findById(id).get().getUser().getNickName()).isEqualTo("글쓴이");
         System.out.println("now = " + now);
         System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
         assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
@@ -69,7 +69,7 @@ public class BoardServiceTest {
 
     @Test
     public void 글수정_실패() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         Long wrongId = id+1;
         String writer="글쓴이"; //세션으로부터 얻어온 이름
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> boardService.update(wrongId, BoardUpdateDto
@@ -83,11 +83,11 @@ public class BoardServiceTest {
 
     @Test
     public void 글삭제() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         //given
-        String writer = "글쓴이"; //session으로 부터 얻어온 이름
+        String nickName = "글쓴이"; //session으로 부터 얻어온 이름
         //when
-        boardService.delete(id);
+        boardService.delete(id,nickName);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> boardService.findById(id));
         //글을 찾을때 글이 없으면 삭제가 성공한 것
         //then
@@ -96,19 +96,19 @@ public class BoardServiceTest {
 
     @Test
     public void 글삭제_실패() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         //given - 상황
-        String writer = "작성자 아님";
+        String nickName = "작성자 아님";
         //when - 실행
-        boardService.delete(id);
+        boardService.delete(id,nickName);
         //then - 검증, 글이 존재한다면 삭제 실패한 것
         Board board = boardRepository.findById(id).get();
-        assertThat(board.getWriter()).isEqualTo("글쓴이");
+        assertThat(board.getUser().getNickName()).isEqualTo("글쓴이");
     }
 
     @Test
     public void 글조회() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         LocalDateTime now = LocalDateTime.now();
         BoardResponseDto responseDto = boardService.read(id);
         assertThat(responseDto.getTitle()).isEqualTo("글제목");
@@ -117,7 +117,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요버튼() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         //given
         boardService.likeIncrease(id);
         boardService.likeIncrease(id);
@@ -129,7 +129,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요취소() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         //given
         boardService.likeIncrease(id);
         boardService.likeIncrease(id);
@@ -144,7 +144,7 @@ public class BoardServiceTest {
 
     @Test
     public void 좋아요취소실패() {
-        Long id= boardWrite("글제목","글내용","글쓴이");
+        Long id= boardWrite("글제목","글내용");
         boardService.likeRollback(id);
 
         Board board = boardRepository.findById(id).get();
@@ -156,7 +156,7 @@ public class BoardServiceTest {
     public void 글목록불러오기() {
         //given 총 글 11개추가
         for(int i=1;i<=11;i++) {
-        boardWrite("글제목"+i,"글내용"+i,"글쓴이");
+        boardWrite("글제목"+i,"글내용"+i);
         }
 
         //when
@@ -183,7 +183,7 @@ public class BoardServiceTest {
         assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
 
         for(int i=1;i<=START_ID;i++) {
-            boardWrite("글제목"+i,"글내용"+i,"글쓴이");
+            boardWrite("글제목"+i,"글내용"+i);
         }
 
         //when 마지막 게시글을 불러올때
@@ -193,13 +193,25 @@ public class BoardServiceTest {
         assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
     }
 
-    public Long boardWrite(String title,String content,String writer) {
+    public Long boardWrite(String title, String content) {
+        User user = User.builder().nickName("글쓴이").build();
         BoardPostDto boardPostDto = BoardPostDto
                 .builder()
                 .title(title)
                 .content(content)
                 .build();
-        boardPostDto.setWriter(writer);
+        boardPostDto.setUser(user);
+
+        return boardService.write(boardPostDto);
+    }
+
+    public Long boardWrite(String title, String content, User user) {
+        BoardPostDto boardPostDto = BoardPostDto
+                .builder()
+                .title(title)
+                .content(content)
+                .build();
+        boardPostDto.setUser(user);
 
         return boardService.write(boardPostDto);
     }

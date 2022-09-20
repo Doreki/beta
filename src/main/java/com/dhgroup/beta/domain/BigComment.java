@@ -1,5 +1,6 @@
 package com.dhgroup.beta.domain;
 
+import com.dhgroup.beta.BaseTimeEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @Entity
-public class BigComment {
+public class BigComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

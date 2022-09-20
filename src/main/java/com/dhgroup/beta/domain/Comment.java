@@ -1,5 +1,7 @@
 package com.dhgroup.beta.domain;
 
+import com.dhgroup.beta.BaseTimeEntity;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -11,7 +13,7 @@ import static javax.persistence.FetchType.*;
 
 @Getter
 @Entity
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,4 +29,10 @@ public class Comment {
 
     @OneToMany(mappedBy = "comment")
     private List<BigComment> bigCommentList = new ArrayList<>();
+
+    @Builder
+    public Comment(String content, Board board) {
+        this.content = content;
+        this.board = board;
+    }
 }

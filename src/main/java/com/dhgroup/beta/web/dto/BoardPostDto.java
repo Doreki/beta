@@ -1,28 +1,29 @@
 package com.dhgroup.beta.web.dto;
 
 import com.dhgroup.beta.domain.Board;
+import com.dhgroup.beta.domain.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class BoardPostDto {
     private String title;
     private String content;
-    private String writer;
+    private User user;
 
     @Builder
-    public BoardPostDto(String title, String content,String writer) {
+    public BoardPostDto(String title, String content) {
         this.title = title;
         this.content = content;
-        this.writer = writer;
     }
     //생성자를 통해 writer를 주입 못하도록 차단, session값을 통해서만 writer를 얻어오기 위함
-    public void setWriter(String writer) {
-        this.writer = writer;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /*
@@ -32,29 +33,8 @@ public class BoardPostDto {
         return Board.builder()
                 .title(title)
                 .content(content)
-                .writer(writer)
+                .user(user)
                 .build();
     }
 
-    @Override
-    public String toString() {
-        return "BoardPostDto{" +
-                "title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", writer='" + writer + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BoardPostDto that = (BoardPostDto) o;
-        return Objects.equals(title, that.title) && Objects.equals(content, that.content) && Objects.equals(writer, that.writer);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(title, content, writer);
-    }
 }

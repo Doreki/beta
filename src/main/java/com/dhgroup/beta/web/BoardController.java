@@ -57,8 +57,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/api/v1/board/{id}")
-    public void delete(@PathVariable Long id) {
-        boardService.delete(id);
+    public void delete(@PathVariable Long id,HttpSession session) {
+        String nickName = (String)session.getAttribute("nickName");
+        boardService.delete(id,nickName);
     }
 
     @PatchMapping("/api/v1/board/like/{id}")
