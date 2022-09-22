@@ -105,7 +105,7 @@ public class BoardControllerTest {
         //then
         assertThat(findPost.getTitle()).isEqualTo(title);
         assertThat(findPost.getContent()).isEqualTo(content);
-        assertThat(findPost.getUser().getNickName()).isEqualTo(writer);
+        assertThat(findPost.getUser().getNickname()).isEqualTo(writer);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class BoardControllerTest {
         //then
         assertThat(findPost.getTitle()).isEqualTo(updatedTitle);
         assertThat(findPost.getContent()).isEqualTo(updatedContent);
-        assertThat(findPost.getUser().getNickName()).isEqualTo(writer);
+        assertThat(findPost.getUser().getNickname()).isEqualTo(writer);
     }
 
     @Test

@@ -51,11 +51,17 @@ public class Board extends BaseTimeEntity {
         likeCnt=0;
         commentCnt=0;
     }
+
+    //연관관계 메서드
     public void setUser(User user) {
+
+        if(this.user != null) {
+            this.user.getBoardList().remove(this);
+        }
         this.user = user;
         user.getBoardList().add(this); //board 객체가 생성될때 user 객체에 주입
     }
-//연관관계 메서드
+
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {

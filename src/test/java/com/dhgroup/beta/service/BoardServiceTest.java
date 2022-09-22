@@ -65,7 +65,7 @@ public class BoardServiceTest {
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
-        assertThat(boardRepository.findById(id).get().getUser().getNickName()).isEqualTo("글쓴이");
+        assertThat(boardRepository.findById(id).get().getUser().getNickname()).isEqualTo("글쓴이");
         System.out.println("now = " + now);
         System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
         assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
@@ -107,7 +107,7 @@ public class BoardServiceTest {
         boardService.delete(id,nickName);
         //then - 검증, 글이 존재한다면 삭제 실패한 것
         Board board = boardRepository.findById(id).get();
-        assertThat(board.getUser().getNickName()).isEqualTo("글쓴이");
+        assertThat(board.getUser().getNickname()).isEqualTo("글쓴이");
     }
 
     @Test

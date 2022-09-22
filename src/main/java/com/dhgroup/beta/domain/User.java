@@ -20,21 +20,18 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
-
-    private String img_file;
+    private String googleId;
 
     @Column(nullable = false)
-    private String nickName;
+    private String nickname;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();
 
     @Builder
-    public User(Long id, String name, String img_file,String nickName) {
+    public User(Long id, String googleId, String nickName) {
         this.id = id;
-        this.name = name;
-        this.img_file = img_file;
-        this.nickName = nickName;
+        this.googleId = googleId;
+        this.nickname = nickName;
     }
 }

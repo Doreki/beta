@@ -41,7 +41,7 @@ public class BoardRepositoryTest {
         Board board = boardList.get(0);
         assertThat(board.getTitle()).isEqualTo(title);
         assertThat(board.getContent()).isEqualTo(content);
-        assertThat(board.getUser().getNickName()).isEqualTo(writer);
+        assertThat(board.getUser().getNickname()).isEqualTo(writer);
     }
 
     @Test
