@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.domain.User;
 import com.dhgroup.beta.service.BoardService;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
@@ -44,9 +45,9 @@ public class BoardController {
     }
 
     @PostMapping("/api/v1/board")
-    public Long write(@RequestBody BoardPostDto boardPostDto) {
-//        String writer = (String)session.getAttribute("name");
-//        boardPostDto.setWriter(writer);
+    public Long write(@RequestBody BoardPostDto boardPostDto,HttpSession session) {
+        User nickName = (User)session.getAttribute("nickName");
+        boardPostDto.setUser(nickName);
         return boardService.write(boardPostDto);
     }
 

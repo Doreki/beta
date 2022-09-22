@@ -1,6 +1,7 @@
 package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.User;
+import com.dhgroup.beta.domain.repository.UserRepository;
 import com.dhgroup.beta.exception.NotFoundBoardException;
 import com.dhgroup.beta.domain.Board;
 import com.dhgroup.beta.domain.repository.BoardRepository;
@@ -28,6 +29,9 @@ public class BoardServiceTest {
     private final static Long LAST_VALUE=START_ID-LIMIT+1;
     @Autowired
     BoardRepository boardRepository;
+
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     BoardService boardService;
 
@@ -156,7 +160,8 @@ public class BoardServiceTest {
     public void 글목록불러오기() {
         //given 총 글 11개추가
         for(int i=1;i<=11;i++) {
-        boardWrite("글제목"+i,"글내용"+i);
+            User user = User.builder().nickName("글쓴이"+i).build();
+        boardWrite("글제목"+i,"글내용"+i,user);
         }
 
         //when
@@ -195,6 +200,7 @@ public class BoardServiceTest {
 
     public Long boardWrite(String title, String content) {
         User user = User.builder().nickName("글쓴이").build();
+
         BoardPostDto boardPostDto = BoardPostDto
                 .builder()
                 .title(title)

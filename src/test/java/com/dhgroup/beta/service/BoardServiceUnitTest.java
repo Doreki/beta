@@ -2,7 +2,9 @@
 //import static org.junit.Assert.assertNotNull;
 //import static org.mockito.BDDMockito.*;
 //
+//import com.dhgroup.beta.domain.Board;
 //import com.dhgroup.beta.domain.exception.NotFoundBoardException;
+//import com.dhgroup.beta.domain.repository.BoardRepository;
 //import com.dhgroup.beta.repository.Board;
 //import com.dhgroup.beta.repository.BoardRepository;
 //import com.dhgroup.beta.web.dto.BoardPostDto;

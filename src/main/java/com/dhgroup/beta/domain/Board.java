@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -46,10 +47,15 @@ public class Board extends BaseTimeEntity {
     public Board(String title, String content, User user) {
         this.title = title;
         this.content = content;
-        this.user = user;
+        setUser(user);
         likeCnt=0;
         commentCnt=0;
     }
+    public void setUser(User user) {
+        this.user = user;
+        user.getBoardList().add(this); //board 객체가 생성될때 user 객체에 주입
+    }
+//연관관계 메서드
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {
@@ -65,5 +71,6 @@ public class Board extends BaseTimeEntity {
         if(likeCnt>0)
            this.likeCnt = likeCnt-1;
     }
+
 
 }
