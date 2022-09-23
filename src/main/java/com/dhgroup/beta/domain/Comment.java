@@ -49,4 +49,11 @@ public class Comment extends BaseTimeEntity {
         this.board = board;
         board.getCommentList().add(this); //board 객체가 생성될때 user 객체에 주입
     }
+
+    public void addBigComment(BigComment bigComment) {
+        this.bigCommentList.add(bigComment);
+        if(bigComment.getComment() !=this) {
+            bigComment.setComment(this);
+        }
+    }
 }

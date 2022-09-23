@@ -34,4 +34,11 @@ public class User extends BaseTimeEntity {
         this.googleId = googleId;
         this.nickname = nickName;
     }
+
+    public void addBoard(Board board) {
+        this.boardList.add(board);
+        if (board.getUser() != this) {
+            board.setUser(this);
+        }
+    }
 }

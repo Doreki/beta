@@ -62,6 +62,13 @@ public class Board extends BaseTimeEntity {
         user.getBoardList().add(this); //board 객체가 생성될때 user 객체에 주입
     }
 
+    public void addComment(Comment comment) {
+        this.commentList.add(comment);
+        if (comment.getBoard() != this) {
+            comment.setBoard(this);
+        }
+
+    }
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {
