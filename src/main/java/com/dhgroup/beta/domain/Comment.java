@@ -1,8 +1,10 @@
 package com.dhgroup.beta.domain;
 
 import com.dhgroup.beta.BaseTimeEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -11,6 +13,7 @@ import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Comment extends BaseTimeEntity {

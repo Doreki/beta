@@ -12,6 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(
+        name = "google_id_nickname_unique",
+        columnNames = {"google_id", "nickname"} )})
 public class User extends BaseTimeEntity {
 
     @Id //pk
@@ -19,10 +22,10 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name="google_id")
     private String googleId;
 
-    @Column(nullable = false)
+    @Column(nullable = false,name="nickname")
     private String nickname;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

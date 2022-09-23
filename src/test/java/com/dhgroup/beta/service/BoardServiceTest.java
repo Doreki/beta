@@ -8,7 +8,6 @@ import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +49,7 @@ public class BoardServiceTest {
     @Test
     public void 글_수정() {
         Long id= boardWrite("글제목","글내용");
-                LocalDateTime now = LocalDateTime.now(); //글 수정전
+                LocalDateTime before = LocalDateTime.now(); //글 수정전
 
                 String writer="글쓴이"; //세션으로부터 얻어온 이름
 
@@ -66,9 +65,10 @@ public class BoardServiceTest {
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
         assertThat(boardRepository.findById(id).get().getUser().getNickname()).isEqualTo("글쓴이");
-        System.out.println("now = " + now);
         System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
-        assertThat(board.getModifiedDate()).isAfter(now); //글 수정 후에 수정시간이 바꼈는지 확인
+        System.out.println("before = " + before);
+        System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
+        assertThat(board.getModifiedDate()).isAfter(before); //글 수정 후에 수정시간이 바꼈는지 확인
     }
 
     @Test
@@ -164,6 +164,8 @@ public class BoardServiceTest {
         boardWrite("글제목"+i,"글내용"+i,user);
         }
 
+        //데이터를 select 하기전에 영속화를 시켜줘야함
+        boardRepository.flush();
         //when
         List<BoardResponseDto> boardList = boardService.viewList(START_ID);
         BoardResponseDto firstBoard = boardList.get(0);

@@ -33,13 +33,4 @@ public class BoardResponseDto {
         this.commentCnt = board.getCommentCnt();
         this.createdDate = board.getCreatedDate();
     }
-    public BoardResponseDto(Long id, String title, String content, String writer, Integer likeCnt, Integer commentCnt, LocalDateTime createdDate) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.writer = writer;
-        this.likeCnt = likeCnt;
-        this.commentCnt = commentCnt;
-        this.createdDate = createdDate;
-    }
 }
