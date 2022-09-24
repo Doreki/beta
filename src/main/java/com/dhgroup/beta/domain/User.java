@@ -1,6 +1,7 @@
 package com.dhgroup.beta.domain;
 
 import com.dhgroup.beta.BaseTimeEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,20 +10,17 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(
-        name = "google_id_nickname_unique",
-        columnNames = {"google_id", "nickname"} )})
-public class User extends BaseTimeEntity {
+public class User{
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false,name="google_id")
+    @Column(unique = true,nullable = false,name="google_id")
     private String googleId;
 
     @Column(nullable = false,name="nickname")
@@ -32,8 +30,7 @@ public class User extends BaseTimeEntity {
     private List<Board> boardList = new ArrayList<>();
 
     @Builder
-    public User(Long id, String googleId, String nickName) {
-        this.id = id;
+    public User(String googleId, String nickName) {
         this.googleId = googleId;
         this.nickname = nickName;
     }

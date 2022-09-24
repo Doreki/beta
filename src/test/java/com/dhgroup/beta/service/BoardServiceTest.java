@@ -8,6 +8,7 @@ import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,8 +52,6 @@ public class BoardServiceTest {
         Long id= boardWrite("글제목","글내용");
                 LocalDateTime before = LocalDateTime.now(); //글 수정전
 
-                String writer="글쓴이"; //세션으로부터 얻어온 이름
-
                 BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
                         .title("글제목 수정")
@@ -60,22 +59,39 @@ public class BoardServiceTest {
                         .build();
         //when - 실행
                 boardService.update(id, updateDto); //repositroy 내용 수정
-            Board board = boardService.findById(id); //DB에서 수정된 시간을 가져옴
+            Board board = boardService.findById(id); //DB에서 수정된 객체를 가져옴
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
         assertThat(boardRepository.findById(id).get().getUser().getNickname()).isEqualTo("글쓴이");
-        System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
-        System.out.println("before = " + before);
-        System.out.println("board.getModifiedDate() = " + board.getModifiedDate());
-        assertThat(board.getModifiedDate()).isAfter(before); //글 수정 후에 수정시간이 바꼈는지 확인
+
+    }
+
+    @Test
+     public void 글수정_시간() throws Exception{
+        //given
+        Long id= boardWrite("글제목","글내용");
+        Board board = boardService.findById(id);
+        LocalDateTime createdDate = board.getCreatedDate(); //게시글 날짜
+
+        //when
+        BoardUpdateDto updateDto = BoardUpdateDto
+                .builder()
+                .title("글제목 수정")
+                .content("글내용 수정")
+                .build();
+        //then
+        boardService.update(id, updateDto); //repositroy 내용 수정
+        board = boardService.findById(id); //수정된 게시글
+        LocalDateTime modifiedDate = board.getModifiedDate();
+
+        assertThat(modifiedDate).isAfter(createdDate); //글 수정 후에 수정시간이 바꼈는지 확인
     }
 
     @Test
     public void 글수정_실패() {
         Long id= boardWrite("글제목","글내용");
         Long wrongId = id+1;
-        String writer="글쓴이"; //세션으로부터 얻어온 이름
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> boardService.update(wrongId, BoardUpdateDto
                 .builder()
                 .title("글제목 수정")
@@ -160,12 +176,12 @@ public class BoardServiceTest {
     public void 글목록불러오기() {
         //given 총 글 11개추가
         for(int i=1;i<=11;i++) {
-            User user = User.builder().nickName("글쓴이"+i).build();
+            User user = User.builder().googleId("1").nickName("글쓴이").build();
+            userRepository.save(user);
+
         boardWrite("글제목"+i,"글내용"+i,user);
         }
 
-        //데이터를 select 하기전에 영속화를 시켜줘야함
-        boardRepository.flush();
         //when
         List<BoardResponseDto> boardList = boardService.viewList(START_ID);
         BoardResponseDto firstBoard = boardList.get(0);
@@ -183,6 +199,9 @@ public class BoardServiceTest {
 
     @Test
     public void 글목록불러오기_마지막_페이지() {
+        User user = User.builder().googleId("1").nickName("글쓴이").build();
+        userRepository.save(user);
+
         //given
         //게시글이 아무 것도 없을때
         System.out.println("boardRepository.findTopByOrderByIdDesc() = " + boardRepository.findTopByOrderByIdDesc());
@@ -190,7 +209,7 @@ public class BoardServiceTest {
         assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
 
         for(int i=1;i<=START_ID;i++) {
-            boardWrite("글제목"+i,"글내용"+i);
+            boardWrite("글제목"+i,"글내용"+i,user);
         }
 
         //when 마지막 게시글을 불러올때
@@ -213,14 +232,24 @@ public class BoardServiceTest {
         return boardService.write(boardPostDto);
     }
 
-    public Long boardWrite(String title, String content, User user) {
-        BoardPostDto boardPostDto = BoardPostDto
+    public Board boardWrite(String title, String content, User user) {
+        Board board = Board
                 .builder()
                 .title(title)
                 .content(content)
                 .build();
-        boardPostDto.setUser(user);
+        board.setUser(user);
 
-        return boardService.write(boardPostDto);
+        return boardRepository.save(board);
+    }
+
+    @Test
+     public void 테스트() throws Exception{
+        //given
+        User user = User.builder().googleId("1").nickName("글쓴이").build();
+        userRepository.save(user);
+        //when
+
+        //then
     }
 }
