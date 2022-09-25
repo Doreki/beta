@@ -1,9 +1,8 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.domain.User;
-import com.dhgroup.beta.domain.repository.UserRepository;
-import com.dhgroup.beta.web.dto.UserCreateDto;
-import org.assertj.core.api.Assertions;
+import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.web.dto.MemberCreateDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,33 +10,32 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
 
 @Transactional
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class MemberServiceTest {
 
     @Mock
-    UserRepository userRepository;
+    MemberRepository memberRepository;
 
     @InjectMocks
-    UserService userService;
+    MemberService memberService;
 
     @Test
      public void 회원가입() throws Exception{
-        User user = createUser();
+        Member Member = createMember();
         //given
-        given(userRepository.save(any(User.class))).willReturn(user);
+        given(memberRepository.save(any(Member.class))).willReturn(Member);
         //when
-        userService.signUp(new UserCreateDto("1", "글쓴이"));
+        memberService.signUp(new MemberCreateDto("1", "글쓴이"));
         //then
-        verify(userRepository).save(any(User.class));
+        verify(memberRepository).save(any(Member.class));
     }
 
-    private static User createUser() {
-        return User.builder()
+    private static Member createMember() {
+        return Member.builder()
                 .googleId("1")
                 .nickName("글쓴이")
                 .build();

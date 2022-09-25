@@ -3,7 +3,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.*;
 
 import com.dhgroup.beta.domain.Board;
-import com.dhgroup.beta.domain.User;
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import org.junit.jupiter.api.Test;
@@ -31,12 +31,12 @@ public class BoardServiceUnitTest {
 //    @Test
 //    public void 글작성() {
 //
-//        User user = User.builder().nickName("글쓴이").build();
-//        given().willReturn(user);
+//        Member member = Member.builder().nickName("글쓴이").build();
+//        given().willReturn(member);
 //        Board board = Board.builder()
 //                .title("글제목")
 //                .content("글내용")
-//                .user()
+//                .member()
 //                .build();
 //
 //        given(boardRepository.save(boardPostDto.toEntity())).willReturn(1L);
@@ -73,11 +73,11 @@ public class BoardServiceUnitTest {
 
         Long startId = 5L;
         List<Board> boards = new ArrayList<>();
-        User user = createUser("글쓴이", "1");
+        Member member = createMember("글쓴이", "1");
 
         //게시글 생성
         for (int i = 0; i < 5; i++) {
-            Board board = createBoard(user, "글제목", "글내용");
+            Board board = createBoard(member, "글제목", "글내용");
             boards.add(board);
         }
         given(boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)).willReturn(boards);
@@ -90,11 +90,11 @@ public class BoardServiceUnitTest {
     }
 
 
-    private static Board createBoard(User user, String title, String content) {
-        return Board.builder().title(title).content(content).user(user).build();
+    private static Board createBoard(Member member, String title, String content) {
+        return Board.builder().title(title).content(content).member(member).build();
     }
 
-    private static User createUser(String nickName, String googleId) {
-        return User.builder().nickName(nickName).googleId(googleId).build();
+    private static Member createMember(String nickName, String googleId) {
+        return Member.builder().nickName(nickName).googleId(googleId).build();
     }
 }

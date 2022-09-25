@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web.dto;
 
 import com.dhgroup.beta.domain.Board;
-import com.dhgroup.beta.domain.User;
+import com.dhgroup.beta.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,16 +14,13 @@ import java.util.Objects;
 public class BoardPostDto {
     private String title;
     private String content;
-    private User user;
+    private Member member;
 
     @Builder
-    public BoardPostDto(String title, String content) {
+    public BoardPostDto(String title, String content, Member member) {
         this.title = title;
         this.content = content;
-    }
-    //생성자를 통해 writer를 주입 못하도록 차단, session값을 통해서만 writer를 얻어오기 위함
-    public void setUser(User user) {
-        this.user = user;
+        this.member = member;
     }
 
     /*
@@ -33,7 +30,7 @@ public class BoardPostDto {
         return Board.builder()
                 .title(title)
                 .content(content)
-                .user(user)
+                .member(member)
                 .build();
     }
 

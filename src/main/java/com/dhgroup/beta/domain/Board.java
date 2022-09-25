@@ -31,8 +31,8 @@ public class Board extends BaseTimeEntity {
     private String content;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "Member_id")
+    private Member member;
 
     private Integer likeCnt;
     private Integer commentCnt;
@@ -44,22 +44,22 @@ public class Board extends BaseTimeEntity {
     id는 자동생성,likeCnt,commentCnt는 메서드로 값 주입예정;
      */
     @Builder
-    public Board(String title, String content, User user) {
+    public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
-        setUser(user);
+        setMember(member);
         likeCnt=0;
         commentCnt=0;
     }
 
     //연관관계 메서드
-    public void setUser(User user) {
+    public void setMember(Member member) {
 
-        if(this.user != null) {
-            this.user.getBoardList().remove(this);
+        if(this.member != null) {
+            this.member.getBoardList().remove(this);
         }
-        this.user = user;
-        user.getBoardList().add(this); //board 객체가 생성될때 user 객체에 주입
+        this.member = member;
+        member.getBoardList().add(this); //board 객체가 생성될때 Member 객체에 주입
     }
 
     public void addComment(Comment comment) {

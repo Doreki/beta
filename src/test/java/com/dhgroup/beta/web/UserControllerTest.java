@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.service.UserService;
-import com.dhgroup.beta.web.dto.UserCreateDto;
+import com.dhgroup.beta.service.MemberService;
+import com.dhgroup.beta.web.dto.MemberCreateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -26,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTest {
 
     @Mock
-    private UserService userService;
+    private MemberService memberService;
 
     @InjectMocks
     private UserController userController;
@@ -41,20 +40,20 @@ public class UserControllerTest {
 
     @Test
      public void 회원가입() throws Exception{
-        UserCreateDto userCreateDto = getUserCreateDto();
+        MemberCreateDto memberCreateDto = getUserCreateDto();
         //given
         String url = "/api/v1/user/1h2g2yysh297h2s";
         //when
         ResultActions resultActions = mockMvc.perform(
                         MockMvcRequestBuilders.post(url)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(userCreateDto)))
+                                .content(new ObjectMapper().writeValueAsString(memberCreateDto)))
                 .andExpect(status().isOk());
         //then
-        verify(userService).signUp(any(UserCreateDto.class));
+        verify(memberService).signUp(any(MemberCreateDto.class));
     }
 
-    private static UserCreateDto getUserCreateDto() {
-        return new UserCreateDto("1", "글쓴이");
+    private static MemberCreateDto getUserCreateDto() {
+        return new MemberCreateDto("1", "글쓴이");
     }
 }

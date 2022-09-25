@@ -1,7 +1,7 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.domain.User;
-import com.dhgroup.beta.domain.repository.UserRepository;
+import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotFoundBoardException;
 import com.dhgroup.beta.domain.Board;
 import com.dhgroup.beta.domain.repository.BoardRepository;
@@ -10,8 +10,11 @@ import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -31,7 +34,7 @@ public class BoardServiceTest {
     BoardRepository boardRepository;
 
     @Autowired
-    UserRepository userRepository;
+    MemberRepository memberRepository;
     @Autowired
     BoardService boardService;
 
@@ -63,7 +66,7 @@ public class BoardServiceTest {
         //then - 검증
         assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
         assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
-        assertThat(boardRepository.findById(id).get().getUser().getNickname()).isEqualTo("글쓴이");
+        assertThat(boardRepository.findById(id).get().getMember().getNickname()).isEqualTo("글쓴이");
 
     }
 
@@ -123,7 +126,7 @@ public class BoardServiceTest {
         boardService.delete(id,nickName);
         //then - 검증, 글이 존재한다면 삭제 실패한 것
         Board board = boardRepository.findById(id).get();
-        assertThat(board.getUser().getNickname()).isEqualTo("글쓴이");
+        assertThat(board.getMember().getNickname()).isEqualTo("글쓴이");
     }
 
     @Test
@@ -176,10 +179,10 @@ public class BoardServiceTest {
     public void 글목록불러오기() {
         //given 총 글 11개추가
         for(int i=1;i<=11;i++) {
-            User user = User.builder().googleId("1").nickName("글쓴이").build();
-            userRepository.save(user);
+            Member member = Member.builder().googleId(""+i).nickName("글쓴이").build();
+            memberRepository.save(member);
 
-        boardWrite("글제목"+i,"글내용"+i,user);
+        boardWrite("글제목"+i,"글내용"+i,member);
         }
 
         //when
@@ -199,8 +202,8 @@ public class BoardServiceTest {
 
     @Test
     public void 글목록불러오기_마지막_페이지() {
-        User user = User.builder().googleId("1").nickName("글쓴이").build();
-        userRepository.save(user);
+        Member member = Member.builder().googleId("1").nickName("글쓴이").build();
+        memberRepository.save(member);
 
         //given
         //게시글이 아무 것도 없을때
@@ -209,7 +212,7 @@ public class BoardServiceTest {
         assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
 
         for(int i=1;i<=START_ID;i++) {
-            boardWrite("글제목"+i,"글내용"+i,user);
+            boardWrite("글제목"+i,"글내용"+i,member);
         }
 
         //when 마지막 게시글을 불러올때
@@ -220,36 +223,27 @@ public class BoardServiceTest {
     }
 
     public Long boardWrite(String title, String content) {
-        User user = User.builder().nickName("글쓴이").build();
+        Member member = Member.builder().nickName("글쓴이").build();
 
-        BoardPostDto boardPostDto = BoardPostDto
-                .builder()
-                .title(title)
-                .content(content)
-                .build();
-        boardPostDto.setUser(user);
-
-        return boardService.write(boardPostDto);
-    }
-
-    public Board boardWrite(String title, String content, User user) {
         Board board = Board
                 .builder()
                 .title(title)
                 .content(content)
+                .member(member)
                 .build();
-        board.setUser(user);
 
-        return boardRepository.save(board);
+        return boardRepository.save(board).getId();
     }
 
-    @Test
-     public void 테스트() throws Exception{
-        //given
-        User user = User.builder().googleId("1").nickName("글쓴이").build();
-        userRepository.save(user);
-        //when
+    public Board boardWrite(String title, String content, Member member) {
+        Board board = Board
+                .builder()
+                .title(title)
+                .content(content)
+                .member(member)
+                .build();
+//        board.setMember(member);
 
-        //then
+        return boardRepository.save(board);
     }
 }

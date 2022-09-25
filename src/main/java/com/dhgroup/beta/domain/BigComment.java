@@ -27,13 +27,13 @@ public class BigComment extends BaseTimeEntity {
     private Comment comment;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
-    public BigComment(String content, Comment comment, User user) {
+    public BigComment(String content, Comment comment, Member member) {
         this.content = content;
-        this.user = user;
+        this.member = member;
         setComment(comment);
     }
 

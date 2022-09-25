@@ -13,11 +13,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class User{
+@Table(name = "member")
+public class Member extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "member_id")
     private Long id;
 
     @Column(unique = true,nullable = false,name="google_id")
@@ -26,19 +27,19 @@ public class User{
     @Column(nullable = false,name="nickname")
     private String nickname;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();
 
     @Builder
-    public User(String googleId, String nickName) {
+    public Member(String googleId, String nickName) {
         this.googleId = googleId;
         this.nickname = nickName;
     }
 
     public void addBoard(Board board) {
         this.boardList.add(board);
-        if (board.getUser() != this) {
-            board.setUser(this);
+        if (board.getMember() != this) {
+            board.setMember(this);
         }
     }
 }

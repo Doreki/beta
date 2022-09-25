@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Board;
-import com.dhgroup.beta.domain.User;
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.BoardRepository;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
@@ -105,7 +105,7 @@ public class BoardControllerTest {
         //then
         assertThat(findPost.getTitle()).isEqualTo(title);
         assertThat(findPost.getContent()).isEqualTo(content);
-        assertThat(findPost.getUser().getNickname()).isEqualTo(writer);
+        assertThat(findPost.getMember().getNickname()).isEqualTo(writer);
     }
 
     @Test
@@ -139,7 +139,7 @@ public class BoardControllerTest {
         //then
         assertThat(findPost.getTitle()).isEqualTo(updatedTitle);
         assertThat(findPost.getContent()).isEqualTo(updatedContent);
-        assertThat(findPost.getUser().getNickname()).isEqualTo(writer);
+        assertThat(findPost.getMember().getNickname()).isEqualTo(writer);
     }
 
     @Test
@@ -218,13 +218,13 @@ public class BoardControllerTest {
     private void boardWrite(String title,String writer, String content) throws Exception {
         String url = "http://localhost:" + port + "/api/v1/board";
 
-        User user = User.builder().nickName(writer).build();
+        Member member = Member.builder().nickName(writer).build();
         BoardPostDto postDto = BoardPostDto.builder()
                 .title(title)
                 .content(content)
+                .member(member)
                 .build();
 
-        postDto.setUser(user);
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(postDto)))

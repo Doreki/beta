@@ -31,16 +31,16 @@ public class Comment extends BaseTimeEntity {
     private Board board;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToMany(mappedBy = "comment")
     private List<BigComment> bigCommentList = new ArrayList<>();
 
     @Builder
-    public Comment(String content, Board board, User user) {
+    public Comment(String content, Board board, Member member) {
         this.content = content;
-        this.user = user;
+        this.member = member;
         setBoard(board);
     }
 
@@ -50,7 +50,7 @@ public class Comment extends BaseTimeEntity {
             this.board.getCommentList().remove(this);
         }
         this.board = board;
-        board.getCommentList().add(this); //board 객체가 생성될때 user 객체에 주입
+        board.getCommentList().add(this); //board 객체가 생성될때 member 객체에 주입
     }
 
     public void addBigComment(BigComment bigComment) {

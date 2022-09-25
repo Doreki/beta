@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Board;
-import com.dhgroup.beta.domain.User;
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.service.BoardService;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,16 +55,16 @@ public class BoardControllerUnitTest {
     @Test
     public void 글작성() throws Exception{
         BoardPostDto boardPostDto = createBoardPostDto("글제목","글내용");
-        User user = createUser("글쓴이");
+        Member member = createMember("1","글쓴이");
 
-        given(httpSession.getAttribute("nickName")).willReturn(user);
+//        given(httpSession.getAttribute("nickName")).willReturn(member);
         given(boardService.write(any(BoardPostDto.class))).willReturn(1L);
 
         ResultActions resultActions = mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/v1/board")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(boardPostDto))
-                        .content(new ObjectMapper().writeValueAsString(httpSession)))
+                        .content(new ObjectMapper().writeValueAsString(boardPostDto)))
+//                        .content(new ObjectMapper().writeValueAsString(httpSession)))
                         .andExpect(status().isOk());
 
 //        verify(boardService).write(boardPostDto);
@@ -100,8 +100,8 @@ public class BoardControllerUnitTest {
         verify(boardService).likeRollback(1L);
     }
 
-    private static User createUser(String nickName) {
-        return User.builder().nickName(nickName).build();
+    private static Member createMember(String googleId,String nickName) {
+        return Member.builder().googleId(googleId).nickName(nickName).build();
     }
 
     private BoardPostDto createBoardPostDto(String title, String content) {

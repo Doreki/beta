@@ -49,7 +49,7 @@ public class BoardService {
     @Transactional //삭제할 게시물이 없을 경우 예외처리해줘야함
     public void delete(Long id,String nickName) {
         Board board = findById(id);
-        if(board.getUser().getNickname() == nickName) //게시글 작성자와 session의 작성자가 똑같다면
+        if(board.getMember().getNickname() == nickName) //게시글 작성자와 session의 작성자가 똑같다면
         boardRepository.delete(board);
     }
 
