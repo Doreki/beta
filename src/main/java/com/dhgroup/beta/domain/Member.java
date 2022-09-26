@@ -27,8 +27,6 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,name="nickname")
     private String nickname;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Board> boardList = new ArrayList<>();
 
     @Builder
     public Member(String googleId, String nickName) {
@@ -36,10 +34,4 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickName;
     }
 
-    public void addBoard(Board board) {
-        this.boardList.add(board);
-        if (board.getMember() != this) {
-            board.setMember(this);
-        }
-    }
 }

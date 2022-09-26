@@ -37,8 +37,6 @@ public class Board extends BaseTimeEntity {
     private Integer likeCnt;
     private Integer commentCnt;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
-    private List<Comment> commentList = new ArrayList<>();
 
     /*
     id는 자동생성,likeCnt,commentCnt는 메서드로 값 주입예정;
@@ -47,27 +45,9 @@ public class Board extends BaseTimeEntity {
     public Board(String title, String content, Member member) {
         this.title = title;
         this.content = content;
-        setMember(member);
+        this.member = member;
         likeCnt=0;
         commentCnt=0;
-    }
-
-    //연관관계 메서드
-    public void setMember(Member member) {
-
-        if(this.member != null) {
-            this.member.getBoardList().remove(this);
-        }
-        this.member = member;
-        member.getBoardList().add(this); //board 객체가 생성될때 Member 객체에 주입
-    }
-
-    public void addComment(Comment comment) {
-        this.commentList.add(comment);
-        if (comment.getBoard() != this) {
-            comment.setBoard(this);
-        }
-
     }
 
     //updateDto에서 받은 내용으로 글을 수정해줌
@@ -84,6 +64,4 @@ public class Board extends BaseTimeEntity {
         if(likeCnt>0)
            this.likeCnt = likeCnt-1;
     }
-
-
 }

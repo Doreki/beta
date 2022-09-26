@@ -34,29 +34,11 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "comment")
-    private List<BigComment> bigCommentList = new ArrayList<>();
 
     @Builder
     public Comment(String content, Board board, Member member) {
         this.content = content;
         this.member = member;
-        setBoard(board);
-    }
-
-    //연관관계 편의 메서드
-    public void setBoard(Board board) {
-        if(this.board != null) {
-            this.board.getCommentList().remove(this);
-        }
         this.board = board;
-        board.getCommentList().add(this); //board 객체가 생성될때 member 객체에 주입
-    }
-
-    public void addBigComment(BigComment bigComment) {
-        this.bigCommentList.add(bigComment);
-        if(bigComment.getComment() !=this) {
-            bigComment.setComment(this);
-        }
     }
 }

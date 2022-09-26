@@ -34,14 +34,6 @@ public class BigComment extends BaseTimeEntity {
     public BigComment(String content, Comment comment, Member member) {
         this.content = content;
         this.member = member;
-        setComment(comment);
-    }
-
-    public void setComment(Comment comment) {
-        if(this.comment != null) {
-            this.comment.getBigCommentList().remove(this);
-        }
         this.comment = comment;
-        comment.getBigCommentList().add(this);
     }
 }
