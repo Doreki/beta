@@ -1,16 +1,12 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.service.BoardService;
 import com.dhgroup.beta.web.dto.BoardPostDto;
 import com.dhgroup.beta.web.dto.BoardResponseDto;
 import com.dhgroup.beta.web.dto.BoardUpdateDto;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +27,8 @@ public class BoardController {
             if(lastIndex == 0)
                 lastIndex = boardService.findRecentBoardId().orElse(0L); //게시글이 하나도 없을때 예외를 던져주기위함
 
-        Long total = boardService.boardCount();
         List<BoardResponseDto> posts = boardService.viewList(lastIndex);
+        Long total = boardService.boardCount();
         lastIndex = posts.get(posts.size()-1).getId(); //List index가 0부터 시작하기때문
 
         Map<String,Object> pageHandler = new HashMap<>();
@@ -45,20 +41,18 @@ public class BoardController {
     }
 
     @PostMapping("/api/v1/board")
-    public Long write(@RequestBody BoardPostDto boardPostDto,HttpSession session) {
+    public Long write(@RequestBody BoardPostDto boardPostDto) {
         return boardService.write(boardPostDto);
     }
 
     @PatchMapping("/api/v1/board/{id}")
     public void update(@PathVariable Long id,@RequestBody BoardUpdateDto boardUpdateDto) {
-//        String writer = (String)session.getAttribute("name");
         boardService.update(id,boardUpdateDto);
     }
 
     @DeleteMapping("/api/v1/board/{id}")
-    public void delete(@PathVariable Long id,HttpSession session) {
-        String nickName = (String)session.getAttribute("nickName");
-        boardService.delete(id,nickName);
+    public void delete(@PathVariable Long id) {
+        boardService.delete(id);
     }
 
     @PatchMapping("/api/v1/board/like/{id}")

@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberCreateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class MemberControllerTest {
 
     @Mock
     private MemberService memberService;
@@ -51,6 +52,26 @@ public class UserControllerTest {
                 .andExpect(status().isOk());
         //then
         verify(memberService).signUp(any(MemberCreateDto.class));
+    }
+
+//    @Test
+//     public void 로그인() throws Exception{
+//        //given
+//        Member member = createMember();
+//        String url = "api/b1/user";
+//        given(memberService.signIn).willReturn(true);
+//        //when
+//        ResultActions resultActions = mockMvc.perform(
+//                        MockMvcRequestBuilders.post(url)
+//                                .contentType(MediaType.APPLICATION_JSON)
+//                                .content(new ObjectMapper().writeValueAsString(member)))
+//                .andExpect(status().isOk());
+//        //then
+//        verify(memberService).signIn();
+//    }
+
+    private static Member createMember() {
+        return Member.builder().googleId("1").nickName("글쓴이").build();
     }
 
     private static MemberCreateDto getUserCreateDto() {

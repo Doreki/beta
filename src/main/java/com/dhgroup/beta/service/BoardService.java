@@ -47,17 +47,12 @@ public class BoardService {
 
 
     @Transactional //삭제할 게시물이 없을 경우 예외처리해줘야함
-    public void delete(Long id,String nickName) {
+    public void delete(Long id) {
         Board board = findById(id);
-        if(board.getMember().getNickname() == nickName) //게시글 작성자와 session의 작성자가 똑같다면
         boardRepository.delete(board);
     }
 
-    public BoardResponseDto read(Long id) {
-        Board board = findById(id);
-        //Entity의 내용을 Dto에 담는다
-        return new BoardResponseDto(board);
-    }
+
 
     @Transactional
     public void likeIncrease(Long id) {
@@ -95,5 +90,11 @@ public class BoardService {
 
     public Long boardCount() {
         return boardRepository.count();
+    }
+
+    public BoardResponseDto read(Long id) {
+        Board board = findById(id);
+        //Entity의 내용을 Dto에 담는다
+        return new BoardResponseDto(board);
     }
 }

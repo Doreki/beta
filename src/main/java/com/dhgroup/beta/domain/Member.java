@@ -13,7 +13,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name = "member")
+@Table(name="member",uniqueConstraints=
+        {@UniqueConstraint(name="google_id_nickname_UNIQUE"
+                ,columnNames={"google_id","nickname"})})
 public class Member extends BaseTimeEntity {
 
     @Id //pk
@@ -21,7 +23,7 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(unique = true,nullable = false,name="google_id")
+    @Column(nullable = false,name="google_id")
     private String googleId;
 
     @Column(nullable = false,name="nickname")
@@ -34,4 +36,7 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickName;
     }
 
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +39,6 @@ public class BoardServiceTest {
     @Autowired
     BoardService boardService;
 
-    Long id;
-//    @AfterEach
-//    public void cleanUp() {
-//        boardRepository.deleteAll();
-//    }
-
     @Test
     public void 글작성() {
         Long id= boardWrite("글제목","글내용");
@@ -53,7 +48,6 @@ public class BoardServiceTest {
     @Test
     public void 글_수정() {
         Long id= boardWrite("글제목","글내용");
-                LocalDateTime before = LocalDateTime.now(); //글 수정전
 
                 BoardUpdateDto updateDto = BoardUpdateDto
                         .builder()
@@ -62,11 +56,11 @@ public class BoardServiceTest {
                         .build();
         //when - 실행
                 boardService.update(id, updateDto); //repositroy 내용 수정
-            Board board = boardService.findById(id); //DB에서 수정된 객체를 가져옴
+            Board board = boardRepository.findById(id).get(); //DB에서 수정된 객체를 가져옴
         //then - 검증
-        assertThat(boardRepository.findById(id).get().getTitle()).isEqualTo("글제목 수정");
-        assertThat(boardRepository.findById(id).get().getContent()).isEqualTo("글내용 수정");
-        assertThat(boardRepository.findById(id).get().getMember().getNickname()).isEqualTo("글쓴이");
+        assertThat(board.getTitle()).isEqualTo("글제목 수정");
+        assertThat(board.getContent()).isEqualTo("글내용 수정");
+        assertThat(board.getMember().getNickname()).isEqualTo("글쓴이");
 
     }
 
@@ -74,7 +68,7 @@ public class BoardServiceTest {
      public void 글수정_시간() throws Exception{
         //given
         Long id= boardWrite("글제목","글내용");
-        Board board = boardService.findById(id);
+        Board board = boardRepository.findById(id).get();
         LocalDateTime createdDate = board.getCreatedDate(); //게시글 날짜
 
         //when
@@ -85,7 +79,8 @@ public class BoardServiceTest {
                 .build();
         //then
         boardService.update(id, updateDto); //repositroy 내용 수정
-        board = boardService.findById(id); //수정된 게시글
+        boardRepository.flush();
+
         LocalDateTime modifiedDate = board.getModifiedDate();
 
         assertThat(modifiedDate).isAfter(createdDate); //글 수정 후에 수정시간이 바꼈는지 확인
@@ -110,7 +105,7 @@ public class BoardServiceTest {
         //given
         String nickName = "글쓴이"; //session으로 부터 얻어온 이름
         //when
-        boardService.delete(id,nickName);
+        boardService.delete(id);
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> boardService.findById(id));
         //글을 찾을때 글이 없으면 삭제가 성공한 것
         //then
@@ -123,7 +118,7 @@ public class BoardServiceTest {
         //given - 상황
         String nickName = "작성자 아님";
         //when - 실행
-        boardService.delete(id,nickName);
+        boardService.delete(id);
         //then - 검증, 글이 존재한다면 삭제 실패한 것
         Board board = boardRepository.findById(id).get();
         assertThat(board.getMember().getNickname()).isEqualTo("글쓴이");

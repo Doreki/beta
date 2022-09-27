@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.web.dto.MemberCreateDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,26 @@ public class MemberService {
     @Transactional
     public Long signUp(MemberCreateDto memberCreateDto) {
 
-        return memberRepository.save(memberCreateDto.toEntity()).getId();
+        Member member = memberCreateDto.toEntity();
+        memberRepository.save(member);
+        member = createUserTag(member);
+        return member.getId();
     }
+
+    private static Member createUserTag(Member member) {
+        Long userId = member.getId();
+        String userTag = "";
+        if(userId/10 == 0) {
+            userTag = "000"+userId;
+        } else if (userId/100 == 0) {
+            userTag = "00" + userId;
+        } else if (userId/1000 == 0) {
+            userTag = "0" +userId;
+        }
+        String nickname = member.getNickname()+"#"+userTag;
+        member.updateNickname(nickname);
+
+        return member;
+    }
+
 }
