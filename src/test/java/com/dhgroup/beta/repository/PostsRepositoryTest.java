@@ -77,7 +77,7 @@ public class PostsRepositoryTest {
     }
 
     private Member createMember() {
-        Member member = Member.builder().googleId("1").nickName("테스트 작가").build();
+        Member member = Member.builder().googleId("1").nickname("테스트 작가").build();
         memberRepository.save(member);
         return member;
     }

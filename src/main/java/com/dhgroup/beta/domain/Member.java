@@ -31,9 +31,9 @@ public class Member extends BaseTimeEntity {
 
 
     @Builder
-    public Member(String googleId, String nickName) {
+    public Member(String googleId, String nickname) {
         this.googleId = googleId;
-        this.nickname = nickName;
+        this.nickname = nickname;
     }
 
     public void updateNickname(String nickname) {

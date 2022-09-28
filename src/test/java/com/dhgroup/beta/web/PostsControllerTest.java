@@ -218,7 +218,7 @@ public class PostsControllerTest {
     private void postsWrite(String title,String writer, String content) throws Exception {
         String url = "http://localhost:" + port + "/api/v1/posts";
 
-        Member member = Member.builder().nickName(writer).build();
+        Member member = Member.builder().nickname(writer).build();
         PostsRequestDto postsRequestDto = PostsRequestDto.builder()
                 .title(title)
                 .content(content)

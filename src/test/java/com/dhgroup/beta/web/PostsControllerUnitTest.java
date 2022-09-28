@@ -93,7 +93,7 @@ public class PostsControllerUnitTest {
     }
 
     private static Member createMember(String googleId,String nickName) {
-        return Member.builder().googleId(googleId).nickName(nickName).build();
+        return Member.builder().googleId(googleId).nickname(nickName).build();
     }
 
     private PostsRequestDto createPostsPostDto(String title, String content) {

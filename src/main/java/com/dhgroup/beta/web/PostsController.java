@@ -4,6 +4,7 @@ import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsUpdateDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,16 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 public class PostsController {
 
     private final PostsService postsService;
-
-    @Autowired
-    public PostsController(PostsService postsService) {
-        this.postsService = postsService;
-    }
-
 
     @GetMapping("/api/v1/posts/{lastIndex}")
     public Map<String,Object> viewList(@PathVariable(required = false) Long lastIndex) {

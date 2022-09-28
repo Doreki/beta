@@ -95,6 +95,6 @@ public class PostsServiceUnitTest {
     }
 
     private static Member createMember(String nickName, String googleId) {
-        return Member.builder().nickName(nickName).googleId(googleId).build();
+        return Member.builder().nickname(nickName).googleId(googleId).build();
     }
 }

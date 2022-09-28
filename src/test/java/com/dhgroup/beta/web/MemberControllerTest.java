@@ -2,7 +2,7 @@ package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.service.MemberService;
-import com.dhgroup.beta.web.dto.MemberCreateDto;
+import com.dhgroup.beta.web.dto.MemberRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,17 +41,17 @@ public class MemberControllerTest {
 
     @Test
      public void 회원가입() throws Exception{
-        MemberCreateDto memberCreateDto = getUserCreateDto();
+        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
         //given
         String url = "/api/v1/user/1h2g2yysh297h2s";
         //when
         ResultActions resultActions = mockMvc.perform(
                         MockMvcRequestBuilders.post(url)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(memberCreateDto)))
+                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
                 .andExpect(status().isOk());
         //then
-        verify(memberService).signUp(any(MemberCreateDto.class));
+        verify(memberService).signUp(any(MemberRequestDto.class));
     }
 
 //    @Test
@@ -71,10 +71,10 @@ public class MemberControllerTest {
 //    }
 
     private static Member createMember() {
-        return Member.builder().googleId("1").nickName("글쓴이").build();
+        return Member.builder().googleId("1").nickname("글쓴이").build();
     }
 
-    private static MemberCreateDto getUserCreateDto() {
-        return new MemberCreateDto("1", "글쓴이");
+    private static MemberRequestDto createMemberRequestDto(String googleId,String nickname) {
+        return MemberRequestDto.builder().googleId(googleId).nickname(nickname).build();
     }
 }

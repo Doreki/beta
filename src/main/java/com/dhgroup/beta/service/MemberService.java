@@ -2,29 +2,30 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.web.dto.MemberCreateDto;
+import com.dhgroup.beta.web.dto.MemberRequestDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    @Autowired
-    public MemberService(MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
-
     @Transactional
-    public Long signUp(MemberCreateDto memberCreateDto) {
+    public Long signUp(MemberRequestDto memberRequestDto) {
 
-        Member member = memberCreateDto.toEntity();
+        Member member = memberRequestDto.toEntity();
         memberRepository.save(member);
         member = createUserTag(member);
         return member.getId();
+    }
+
+    @Transactional
+    public Member singIn(String googleId) {
     }
 
     public static Member createUserTag(Member member) {

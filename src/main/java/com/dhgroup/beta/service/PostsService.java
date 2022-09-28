@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Service
 public class PostsService {
 
-    @Autowired
     private final PostsRepository postsRepository;
 
     public Posts findById(Long id) {
@@ -39,8 +38,7 @@ public class PostsService {
     @Transactional
     public void update(Long id, PostsUpdateDto postsUpdateDto) {
 
-        Posts posts = findById(id);
-//        if(posts.getWriter() == writer)
+        Posts posts = findById(id); //영속성 컨테스트에 올린다.
         posts.update(postsUpdateDto.getTitle(), postsUpdateDto.getContent());
         //게시글이 있으면 글 내용을 수정
     }

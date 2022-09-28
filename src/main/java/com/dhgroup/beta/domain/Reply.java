@@ -9,14 +9,15 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.LAZY;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class BigComment extends BaseTimeEntity {
+public class Reply extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "big_comment_id")
+    @Column(name = "reply_id")
     private Long id;
 
     @Column(columnDefinition = "TEXT", nullable = false, name = "big_comment_content")
@@ -31,7 +32,7 @@ public class BigComment extends BaseTimeEntity {
     private Member member;
 
     @Builder
-    public BigComment(String content, Comment comment, Member member) {
+    public Reply(String content, Comment comment, Member member) {
         this.content = content;
         this.member = member;
         this.comment = comment;
