@@ -13,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class MemberService {
 
+//    @Transactional
+//    public Member singIn(String googleId) {
+//
+//        return new Member();
+//    }
+
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -20,28 +26,12 @@ public class MemberService {
 
         Member member = memberRequestDto.toEntity();
         memberRepository.save(member);
-        member = createUserTag(member);
+        String nickname = member.getNickname()+member.createUserTag();
+        member.updateNickname(nickname);
         return member.getId();
     }
 
-    @Transactional
-    public Member singIn(String googleId) {
+
+    public void signIn() {
     }
-
-    public static Member createUserTag(Member member) {
-        Long userId = member.getId();
-        String userTag = "";
-        if(userId/10 == 0) {
-            userTag = "000"+userId;
-        } else if (userId/100 == 0) {
-            userTag = "00" + userId;
-        } else if (userId/1000 == 0) {
-            userTag = "0" +userId;
-        }
-        String nickname = member.getNickname()+"#"+userTag;
-        member.updateNickname(nickname);
-
-        return member;
-    }
-
 }

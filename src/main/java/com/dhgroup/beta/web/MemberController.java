@@ -20,8 +20,8 @@ public class MemberController {
 
 
     @PostMapping("/api/v1/user/1h2g2yysh297h2s")
-    public Long singUp(String googleId) {
-        return memberService.signUp(googleId);
+    public Long singUp(MemberRequestDto memberRequestDto) {
+        return memberService.signUp(memberRequestDto);
     }
 
     @PostMapping("/api/b1/user/login")
@@ -29,13 +29,15 @@ public class MemberController {
         Map<String, Object> result = new HashMap();
 
         if(memberCheck(googleId)) {
-            Member member = memberService.singIn(googleId);
-            result.put("Member",member);
+//            Member member = memberService.singIn(googleId);
+//            result.put("Member",member);
         } //회원가입 로그인 같이 묶어야함
+
+        return result;
     }
 
-    private boolean memberCheck(Member member) {
+    private boolean memberCheck(String googleId) {
 
-        return memberRepository.existsById(member.getId());
+        return true;
     }
 }

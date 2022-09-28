@@ -2,45 +2,43 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.web.dto.MemberCreateDto;
+import com.dhgroup.beta.web.dto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.*;
 
 @Transactional
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class MemberServiceTest {
 
-    @Mock
-    MemberRepository memberRepository;
-
-    @InjectMocks
+    @Autowired
     MemberService memberService;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
      public void 회원가입() throws Exception{
-        Member member = createMember();
         //given
-        given(memberRepository.save(any(Member.class))).willReturn(member);
-
+        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
+        Long memberId = memberService.signUp(memberRequestDto);
         //when
-        given(MemberService.createUserTag(any(Member.class))).willReturn(member);
-        memberService.signUp(new MemberCreateDto("1", "글쓴이"));
+        Member member = memberRepository.findById(memberId).get(); //db에 저장된 닉네임
+        String userTag = member.createUserTag(); //userTag메서드가 만들어준 닉네임
 
         //then
-        verify(memberRepository).save(any(Member.class));
+        assertThat(member.getNickname()).isEqualTo("글쓴이"+userTag);
+
     }
 
-    private static Member createMember() {
-        return Member.builder()
-                .googleId("1")
-                .nickName("글쓴이")
-                .build();
+    private static MemberRequestDto createMemberRequestDto(String googleId, String nickname) {
+        return MemberRequestDto.builder().googleId(googleId).nickname(nickname).build();
+    }
+
+    private static Member createMember(String googleId, String nickname) {
+        return Member.builder().googleId(googleId).nickname(nickname).build();
     }
 }

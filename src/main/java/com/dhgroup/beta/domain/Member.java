@@ -39,4 +39,17 @@ public class Member extends BaseTimeEntity {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public String createUserTag() {
+        String userTag = "";
+        if(id/10 == 0) {
+            userTag = "000"+id;
+        } else if (id/100 == 0) {
+            userTag = "00" + id;
+        } else if (id/1000 == 0) {
+            userTag = "0" +id;
+        }
+        userTag = "#"+userTag;
+        return userTag;
+    }
 }

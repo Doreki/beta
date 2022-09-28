@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,9 @@ public class MemberControllerTest {
     @Mock
     private MemberService memberService;
 
+    @Mock
+    private MemberRepository memberRepository;
+
     @InjectMocks
     private MemberController memberController;
 
@@ -39,36 +43,36 @@ public class MemberControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
     }
 
-    @Test
-     public void 회원가입() throws Exception{
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
-        //given
-        String url = "/api/v1/user/1h2g2yysh297h2s";
-        //when
-        ResultActions resultActions = mockMvc.perform(
-                        MockMvcRequestBuilders.post(url)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
-                .andExpect(status().isOk());
-        //then
-        verify(memberService).signUp(any(MemberRequestDto.class));
-    }
-
 //    @Test
-//     public void 로그인() throws Exception{
+//     public void 회원가입() throws Exception{
+//        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
 //        //given
-//        Member member = createMember();
-//        String url = "api/b1/user";
-//        given(memberService.signIn).willReturn(true);
+//        String url = "/api/v1/user/1h2g2yysh297h2s";
 //        //when
 //        ResultActions resultActions = mockMvc.perform(
 //                        MockMvcRequestBuilders.post(url)
 //                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(new ObjectMapper().writeValueAsString(member)))
+//                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
 //                .andExpect(status().isOk());
 //        //then
-//        verify(memberService).signIn();
+//        verify(memberService).signUp(any(MemberRequestDto.class));
 //    }
+
+    @Test
+     public void 로그인성공() throws Exception{
+        //given
+        Member member = createMember();
+        String url = "api/b1/user";
+        given(memberRepository.existsByGoogleId(member.getGoogleId())).willReturn(true);
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                        MockMvcRequestBuilders.post(url)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(member)))
+                .andExpect(status().isOk());
+        //then
+        verify(memberService).signIn();
+    }
 
     private static Member createMember() {
         return Member.builder().googleId("1").nickname("글쓴이").build();
