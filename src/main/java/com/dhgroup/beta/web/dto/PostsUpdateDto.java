@@ -4,17 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @NoArgsConstructor
 @Getter
-public class BoardUpdateDto {
+public class PostsUpdateDto {
     private String title;
     private String content;
 
 
     @Builder
-    public BoardUpdateDto(String title, String content) {
+    public PostsUpdateDto(String title, String content) {
         this.title = title;
         this.content = content;
     }

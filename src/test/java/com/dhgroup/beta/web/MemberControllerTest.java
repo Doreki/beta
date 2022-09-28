@@ -29,14 +29,14 @@ public class MemberControllerTest {
     private MemberService memberService;
 
     @InjectMocks
-    private UserController userController;
+    private MemberController memberController;
 
     @Autowired
     private MockMvc mockMvc;
 
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
     }
 
     @Test

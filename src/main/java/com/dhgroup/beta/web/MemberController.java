@@ -1,30 +1,25 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberCreateDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
-public class UserController {
+public class MemberController {
 
     private MemberService memberService;
     private MemberRepository memberRepository;
 
     @Autowired
-    public UserController(MemberService memberService) {
+    public MemberController(MemberService memberService) {
         this.memberService = memberService;
     }
 
     @Autowired
-    public UserController(MemberRepository memberRepository) {
+    public MemberController(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 

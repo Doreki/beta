@@ -1,9 +1,8 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.Board;
 import com.dhgroup.beta.domain.Member;
-import com.dhgroup.beta.service.BoardService;
-import com.dhgroup.beta.web.dto.BoardPostDto;
+import com.dhgroup.beta.service.PostsService;
+import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,20 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpSession;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
@@ -33,13 +25,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class BoardControllerUnitTest {
+public class PostsControllerUnitTest {
 
     @Mock
-    private BoardService boardService;
+    private PostsService postsService;
 
     @InjectMocks
-    private BoardController boardController;
+    private PostsController postsController;
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,25 +41,25 @@ public class BoardControllerUnitTest {
 
     @BeforeEach
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(boardController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(postsController).build();
     }
 
     @Test
     public void 글작성() throws Exception{
-        BoardPostDto boardPostDto = createBoardPostDto("글제목","글내용");
+        PostsRequestDto postsRequestDto = createPostsPostDto("글제목","글내용");
         Member member = createMember("1","글쓴이");
 
 //        given(httpSession.getAttribute("nickName")).willReturn(member);
-        given(boardService.write(any(BoardPostDto.class))).willReturn(1L);
+        given(postsService.write(any(PostsRequestDto.class))).willReturn(1L);
 
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/board")
+                MockMvcRequestBuilders.post("/api/v1/Posts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(boardPostDto)))
+                        .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
 //                        .content(new ObjectMapper().writeValueAsString(httpSession)))
                         .andExpect(status().isOk());
 
-//        verify(boardService).write(boardPostDto);
+//        verify(PostsService).write(postsPostDto);
     }
 
     @Test
@@ -78,11 +70,11 @@ public class BoardControllerUnitTest {
 
         //then
         mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/board/like/{id}", 1L)
+                        MockMvcRequestBuilders.patch("/api/v1/posts/like/{id}", 1L)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk());
 
-        verify(boardService).likeIncrease(1L);
+        verify(postsService).likeIncrease(1L);
     }
 
     @Test
@@ -93,19 +85,19 @@ public class BoardControllerUnitTest {
 
         //then
         mockMvc.perform(
-                        MockMvcRequestBuilders.patch("/api/v1/board/likeRollback/{id}", 1L)
+                        MockMvcRequestBuilders.patch("/api/v1/posts/likeRollback/{id}", 1L)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(boardService).likeRollback(1L);
+        verify(postsService).likeRollback(1L);
     }
 
     private static Member createMember(String googleId,String nickName) {
         return Member.builder().googleId(googleId).nickName(nickName).build();
     }
 
-    private BoardPostDto createBoardPostDto(String title, String content) {
-        return BoardPostDto.builder()
+    private PostsRequestDto createPostsPostDto(String title, String content) {
+        return PostsRequestDto.builder()
                 .title(title)
                 .content(content)
                 .build();

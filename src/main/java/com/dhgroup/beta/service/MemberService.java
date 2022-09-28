@@ -27,7 +27,7 @@ public class MemberService {
         return member.getId();
     }
 
-    private static Member createUserTag(Member member) {
+    public static Member createUserTag(Member member) {
         Long userId = member.getId();
         String userTag = "";
         if(userId/10 == 0) {

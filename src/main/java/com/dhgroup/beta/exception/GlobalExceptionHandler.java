@@ -14,8 +14,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(value = NotFoundBoardException.class)
-    public Map<String, String> handleException(NotFoundBoardException e) {
+    @ExceptionHandler(value = NotFoundPostsException.class)
+    public Map<String, String> handleException(NotFoundPostsException e) {
         Map<String, String> map = new HashMap<>();
         map.put("msg","LIST_ERR");
         return map;

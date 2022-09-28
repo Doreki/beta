@@ -25,11 +25,14 @@ public class MemberServiceTest {
 
     @Test
      public void 회원가입() throws Exception{
-        Member Member = createMember();
+        Member member = createMember();
         //given
-        given(memberRepository.save(any(Member.class))).willReturn(Member);
+        given(memberRepository.save(any(Member.class))).willReturn(member);
+
         //when
+        given(MemberService.createUserTag(any(Member.class))).willReturn(member);
         memberService.signUp(new MemberCreateDto("1", "글쓴이"));
+
         //then
         verify(memberRepository).save(any(Member.class));
     }

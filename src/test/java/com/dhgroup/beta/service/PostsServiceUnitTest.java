@@ -2,10 +2,10 @@ package com.dhgroup.beta.service;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.*;
 
-import com.dhgroup.beta.domain.Board;
+import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
-import com.dhgroup.beta.domain.repository.BoardRepository;
-import com.dhgroup.beta.web.dto.BoardResponseDto;
+import com.dhgroup.beta.domain.repository.PostsRepository;
+import com.dhgroup.beta.web.dto.PostsResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,52 +19,52 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class BoardServiceUnitTest {
+public class PostsServiceUnitTest {
 
     @Mock
-    private BoardRepository boardRepository;
+    private PostsRepository postsRepository;
 
 
     @InjectMocks
-    BoardService boardService;
+    PostsService postsService;
 
 //    @Test
 //    public void 글작성() {
 //
 //        Member member = Member.builder().nickName("글쓴이").build();
 //        given().willReturn(member);
-//        Board board = Board.builder()
+//        Posts posts = Posts.builder()
 //                .title("글제목")
 //                .content("글내용")
 //                .member()
 //                .build();
 //
-//        given(boardRepository.save(boardPostDto.toEntity())).willReturn(1L);
+//        given(PostsRepository.save(postDto.toEntity())).willReturn(1L);
 //
-//        Long id = boardService.write(boardPostDto);
+//        Long id = PostsService.write(postsPostDto);
 //
 //        assertThat(id).isEqualTo(1);
 //    }
 //
 //    @Test
 //    public void 게시글목록() {
-//        List<Board> boardList = boardList();
-//        Long id = boardList.get(9).getId();
-//        doReturn(boardList()).when(boardRepository).findFirst10ByIdLessThanEqualOrderByIdDesc(id);
+//        List<Posts> PostsList = postsList();
+//        Long id = postsList.get(9).getId();
+//        doReturn(postsList()).when(PostsRepository).findFirst10ByIdLessThanEqualOrderByIdDesc(id);
 //    }
-//    private BoardPostDto boardPostDto() {
-//        return BoardPostDto.builder()
+//    private PostsDto postsDto() {
+//        return PostsDto.builder()
 //                .title("글제목")
 //                .content("글내용")
 //                .build();
 //    }
 //
-//    private List<Board> boardList() {
-//        List<Board> boardList = new ArrayList<>();
+//    private List<Posts> postsList() {
+//        List<Posts> postsList = new ArrayList<>();
 //        for (int i = 0; i < 10; i++) {
-//            boardList.add(new Board("title","content","writer"));
+//            postsList.add(new Posts("title","content","writer"));
 //        }
-//        return boardList;
+//        return postsList;
 //    }
 
     @Test
@@ -72,26 +72,26 @@ public class BoardServiceUnitTest {
         //given
 
         Long startId = 5L;
-        List<Board> boards = new ArrayList<>();
+        List<Posts> postsList = new ArrayList<>();
         Member member = createMember("글쓴이", "1");
 
         //게시글 생성
         for (int i = 0; i < 5; i++) {
-            Board board = createBoard(member, "글제목", "글내용");
-            boards.add(board);
+            Posts posts = createPosts(member, "글제목", "글내용");
+            postsList.add(posts);
         }
-        given(boardRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)).willReturn(boards);
+        given(postsRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)).willReturn(postsList);
         //when
 
-        List<BoardResponseDto> boardResponseDtos = boardService.viewList(startId);
+        List<PostsResponseDto> postsResponseDtos = postsService.viewList(startId);
         //then
-        verify(boardRepository).findFirst10ByIdLessThanEqualOrderByIdDesc(startId);
-        assertThat(boardResponseDtos.size()).isEqualTo(5);
+        verify(postsRepository).findFirst10ByIdLessThanEqualOrderByIdDesc(startId);
+        assertThat(postsResponseDtos.size()).isEqualTo(5);
     }
 
 
-    private static Board createBoard(Member member, String title, String content) {
-        return Board.builder().title(title).content(content).member(member).build();
+    private static Posts createPosts(Member member, String title, String content) {
+        return Posts.builder().title(title).content(content).member(member).build();
     }
 
     private static Member createMember(String nickName, String googleId) {

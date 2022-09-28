@@ -5,29 +5,25 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //불필요한 생성자 접근을 막기 위함
 @Getter
 @Entity
-public class Board extends BaseTimeEntity {
+public class Posts extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Auto_increment 설정
-    @Column(name = "board_id")
+    @Column(name = "posts_id")
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT", nullable = false, name="board_content")
+    @Column(columnDefinition = "TEXT", nullable = false, name="posts_content")
     private String content;
 
     @ManyToOne(fetch = LAZY)
@@ -42,7 +38,7 @@ public class Board extends BaseTimeEntity {
     id는 자동생성,likeCnt,commentCnt는 메서드로 값 주입예정;
      */
     @Builder
-    public Board(String title, String content, Member member) {
+    public Posts(String title, String content, Member member) {
         this.title = title;
         this.content = content;
         this.member = member;

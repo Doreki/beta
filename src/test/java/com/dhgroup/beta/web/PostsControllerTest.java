@@ -1,10 +1,10 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.Board;
+import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
-import com.dhgroup.beta.domain.repository.BoardRepository;
-import com.dhgroup.beta.web.dto.BoardPostDto;
-import com.dhgroup.beta.web.dto.BoardUpdateDto;
+import com.dhgroup.beta.domain.repository.PostsRepository;
+import com.dhgroup.beta.web.dto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,14 +20,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class BoardControllerTest {
+public class PostsControllerTest {
     private final static Long INITIAL_VALUE=10L;
     @LocalServerPort
     private int port;
@@ -36,7 +36,7 @@ public class BoardControllerTest {
     private TestRestTemplate testRestTemplate;
 
     @Autowired
-    private BoardRepository boardRepository;
+    private PostsRepository postsRepository;
 
     @Autowired
     private WebApplicationContext context;
@@ -52,20 +52,20 @@ public class BoardControllerTest {
     }
     @AfterEach
     public void tearDown() throws Exception {
-        boardRepository.deleteAll();
+        postsRepository.deleteAll();
     }
     
     @Test
     public void 게시글목록() throws Exception {
         //given
-        String url = "http://localhost:" + port + "/api/v1/board/{lastIndex}";
+        String url = "http://localhost:" + port + "/api/v1/posts/{lastIndex}";
 
         for(int i=1;i<=INITIAL_VALUE;i++) {
-            boardWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
+            postsWrite("글제목"+i,"글쓴이"+i,"글내용"+i);
         }
 
-        int total = (int)boardRepository.count();
-        int lastIndex = (int)(boardRepository.findTopByOrderByIdDesc().getId()-9);
+        int total = (int) postsRepository.count();
+        int lastIndex = (int)(postsRepository.findTopByOrderByIdDesc().getId()-9);
         //when
         mockMvc.perform(get(url,0L)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -79,7 +79,7 @@ public class BoardControllerTest {
 
     @Test
     public void 마지막게시글_테스트() throws Exception {
-        String url = "http://localhost:" + port + "/api/v1/board/{lastIndex}";
+        String url = "http://localhost:" + port + "/api/v1/posts/{lastIndex}";
 
         //불러올 게시글이 없음
         mockMvc.perform(get(url,0L)
@@ -97,11 +97,11 @@ public class BoardControllerTest {
         String writer = "글쓴이";
         String content = "글내용";
 
-        boardWrite(title,writer,content);
+        postsWrite(title,writer,content);
 
         //when
-        List<Board> all = boardRepository.findAll();
-        Board findPost = all.get(0); //등록게시물
+        List<Posts> all = postsRepository.findAll();
+        Posts findPost = all.get(0); //등록게시물
         //then
         assertThat(findPost.getTitle()).isEqualTo(title);
         assertThat(findPost.getContent()).isEqualTo(content);
@@ -111,16 +111,16 @@ public class BoardControllerTest {
     @Test
     public void 게시물수정() throws Exception {
         //given
-        String url = "http://localhost:" + port + "/api/v1/board/{id}";
+        String url = "http://localhost:" + port + "/api/v1/posts/{id}";
 
         String writer = "글쓴이";
 
-        boardWrite("글제목",writer,"글내용");
+        postsWrite("글제목",writer,"글내용");
 
         String updatedTitle = "수정제목";
         String updatedContent = "수정내용";
 
-        BoardUpdateDto updateDto = BoardUpdateDto.builder()
+        PostsUpdateDto postsUpdateDto = PostsUpdateDto.builder()
                 .title(updatedTitle)
                 .content(updatedContent)
                 .build();
@@ -130,12 +130,12 @@ public class BoardControllerTest {
         //when
         mockMvc.perform(patch(url,id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(updateDto)))
+                .content(new ObjectMapper().writeValueAsString(postsUpdateDto)))
                 .andExpect(status().isOk());
 
         Long updatedId = findId(); //수정된 게시물
 
-        Board findPost = boardRepository.findById(updatedId).get();
+        Posts findPost = postsRepository.findById(updatedId).get();
         //then
         assertThat(findPost.getTitle()).isEqualTo(updatedTitle);
         assertThat(findPost.getContent()).isEqualTo(updatedContent);
@@ -145,11 +145,11 @@ public class BoardControllerTest {
     @Test
     public void 게시물없음() throws Exception {
         //given
-        String url = "http://localhost:" + port + "/api/v1/board/{id}";
+        String url = "http://localhost:" + port + "/api/v1/posts/{id}";
 
-        boardWrite("글제목","글쓴이","글내용");
+        postsWrite("글제목","글쓴이","글내용");
 
-        BoardUpdateDto updateDto = BoardUpdateDto.builder()
+        PostsUpdateDto updateDto = PostsUpdateDto.builder()
                 .title("수정제목")
                 .content("수정내용")
                 .build();
@@ -166,9 +166,9 @@ public class BoardControllerTest {
     @Test
     public void 게시글삭제() throws Exception {
         //given
-        String url = "http://localhost:" + port + "/api/v1/board/{id}";
+        String url = "http://localhost:" + port + "/api/v1/posts/{id}";
 
-        boardWrite("글제목","글쓴이","글내용");
+        postsWrite("글제목","글쓴이","글내용");
 
         Long id = findId();
 
@@ -183,9 +183,9 @@ public class BoardControllerTest {
 
     @Test
     public void 좋아요() throws Exception{
-        String url = "http://localhost:" + port + "/api/v1/board/like/{id}";
+        String url = "http://localhost:" + port + "/api/v1/posts/like/{id}";
 
-        boardWrite("글제목","글쓴이","글내용");
+        postsWrite("글제목","글쓴이","글내용");
 
         Long id = findId();
 
@@ -198,9 +198,9 @@ public class BoardControllerTest {
 
     @Test
     public void 좋아요취소() throws Exception{
-        String url = "http://localhost:" + port + "/api/v1/board/like/{id}";
+        String url = "http://localhost:" + port + "/api/v1/posts/like/{id}";
 
-        boardWrite("글제목","글쓴이","글내용");
+        postsWrite("글제목","글쓴이","글내용");
 
         Long id = findId();
 
@@ -208,18 +208,18 @@ public class BoardControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-         url = "http://localhost:" + port + "/api/v1/board/likeRollback/{id}";
+         url = "http://localhost:" + port + "/api/v1/posts/likeRollback/{id}";
         mockMvc.perform(patch(url,id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         assertThat(findPost().getLikeCnt()).isEqualTo(0);
     }
-    private void boardWrite(String title,String writer, String content) throws Exception {
-        String url = "http://localhost:" + port + "/api/v1/board";
+    private void postsWrite(String title,String writer, String content) throws Exception {
+        String url = "http://localhost:" + port + "/api/v1/posts";
 
         Member member = Member.builder().nickName(writer).build();
-        BoardPostDto postDto = BoardPostDto.builder()
+        PostsRequestDto postsRequestDto = PostsRequestDto.builder()
                 .title(title)
                 .content(content)
                 .member(member)
@@ -227,21 +227,21 @@ public class BoardControllerTest {
 
         mockMvc.perform(post(url)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(postDto)))
+                        .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
                         .andExpect(status().isOk());
     }
 
     private Long findId() throws Exception {
-        List<Board> all = boardRepository.findAll();
-        Board findPost = all.get(0); //등록 게시물
+        List<Posts> all = postsRepository.findAll();
+        Posts findPost = all.get(0); //등록 게시물
         Long id = findPost.getId();
 
         return id;
     }
 
-    private Board findPost() throws Exception {
-        List<Board> all = boardRepository.findAll();
-        Board findPost = all.get(0); //등록 게시물
+    private Posts findPost() throws Exception {
+        List<Posts> all = postsRepository.findAll();
+        Posts findPost = all.get(0); //등록 게시물
 
         return findPost;
     }
