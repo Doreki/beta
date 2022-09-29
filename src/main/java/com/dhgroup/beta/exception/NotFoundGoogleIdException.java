@@ -3,8 +3,9 @@ package com.dhgroup.beta.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NotFoundPostsException extends RuntimeException{
-    public NotFoundPostsException(String message) {
+public class NotFoundGoogleIdException extends RuntimeException{
+
+    public NotFoundGoogleIdException(String message) {
         super(message);
     }
 }

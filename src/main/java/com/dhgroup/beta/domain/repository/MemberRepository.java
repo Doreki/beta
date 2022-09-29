@@ -7,4 +7,6 @@ import org.springframework.data.repository.query.Param;
 public interface MemberRepository extends JpaRepository<Member,Long> {
 
     boolean existsByGoogleId(@Param("google_id") String googleId);
+
+    Member findByGoogleId(@Param("google_id") String googleId);
 }

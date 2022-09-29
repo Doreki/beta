@@ -31,7 +31,11 @@ public class MemberService {
         return member.getId();
     }
 
+    public boolean memberCheck(String googleId) {
+        return memberRepository.existsByGoogleId(googleId);
+    }
 
-    public void signIn() {
+    public Member logIn(String googleId) {
+        return memberRepository.findByGoogleId(googleId);
     }
 }

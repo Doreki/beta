@@ -2,6 +2,7 @@ package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.NotFoundGoogleIdException;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -19,25 +20,18 @@ public class MemberController {
     private final MemberService memberService;
 
 
-    @PostMapping("/api/v1/user/1h2g2yysh297h2s")
+    @PostMapping("/api/v1/member/1h2g2yysh297h2s")
     public Long singUp(MemberRequestDto memberRequestDto) {
         return memberService.signUp(memberRequestDto);
     }
 
-    @PostMapping("/api/b1/user/login")
-    public Map<String,Object> signIn(String googleId) {
-        Map<String, Object> result = new HashMap();
-
-        if(memberCheck(googleId)) {
-//            Member member = memberService.singIn(googleId);
-//            result.put("Member",member);
-        } //회원가입 로그인 같이 묶어야함
-
-        return result;
+    @PostMapping("/api/v1/member/login")
+    public Member signIn(String googleId) {
+        if(memberService.memberCheck(googleId))  //구글 아이디가 db에 있으면 로그인 없으면 회원가입창으로 가기위한 에러메시지 출력
+            return memberService.logIn(googleId);
+        else
+            throw new NotFoundGoogleIdException();
     }
 
-    private boolean memberCheck(String googleId) {
 
-        return true;
-    }
 }

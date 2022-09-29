@@ -16,24 +16,34 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = NotFoundPostsException.class)
     public Map<String, String> handleException(NotFoundPostsException e) {
-        Map<String, String> map = new HashMap<>();
-        map.put("msg","LIST_ERR");
+        Map<String, String> map = putErrorMessage("LIST_ERR");
         return map;
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = IllegalArgumentException.class)
     public Map<String, String> handleException(IllegalArgumentException e) {
-        Map<String, String> map = new HashMap<>();
-        map.put("msg","POST_ERR");
+        Map<String, String> map = putErrorMessage("POST_ERR");
         return map;
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public Map<String, String> handleException(Exception e) {
+        Map<String, String> map = putErrorMessage("NULL_ERR");
+        return map;
+    }
+
+    @ResponseStatus(HttpStatus.SEE_OTHER)
+    @ExceptionHandler(value = Exception.class)
+    public Map<String, String> handleException(NotFoundGoogleIdException e) {
+        Map<String, String> map = putErrorMessage("REDIRECT_TO_SIGNUP");
+        return map;
+    }
+
+    private static Map<String, String> putErrorMessage(String err) {
         Map<String, String> map = new HashMap<>();
-        map.put("msg","NULL_ERR");
+        map.put("msg", err);
         return map;
     }
 }
