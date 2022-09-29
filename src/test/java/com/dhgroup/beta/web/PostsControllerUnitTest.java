@@ -49,17 +49,14 @@ public class PostsControllerUnitTest {
         PostsRequestDto postsRequestDto = createPostsPostDto("글제목","글내용");
         Member member = createMember("1","글쓴이");
 
-//        given(httpSession.getAttribute("nickName")).willReturn(member);
         given(postsService.write(any(PostsRequestDto.class))).willReturn(1L);
 
         ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/Posts")
+                MockMvcRequestBuilders.post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
-//                        .content(new ObjectMapper().writeValueAsString(httpSession)))
                         .andExpect(status().isOk());
 
-//        verify(PostsService).write(postsPostDto);
     }
 
     @Test

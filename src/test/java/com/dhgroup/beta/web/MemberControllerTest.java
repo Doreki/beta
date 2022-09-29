@@ -5,62 +5,36 @@ import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(MemberController.class)
+@MockBean(JpaMetamodelMappingContext.class) //Auditing 기능을 위해 mock객체로 올려둠
 public class MemberControllerTest {
 
-    @Mock
+    @MockBean
     private MemberService memberService;
 
-    @Mock
+    @MockBean
     private MemberRepository memberRepository;
-
-    @InjectMocks
-    private MemberController memberController;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @BeforeEach
-    public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(memberController).build();
-        MockitoAnnotations.initMocks(this);
-    }
-
-//    @Test
-//     public void 회원가입() throws Exception{
-//        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
-//        //given
-//        String url = "/api/v1/member/1h2g2yysh297h2s";
-//        //when
-//        ResultActions resultActions = mockMvc.perform(
-//                        MockMvcRequestBuilders.post(url)
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
-//                .andExpect(status().isOk());
-//        //then
-//        verify(memberService).signUp(any(MemberRequestDto.class));
-//    }
 
     @Test
      public void 로그인성공() throws Exception{
@@ -68,14 +42,18 @@ public class MemberControllerTest {
         Member member = createMember("1","글쓴이");
         String url = "/api/v1/member/login";
         String googleId = member.getGoogleId();
-        given(memberService.memberCheck(googleId)).willReturn(true);
+
+        given(memberService.isValidMember(googleId)).willReturn(true);
         given(memberService.logIn(googleId)).willReturn(member);
         //when
                     mockMvc.perform(
-                        MockMvcRequestBuilders.post(url)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(googleId)))
-                .andExpect(status().isOk());
+                                post(url)
+                                .content(googleId)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.googleId",is("1")))
+                                .andExpect(jsonPath("$.nickname",is("글쓴이")))
+                                .andDo(print());
         //then
         verify(memberService).logIn(googleId);
     }
@@ -85,15 +63,17 @@ public class MemberControllerTest {
         //given
         Member member = createMember("1","글쓴이");
         String url = "/api/v1/member/login";
-        given(memberRepository.existsByGoogleId(member.getGoogleId())).willReturn(false);
+        String googleId = member.getGoogleId();
+        given(memberService.isValidMember(member.getGoogleId())).willReturn(false);
         //when
         ResultActions resultActions = mockMvc.perform(
-                        MockMvcRequestBuilders.post(url)
+                                 post(url)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(member)))
-                .andExpect(status().isSeeOther());
+                                .content(googleId))
+                                .andExpect(status().isSeeOther())
+                                .andExpect(jsonPath("$.msg",is("REDIRECT_TO_SIGNUP")))
+                                .andDo(print());
         //then
-
     }
 
     private static Member createMember(String googleId, String nickname) {

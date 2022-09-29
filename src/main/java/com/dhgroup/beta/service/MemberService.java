@@ -2,6 +2,7 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.NotFoundGoogleIdException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class MemberService {
-
-//    @Transactional
-//    public Member singIn(String googleId) {
-//
-//        return new Member();
-//    }
-
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -31,11 +25,11 @@ public class MemberService {
         return member.getId();
     }
 
-    public boolean memberCheck(String googleId) {
+    public boolean isValidMember(String googleId) {
         return memberRepository.existsByGoogleId(googleId);
     }
 
     public Member logIn(String googleId) {
-        return memberRepository.findByGoogleId(googleId);
+        return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotFoundGoogleIdException("존재하지 않는 회원입니다."));
     }
 }

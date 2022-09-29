@@ -58,27 +58,27 @@ public class PostsServiceTest {
 
     }
 
-    @Test
-     public void 글수정_시간() throws Exception{
-        //given
-        Long id= postsWrite("글제목","글내용");
-        Posts posts = postsRepository.findById(id).get();
-        LocalDateTime createdDate = posts.getCreatedDate(); //게시글 날짜
-
-        //when
-        PostsUpdateDto postsUpdateDto = PostsUpdateDto
-                .builder()
-                .title("글제목 수정")
-                .content("글내용 수정")
-                .build();
-        //then
-        postsService.update(id, postsUpdateDto); //repositroy 내용 수정
-        postsRepository.flush();
-
-        LocalDateTime modifiedDate = posts.getModifiedDate();
-
-        assertThat(modifiedDate).isAfter(createdDate); //글 수정 후에 수정시간이 바꼈는지 확인
-    }
+//    @Test
+//     public void 글수정_시간() throws Exception{
+//        //given
+//        Long id= postsWrite("글제목","글내용");
+//        Posts posts = postsRepository.findById(id).get();
+//        LocalDateTime createdDate = posts.getCreatedDate(); //게시글 날짜
+//
+//        //when
+//        PostsUpdateDto postsUpdateDto = PostsUpdateDto
+//                .builder()
+//                .title("글제목 수정")
+//                .content("글내용 수정")
+//                .build();
+//        //then
+//        postsService.update(id, postsUpdateDto); //repositroy 내용 수정
+//        postsRepository.flush();
+//
+//        LocalDateTime modifiedDate = posts.getModifiedDate();
+//
+//        assertThat(modifiedDate).isAfter(createdDate); //글 수정 후에 수정시간이 바꼈는지 확인
+//    }
 
     @Test
     public void 글수정_실패() {

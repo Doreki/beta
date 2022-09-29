@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.SEE_OTHER)
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = NotFoundGoogleIdException.class)
     public Map<String, String> handleException(NotFoundGoogleIdException e) {
         Map<String, String> map = putErrorMessage("REDIRECT_TO_SIGNUP");
         return map;
