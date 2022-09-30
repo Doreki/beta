@@ -16,11 +16,11 @@ import static javax.persistence.FetchType.LAZY;
 public class Reply extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reply_id")
     private Long id;
 
-    @Column(columnDefinition = "TEXT", nullable = false, name = "big_comment_content")
+    @Column(columnDefinition = "TEXT", nullable = false, name = "reply_content")
     private String content;
 
     @ManyToOne(fetch = LAZY)

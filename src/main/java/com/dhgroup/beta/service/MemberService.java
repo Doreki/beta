@@ -19,8 +19,8 @@ public class MemberService {
     public Long signUp(MemberRequestDto memberRequestDto) {
 
         Member member = memberRequestDto.toEntity();
-        memberRepository.save(member);
-        String nickname = member.getNickname()+member.createUserTag();
+        member = memberRepository.saveAndFlush(member);
+        String nickname = member.getNickname()+ member.createUserTag();
         member.updateNickname(nickname);
         return member.getId();
     }

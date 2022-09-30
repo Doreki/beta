@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-@Table(name="member",uniqueConstraints=
+@Table(name="members",uniqueConstraints=
         {@UniqueConstraint(name="google_id_nickname_UNIQUE"
                 ,columnNames={"google_id","nickname"})})
 public class Member extends BaseTimeEntity {
@@ -31,7 +31,8 @@ public class Member extends BaseTimeEntity {
 
 
     @Builder
-    public Member(String googleId, String nickname) {
+    public Member(Long id,String googleId, String nickname) {
+        this.id = id;
         this.googleId = googleId;
         this.nickname = nickname;
     }

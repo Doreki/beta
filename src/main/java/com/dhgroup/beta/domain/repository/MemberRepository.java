@@ -8,7 +8,8 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member,Long> {
 
-    boolean existsByGoogleId(@Param("google_id") String googleId);
+    boolean existsByGoogleId(String googleId);
 
-    Optional<Member> findByGoogleId(@Param("google_id") String googleId);
+    boolean existsByNickname(String nickname);
+    Optional<Member> findByGoogleId(String googleId);
 }

@@ -27,7 +27,7 @@ public class Posts extends BaseTimeEntity {
     private String content;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "Member_id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     private Integer likeCnt;
