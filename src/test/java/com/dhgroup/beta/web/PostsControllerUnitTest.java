@@ -1,8 +1,13 @@
 package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.domain.repository.PostsRepository;
+import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -24,25 +32,19 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(PostsController.class)
+@MockBean(JpaMetamodelMappingContext.class)
 public class PostsControllerUnitTest {
 
-    @Mock
+    @MockBean
     private PostsService postsService;
 
-    @InjectMocks
-    private PostsController postsController;
+    @MockBean
+    private PostsRepository postsRepository;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
-    private HttpSession httpSession;
-
-    @BeforeEach
-    public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(postsController).build();
-    }
 
     @Test
     public void 글작성() throws Exception{
@@ -51,12 +53,11 @@ public class PostsControllerUnitTest {
 
         given(postsService.write(any(PostsRequestDto.class))).willReturn(1L);
 
-        ResultActions resultActions = mockMvc.perform(
+         mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/v1/posts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
                         .andExpect(status().isOk());
-
     }
 
     @Test
@@ -88,6 +89,21 @@ public class PostsControllerUnitTest {
 
         verify(postsService).likeRollback(1L);
     }
+
+//    @Test
+//     public void 글수정() throws Exception{
+//        //given
+//
+//        PostsUpdateDto updateDto = PostsUpdateDto.builder().content("글내용").title("글제목").build();
+////        given(postsService.update(1L,updateDto))
+//        //when
+//        mockMvc.perform(
+//                        MockMvcRequestBuilders.patch("/api/v1/posts/{id}", 1L)
+//                                .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isOk());
+//        //then
+//        verify()
+//    }
 
     private static Member createMember(String googleId,String nickName) {
         return Member.builder().googleId(googleId).nickname(nickName).build();

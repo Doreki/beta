@@ -1,13 +1,14 @@
 package com.dhgroup.beta.web.dto;
 
 import com.dhgroup.beta.domain.Member;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+
+import java.util.Objects;
 
 @NoArgsConstructor
 @Getter
+@EqualsAndHashCode
+@ToString
 public class MemberRequestDto {
 
     private String googleId;

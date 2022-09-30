@@ -32,4 +32,9 @@ public class MemberService {
     public Member logIn(String googleId) {
         return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotFoundGoogleIdException("존재하지 않는 회원입니다."));
     }
+
+    public void updateNickname(Long id, String googleId) {
+        Member member = memberRepository.findById(id).get();
+        member.updateNickname(googleId);
+    }
 }

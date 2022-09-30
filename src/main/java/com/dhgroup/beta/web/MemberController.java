@@ -7,10 +7,7 @@ import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,5 +32,9 @@ public class MemberController {
             throw new NotFoundGoogleIdException("존재하지 않는 회원입니다.");
     }
 
+    @PatchMapping("/api/v1/member/{id}")
+    public void updateNickname(@PathVariable Long id, @RequestBody String googleId) {
+         memberService.updateNickname(id, googleId);
+    }
 
 }

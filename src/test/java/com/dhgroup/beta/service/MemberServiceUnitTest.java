@@ -42,10 +42,19 @@ public class MemberServiceUnitTest {
         Member member = createMember("1", "글쓴이");
         given(memberRepository.findByGoogleId(anyString())).willReturn(Optional.of(member));
         //when
-        ;
+
         //then
         NotFoundGoogleIdException e = assertThrows(NotFoundGoogleIdException.class, () -> memberService.logIn(null));
         assertThat(e.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+     public void () throws Exception{
+        //given
+
+        //when
+
+        //then
     }
 
     private static Member createMember(String googleId, String nickname) {
