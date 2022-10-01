@@ -49,6 +49,8 @@ public class Member extends BaseTimeEntity {
             userTag = "00" + id;
         } else if (id/1000 == 0) {
             userTag = "0" +id;
+        } else {
+            userTag = ""+id;
         }
         userTag = "#"+userTag;
         return userTag;

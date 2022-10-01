@@ -2,6 +2,7 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.ExistNicknameException;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
@@ -56,10 +57,12 @@ public class MemberServiceUnitTest {
     @Test
      public void 닉네임중복발생() throws Exception{
         //given
-
+        String googleId = "1";
+        given(memberRepository.existsByNickname(googleId)).willReturn(true);
         //when
-
+        ExistNicknameException e = assertThrows(ExistNicknameException.class, () -> memberService.isDuplicated(googleId));
         //then
+        assertThat(e.getMessage()).isEqualTo("이미 존재하는 닉네임입니다.");
     }
 
     private static MemberRequestDto createRequestDto(String googleId, String nickname) {

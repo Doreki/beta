@@ -54,7 +54,7 @@ public class MemberControllerTest {
         verify(memberService).signUp(any(MemberRequestDto.class));
     }
     @Test
-     public void 로그인성공() throws Exception{
+     public void 로그인() throws Exception{
         //given
         Member member = createMember("1","글쓴이");
         String url = "/api/v1/member/login";
@@ -73,23 +73,6 @@ public class MemberControllerTest {
                                 .andDo(print());
         //then
         verify(memberService).logIn(googleId);
-    }
-
-    @Test
-     public void 로그인실패() throws Exception{
-        //given
-        String url = "/api/v1/member/login";
-        String googleId = "1";
-//        given(memberService.isValidMember(googleId)).willReturn(false);
-        //when
-                        mockMvc.perform(
-                                 post(url)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(googleId))
-                                .andExpect(status().isSeeOther())
-                                .andExpect(jsonPath("$.msg",is("REDIRECT_TO_SIGNUP")))
-                                .andDo(print());
-        //then
     }
 
     @Test

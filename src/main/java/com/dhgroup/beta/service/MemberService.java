@@ -36,6 +36,6 @@ public class MemberService {
 
     public void isDuplicated(String nickname) {
         if(memberRepository.existsByNickname(nickname))
-            throw new ExistNicknameException("이미 존재하는 닉네임 입니다.");
+            throw new ExistNicknameException("이미 존재하는 닉네임입니다.");
     }
 }
