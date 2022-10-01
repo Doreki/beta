@@ -37,6 +37,17 @@ public class MemberRepositoryTest {
         assertThat(existsByGoogleId).isEqualTo(true);
     }
 
+    @Test
+    public void 닉네임중복체크() throws Exception{
+        //given
+        Member member = createMember("1","nickname");
+        memberRepository.save(member);
+        //when
+        boolean existsByNickname = memberRepository.existsByNickname(member.getNickname());
+        //then
+        assertThat(existsByNickname).isEqualTo(true);
+    }
+
 
     private static Member createMember(String googleId,String nickname) {
         return Member.builder().googleId(googleId).nickname(nickname).build();

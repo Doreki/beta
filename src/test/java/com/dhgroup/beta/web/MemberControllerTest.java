@@ -60,7 +60,7 @@ public class MemberControllerTest {
         String url = "/api/v1/member/login";
         String googleId = member.getGoogleId();
 
-        given(memberService.isValidMember(googleId)).willReturn(true);
+//        given(memberService.isValidMember(googleId)).willReturn(true);
         given(memberService.logIn(googleId)).willReturn(member);
         //when
                     mockMvc.perform(
@@ -80,7 +80,7 @@ public class MemberControllerTest {
         //given
         String url = "/api/v1/member/login";
         String googleId = "1";
-        given(memberService.isValidMember(googleId)).willReturn(false);
+//        given(memberService.isValidMember(googleId)).willReturn(false);
         //when
                         mockMvc.perform(
                                  post(url)

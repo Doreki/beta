@@ -2,10 +2,10 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.exception.NotFoundGoogleIdException;
+import com.dhgroup.beta.exception.ExistNicknameException;
+import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,16 +25,17 @@ public class MemberService {
         return member.getId();
     }
 
-    public boolean isValidMember(String googleId) {
-        return memberRepository.existsByGoogleId(googleId);
-    }
-
     public Member logIn(String googleId) {
-        return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotFoundGoogleIdException("존재하지 않는 회원입니다."));
+        return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
     public void updateNickname(Long id, String googleId) {
         Member member = memberRepository.findById(id).get();
         member.updateNickname(googleId);
+    }
+
+    public void isDuplicated(String nickname) {
+        if(memberRepository.existsByNickname(nickname))
+            throw new ExistNicknameException("이미 존재하는 닉네임 입니다.");
     }
 }

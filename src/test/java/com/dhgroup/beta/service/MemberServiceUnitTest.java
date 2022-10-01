@@ -2,7 +2,7 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.exception.NotFoundGoogleIdException;
+import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +37,7 @@ public class MemberServiceUnitTest {
         //when
 
         //then
-        NotFoundGoogleIdException e = assertThrows(NotFoundGoogleIdException.class, () -> memberService.logIn(null));
+        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.logIn(null));
         assertThat(e.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
@@ -51,6 +51,15 @@ public class MemberServiceUnitTest {
         memberService.signUp(requestDto);
         //then
         verify(memberRepository).saveAndFlush(any(Member.class));
+    }
+
+    @Test
+     public void 닉네임중복발생() throws Exception{
+        //given
+
+        //when
+
+        //then
     }
 
     private static MemberRequestDto createRequestDto(String googleId, String nickname) {

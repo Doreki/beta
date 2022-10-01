@@ -35,9 +35,16 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.SEE_OTHER)
-    @ExceptionHandler(value = NotFoundGoogleIdException.class)
-    public Map<String, String> handleException(NotFoundGoogleIdException e) {
+    @ExceptionHandler(value = NotExistMemberException.class)
+    public Map<String, String> handleException(NotExistMemberException e) {
         Map<String, String> map = putErrorMessage("REDIRECT_TO_SIGNUP");
+        return map;
+    }
+
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(value = ExistNicknameException.class)
+    public Map<String, String> handleException(ExistNicknameException e) {
+        Map<String, String> map = putErrorMessage("DUPLICATED_ID");
         return map;
     }
 
