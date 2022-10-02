@@ -1,5 +1,9 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.domain.repository.PostsRepository;
+import com.dhgroup.beta.exception.MemberNotMatchException;
 import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsResponseDto;
@@ -17,6 +21,11 @@ import java.util.Map;
 public class PostsController {
 
     private final PostsService postsService;
+
+    private final PostsRepository postsRepository;
+    private final MemberRepository memberRepository;
+
+
 
     @GetMapping("/api/v1/posts/{lastIndex}")
     public Map<String,Object> viewList(@PathVariable(required = false) Long lastIndex) {
@@ -41,23 +50,29 @@ public class PostsController {
         return postsService.write(postsRequestDto);
     }
 
-    @PatchMapping("/api/v1/posts/{id}")
-    public void update(@PathVariable Long id,@RequestBody PostsUpdateDto postsUpdateDto) {
-        postsService.update(id, postsUpdateDto);
+    @PatchMapping("/api/v1/posts/{postsId}")
+    public void update(@PathVariable Long postsId,
+                       @RequestBody PostsUpdateDto postsUpdateDto
+                       ) {
+        if(postsService.authorCheck(postsId, postsUpdateDto.getGoogleId()))
+            postsService.update(postsId, postsUpdateDto);
+        else
+            throw new MemberNotMatchException("권한이 없습니다.");
     }
 
-    @DeleteMapping("/api/v1/posts/{id}")
-    public void delete(@PathVariable Long id) {
-        postsService.delete(id);
+    @DeleteMapping("/api/v1/posts/{postsId}")
+    public void delete(@PathVariable Long postsId) {
+        postsService.delete(postsId);
     }
 
-    @PatchMapping("/api/v1/posts/like/{id}")
-    public void like(@PathVariable Long id) {
-        postsService.likeIncrease(id);
+    @PatchMapping("/api/v1/posts/like/{postsId}")
+    public void like(@PathVariable Long postsId) {
+        postsService.likeIncrease(postsId);
     }
 
     @PatchMapping("/api/v1/posts/likeRollback/{id}")
     public void likeRollback(@PathVariable Long id) {
         postsService.likeRollback(id);
     }
+
 }

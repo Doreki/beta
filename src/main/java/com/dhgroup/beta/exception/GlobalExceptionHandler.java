@@ -48,6 +48,13 @@ public class GlobalExceptionHandler {
         return map;
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(value = MemberNotMatchException.class)
+    public Map<String, String> handleException(MemberNotMatchException e) {
+        Map<String, String> map = putErrorMessage("NOT_ALLOW");
+        return map;
+    }
+
     private static Map<String, String> putErrorMessage(String err) {
         Map<String, String> map = new HashMap<>();
         map.put("msg", err);

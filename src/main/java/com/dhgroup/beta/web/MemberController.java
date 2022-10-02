@@ -28,10 +28,10 @@ public class MemberController {
             return memberService.logIn(googleId);
     }
 
-    @PatchMapping("/api/v1/member/{id}")
-    public void updateNickname(@PathVariable Long id, @RequestBody String googleId) {
+    @PatchMapping("/api/v1/member/{memberId}")
+    public void updateNickname(@PathVariable Long memberId, @RequestBody String googleId) {
         memberService.isDuplicated(googleId); //중복되었으면 예외발생
-        memberService.updateNickname(id, googleId);
+        memberService.updateNickname(memberId, googleId);
     }
 
 }

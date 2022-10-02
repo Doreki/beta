@@ -78,12 +78,12 @@ public class MemberControllerTest {
     @Test
      public void 닉네임변경() throws Exception{
         //given
-        String url = "/api/v1/member/{id}";
+        String url = "/api/v1/member/{memberId}";
         String newNickname = "홍길동";
 //        given(memberService.updateNickname())
         //when
         mockMvc.perform(
-                        patch(url,1L,newNickname)
+                        patch(url,1L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(newNickname))
                 .andExpect(status().isOk())

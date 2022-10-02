@@ -42,6 +42,9 @@ public class PostsControllerUnitTest {
     @MockBean
     private PostsRepository postsRepository;
 
+    @MockBean
+    private MemberRepository memberRepository;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -90,20 +93,43 @@ public class PostsControllerUnitTest {
         verify(postsService).likeRollback(1L);
     }
 
-//    @Test
-//     public void 글수정() throws Exception{
-//        //given
-//
-//        PostsUpdateDto updateDto = PostsUpdateDto.builder().content("글내용").title("글제목").build();
-////        given(postsService.update(1L,updateDto))
-//        //when
-//        mockMvc.perform(
-//                        MockMvcRequestBuilders.patch("/api/v1/posts/{id}", 1L)
-//                                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk());
-//        //then
-//        verify()
-//    }
+    @Test
+     public void 글수정() throws Exception{
+        //given
+
+        PostsUpdateDto updateDto = PostsUpdateDto.builder().googleId("1").content("글내용").title("글제목").build();
+        Long postsId = 1L;
+        String googleId = updateDto.getGoogleId();
+
+        given(postsService.authorCheck(postsId,googleId)).willReturn(true);
+        //when
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
+                                .content(new ObjectMapper().writeValueAsString(updateDto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        //then
+        verify(postsService).authorCheck(postsId,googleId);
+        verify(postsService).update(eq(postsId),any(PostsUpdateDto.class));
+    }
+
+    @Test
+    public void 글수정_실패() throws Exception{
+        //given
+
+        PostsUpdateDto updateDto = PostsUpdateDto.builder().googleId("1").content("글내용").title("글제목").build();
+        Long postsId = 1L;
+        String googleId = updateDto.getGoogleId();
+
+        given(postsService.authorCheck(postsId,googleId)).willReturn(false);
+        //when
+        mockMvc.perform(
+                        MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
+                                .content(new ObjectMapper().writeValueAsString(updateDto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+        //then
+    }
 
     private static Member createMember(String googleId,String nickName) {
         return Member.builder().googleId(googleId).nickname(nickName).build();

@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
@@ -21,6 +22,8 @@ import java.util.stream.Collectors;
 public class PostsService {
 
     private final PostsRepository postsRepository;
+
+    private final MemberRepository memberRepository;
 
     public Posts findById(Long id) {
         return postsRepository.findById(id)
@@ -94,5 +97,12 @@ public class PostsService {
         Posts posts = findById(id);
         //Entity의 내용을 Dto에 담는다
         return new PostsResponseDto(posts);
+    }
+
+    public boolean authorCheck(Long postsId, String googleId) {
+        String nicknameByMobile = memberRepository.findByGoogleId(googleId).get().getNickname();
+        String nicknameByPosts = postsRepository.findById(postsId).get().getMember().getNickname();
+        if(nicknameByMobile==nicknameByPosts) return true;
+        else return false;
     }
 }

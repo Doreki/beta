@@ -29,8 +29,9 @@ public class MemberService {
         return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
-    public void updateNickname(Long id, String googleId) {
-        Member member = memberRepository.findById(id).get();
+    @Transactional
+    public void updateNickname(Long memberId, String googleId) {
+        Member member = memberRepository.findById(memberId).get();
         member.updateNickname(googleId);
     }
 
