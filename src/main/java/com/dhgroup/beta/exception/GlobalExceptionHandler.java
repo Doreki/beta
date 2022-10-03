@@ -42,8 +42,8 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(value = ExistNicknameException.class)
-    public Map<String, String> handleException(ExistNicknameException e) {
+    @ExceptionHandler(value = OverlapMemberException.class)
+    public Map<String, String> handleException(OverlapMemberException e) {
         Map<String, String> map = putErrorMessage("DUPLICATED_ID");
         return map;
     }

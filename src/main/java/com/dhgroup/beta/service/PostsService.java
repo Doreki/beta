@@ -69,10 +69,7 @@ public class PostsService {
         posts.likeCancle();
     }
 
-    public List<PostsResponseDto> viewList(Pageable pageable) {
-//        if(startId<=0) {
-//            throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
-//        }
+    public List<PostsResponseDto> viewPostsList(Pageable pageable) {
 
         List<PostsResponseDto> postsList = postsRepository.findAllByOrderByIdDesc(pageable)
                 .stream().map(PostsResponseDto::new).collect(Collectors.toList());

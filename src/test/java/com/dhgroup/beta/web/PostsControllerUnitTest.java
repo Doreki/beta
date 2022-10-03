@@ -7,6 +7,7 @@ import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,8 +29,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.servlet.http.HttpSession;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -51,7 +57,7 @@ public class PostsControllerUnitTest {
 
     @Test
     public void 글작성() throws Exception{
-        PostsRequestDto postsRequestDto = createPostsPostDto("글제목","글내용");
+        PostsRequestDto postsRequestDto = createPostsReqeustDto("글제목","글내용");
         Member member = createMember("1","글쓴이");
 
         given(postsService.write(any(PostsRequestDto.class))).willReturn(1L);
@@ -131,12 +137,43 @@ public class PostsControllerUnitTest {
         //then
     }
 
+    @Test
+    public void 글목록_불러오기() throws Exception{
+        //given
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<PostsResponseDto> postsResponseDtos = new ArrayList<>();
+
+        for (int i = 1; i <= 5; i++) {
+        postsResponseDtos.add(createPostsResponseDto("글제목"+i, "글내용"+i));
+        }
+
+        given(postsService.viewPostsList(pageRequest)).willReturn(postsResponseDtos);
+        //when
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/posts/")
+                                .content(new ObjectMapper().writeValueAsString(pageRequest))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk())
+                                .andDo(print());
+        //then
+        verify(postsService).viewPostsList(any(PageRequest.class));
+    }
+
     private static Member createMember(String googleId,String nickName) {
         return Member.builder().googleId(googleId).nickname(nickName).build();
     }
 
-    private PostsRequestDto createPostsPostDto(String title, String content) {
+    private PostsRequestDto createPostsReqeustDto(String title, String content) {
         return PostsRequestDto.builder()
+                .title(title)
+                .content(content)
+                .build();
+    }
+
+    private PostsResponseDto createPostsResponseDto(String title, String content) {
+        return PostsResponseDto.builder()
                 .title(title)
                 .content(content)
                 .build();

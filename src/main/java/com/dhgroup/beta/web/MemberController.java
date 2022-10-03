@@ -14,12 +14,10 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    private final MemberRepository memberRepository;
-
 
     @PostMapping("/api/v1/member/1h2g2yysh297h2s")
-    public Long singUp(MemberRequestDto memberRequestDto) {
-        memberService.isDuplicated(memberRequestDto.getNickname()); //중복된 닉네임이면 예외 발생
+    public Long singUp(@RequestBody MemberRequestDto memberRequestDto) {
+        memberService.isDuplicated(memberRequestDto.getGoogleId()); //중복 회원
         return memberService.signUp(memberRequestDto);
     }
 
@@ -29,9 +27,8 @@ public class MemberController {
     }
 
     @PatchMapping("/api/v1/member/{memberId}")
-    public void updateNickname(@PathVariable Long memberId, @RequestBody String googleId) {
-        memberService.isDuplicated(googleId); //중복되었으면 예외발생
-        memberService.updateNickname(memberId, googleId);
+    public void updateNickname(@PathVariable Long memberId, @RequestBody String nickname) {
+        memberService.updateNickname(memberId, nickname);
     }
 
 }

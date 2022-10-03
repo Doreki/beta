@@ -74,43 +74,22 @@ public class PostsRepositoryTest {
         assertThat(posts.getModifiedDate()).isAfter(now);
     }
 
-//    @Test
-//     public void 최신글찾기() throws Exception{
-//        //given
-//        Member member = createMember("홍길동", "1");
-//            memberRepository.save(member);
-//
-//        for (int i = 1; i <= 10; i++) {
-//        Posts posts = createPosts(member, "글제목"+i, "글내용");
-//            postsRepository.save(posts);
-//        }
-//        //when
-//        Posts findRecentPosts = postsRepository.findTopByOrderByIdDesc();
-//        //then
-//        assertThat(findRecentPosts.getTitle()).isEqualTo("글제목10");
-//    }
-//
-//    @Test
-//     public void 글목록_불러오기() throws Exception{
-//        //given
-//        for (int i = 1; i <= 100; i++) {
-//            Member member = createMember("홍길동"+i, "1");
-//            memberRepository.save(member);
-//
-//            Posts posts = createPosts(member, "글제목"+i, "글내용");
-//            postsRepository.save(posts);
-//        }
-//
-//        Posts findRecentPosts = postsRepository.findTopByOrderByIdDesc();
-//        Long researchId = findRecentPosts.getId();
-//        //when
-//        List<Posts> PostsList = postsRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(researchId);
-//
-//        //then
-//        assertThat(PostsList.size()).isEqualTo(10);
-//        assertThat(PostsList.get(0).getTitle()).isEqualTo("글제목100");
-//        assertThat(PostsList.get(9).getTitle()).isEqualTo("글제목91");
-//    }
+    @Test
+     public void 최신글찾기() throws Exception{
+        //given
+        Member member = createMember("홍길동", "1");
+            memberRepository.save(member);
+
+        for (int i = 1; i <= 10; i++) {
+        Posts posts = createPosts(member, "글제목"+i, "글내용");
+            postsRepository.save(posts);
+        }
+        //when
+        Posts findRecentPosts = postsRepository.findTopByOrderByIdDesc();
+        //then
+        assertThat(findRecentPosts.getTitle()).isEqualTo("글제목10");
+    }
+
 
     @Test
     public void 글목록_불러오기_10개() throws Exception{
@@ -126,7 +105,6 @@ public class PostsRepositoryTest {
         Pageable pageable = PageRequest.of(0,10);
         //when
         Page<Posts> PostsList = postsRepository.findAllByOrderByIdDesc(pageable);
-
         //then
         assertThat(PostsList.getTotalPages()).isEqualTo(10);
         assertThat(PostsList.getNumberOfElements()).isEqualTo(10);

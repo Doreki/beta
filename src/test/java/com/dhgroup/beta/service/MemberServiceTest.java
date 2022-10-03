@@ -31,7 +31,20 @@ public class MemberServiceTest {
 
         //then
         assertThat(member.getNickname()).isEqualTo("글쓴이"+userTag);
+    }
 
+    @Test
+    public void 회원수정() throws Exception{
+        //given
+        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
+        Long memberId = memberService.signUp(memberRequestDto);
+        //when
+        Member member = memberRepository.findById(memberId).get(); //db에 저장된 닉네임
+        String userTag = member.createUserTag(); //userTag메서드가 만들어준 닉네임
+        member.updateNickname("홍길동");
+
+        //then
+        assertThat(member.getNickname()).isEqualTo("홍길동"+userTag);
     }
 
     private static MemberRequestDto createMemberRequestDto(String googleId, String nickname) {

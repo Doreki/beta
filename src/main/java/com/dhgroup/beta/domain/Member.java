@@ -26,8 +26,11 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false,name="google_id")
     private String googleId;
 
-    @Column(nullable = false,name="nickname")
+    @Column(nullable = false)
     private String nickname;
+
+    @Column
+    private String userTag;
 
 
     @Builder
@@ -38,7 +41,8 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updateNickname(String nickname) {
-        this.nickname = nickname;
+        this.userTag = createUserTag(); //member객체 생성과 수정 둘 다 userTag 필요함, id값은 불변하기 때문에 userTag를 다시 생성해도 똑같은 값이 들어감
+        this.nickname = nickname+createUserTag();
     }
 
     public String createUserTag() {
@@ -53,6 +57,8 @@ public class Member extends BaseTimeEntity {
             userTag = ""+id;
         }
         userTag = "#"+userTag;
+
+        this.userTag = userTag;
         return userTag;
     }
 }

@@ -2,7 +2,7 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.exception.ExistNicknameException;
+import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class MemberService {
 
         Member member = memberRequestDto.toEntity();
         member = memberRepository.saveAndFlush(member);
-        String nickname = member.getNickname()+ member.createUserTag();
+        String nickname = member.getNickname();
         member.updateNickname(nickname);
         return member.getId();
     }
@@ -30,13 +30,14 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateNickname(Long memberId, String googleId) {
+    public void updateNickname(Long memberId, String nickname) {
         Member member = memberRepository.findById(memberId).get();
-        member.updateNickname(googleId);
+        member.updateNickname(nickname);
     }
 
-    public void isDuplicated(String nickname) {
-        if(memberRepository.existsByNickname(nickname))
-            throw new ExistNicknameException("이미 존재하는 닉네임입니다.");
+    @Transactional
+    public void isDuplicated(String googleId) {
+        if(memberRepository.existsByGoogleId(googleId))
+            throw new OverlapMemberException("이미 존재하는 회원입니다.");
     }
 }

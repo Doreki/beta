@@ -11,7 +11,6 @@ import java.util.Objects;
 @ToString
 public class MemberRequestDto {
 
-    private Long id;
     private String googleId;
     private String nickname;
 

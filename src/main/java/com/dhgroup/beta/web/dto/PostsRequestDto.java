@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class PostsRequestDto {
     private String title;
     private String content;
-    private Member member;
+    private Member member
+            ;
 
     @Builder
     public PostsRequestDto(String title, String content, Member member) {

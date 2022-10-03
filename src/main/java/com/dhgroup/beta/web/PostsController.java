@@ -11,6 +11,7 @@ import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -28,11 +29,10 @@ public class PostsController {
 
 
 
-    @GetMapping("/api/v1/posts/{lastIndex}")
-    public List<PostsResponseDto> viewList(@RequestParam Pageable pageable) {
+    @GetMapping("/api/v1/posts")
+    public List<PostsResponseDto> viewPostsList(Pageable pageable) {
 
-        List<PostsResponseDto> posts = postsService.viewList(pageable);
-        return posts;
+        return postsService.viewPostsList(pageable);
     }
 
     @PostMapping("/api/v1/posts")
