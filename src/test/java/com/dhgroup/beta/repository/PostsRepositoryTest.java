@@ -1,6 +1,8 @@
 package com.dhgroup.beta.repository;
 
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -25,6 +31,8 @@ public class PostsRepositoryTest {
     @Autowired
     PostsRepository postsRepository;
 
+    @Autowired
+    MemberRepository memberRepository;
 
     @Test
     public void save() {
@@ -64,5 +72,95 @@ public class PostsRepositoryTest {
 
         assertThat(posts.getCreatedDate()).isAfter(now);
         assertThat(posts.getModifiedDate()).isAfter(now);
+    }
+
+//    @Test
+//     public void 최신글찾기() throws Exception{
+//        //given
+//        Member member = createMember("홍길동", "1");
+//            memberRepository.save(member);
+//
+//        for (int i = 1; i <= 10; i++) {
+//        Posts posts = createPosts(member, "글제목"+i, "글내용");
+//            postsRepository.save(posts);
+//        }
+//        //when
+//        Posts findRecentPosts = postsRepository.findTopByOrderByIdDesc();
+//        //then
+//        assertThat(findRecentPosts.getTitle()).isEqualTo("글제목10");
+//    }
+//
+//    @Test
+//     public void 글목록_불러오기() throws Exception{
+//        //given
+//        for (int i = 1; i <= 100; i++) {
+//            Member member = createMember("홍길동"+i, "1");
+//            memberRepository.save(member);
+//
+//            Posts posts = createPosts(member, "글제목"+i, "글내용");
+//            postsRepository.save(posts);
+//        }
+//
+//        Posts findRecentPosts = postsRepository.findTopByOrderByIdDesc();
+//        Long researchId = findRecentPosts.getId();
+//        //when
+//        List<Posts> PostsList = postsRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(researchId);
+//
+//        //then
+//        assertThat(PostsList.size()).isEqualTo(10);
+//        assertThat(PostsList.get(0).getTitle()).isEqualTo("글제목100");
+//        assertThat(PostsList.get(9).getTitle()).isEqualTo("글제목91");
+//    }
+
+    @Test
+    public void 글목록_불러오기_10개() throws Exception{
+        //given
+        for (int i = 1; i <= 100; i++) {
+            Member member = createMember("홍길동"+i, "1");
+            memberRepository.save(member);
+
+            Posts posts = createPosts(member, "글제목"+i, "글내용");
+            postsRepository.save(posts);
+        }
+
+        Pageable pageable = PageRequest.of(0,10);
+        //when
+        Page<Posts> PostsList = postsRepository.findAllByOrderByIdDesc(pageable);
+
+        //then
+        assertThat(PostsList.getTotalPages()).isEqualTo(10);
+        assertThat(PostsList.getNumberOfElements()).isEqualTo(10);
+        assertThat(PostsList.getContent().get(0).getTitle()).isEqualTo("글제목100");
+        assertThat(PostsList.getContent().get(9).getTitle()).isEqualTo("글제목91");
+    }
+
+    @Test
+    public void 글목록_불러오기_10개이하() throws Exception{
+        //given
+        for (int i = 1; i <= 3; i++) {
+            Member member = createMember("홍길동"+i, "1");
+            memberRepository.save(member);
+
+            Posts posts = createPosts(member, "글제목"+i, "글내용");
+            postsRepository.save(posts);
+        }
+
+        Pageable pageable = PageRequest.of(0,10);
+        //when
+        Page<Posts> postsList = postsRepository.findAllByOrderByIdDesc(pageable);
+
+        //then
+        assertThat(postsList.getTotalPages()).isEqualTo(1);
+        assertThat(postsList.getNumberOfElements()).isEqualTo(3);
+        assertThat(postsList.getContent().get(0).getTitle()).isEqualTo("글제목3");
+        assertThat(postsList.getContent().get(2).getTitle()).isEqualTo("글제목1");
+    }
+
+    private static Posts createPosts(Member member, String title, String content) {
+        return Posts.builder().title(title).content(content).member(member).build();
+    }
+
+    private static Member createMember(String nickName, String googleId) {
+        return Member.builder().nickname(nickName).googleId(googleId).build();
     }
 }

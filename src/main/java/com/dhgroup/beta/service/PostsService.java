@@ -9,6 +9,7 @@ import com.dhgroup.beta.web.dto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,12 +69,12 @@ public class PostsService {
         posts.likeCancle();
     }
 
-    public List<PostsResponseDto> viewList(Long startId) {
-        if(startId<=0) {
-            throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
-        }
+    public List<PostsResponseDto> viewList(Pageable pageable) {
+//        if(startId<=0) {
+//            throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
+//        }
 
-        List<PostsResponseDto> postsList = postsRepository.findFirst10ByIdLessThanEqualOrderByIdDesc(startId)
+        List<PostsResponseDto> postsList = postsRepository.findAllByOrderByIdDesc(pageable)
                 .stream().map(PostsResponseDto::new).collect(Collectors.toList());
         //Posts형태의 데이터를 PostsResponseDto로 변환시켜서 List에 담아서 보냄
 
