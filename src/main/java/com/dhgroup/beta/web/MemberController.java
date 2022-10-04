@@ -8,6 +8,9 @@ import com.dhgroup.beta.web.dto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
+
 @RequiredArgsConstructor
 @RestController
 public class MemberController {
@@ -21,13 +24,17 @@ public class MemberController {
         return memberService.signUp(memberRequestDto);
     }
 
-    @PostMapping("/api/v1/member/login")
+    @GetMapping("/api/v1/member/login")
     public Member logIn(@RequestBody String googleId) {
             return memberService.logIn(googleId);
     }
 
     @PatchMapping("/api/v1/member/{memberId}")
-    public void updateNickname(@PathVariable Long memberId, @RequestBody String nickname) {
+    public void updateNickname(@PathVariable Long memberId,
+                               @RequestBody
+                               @Valid
+                               @Pattern(regexp = "^[0-9a-zA-Z가-힇]{2,10}$",message = "특수문자, 공백을 제외하고 2자 이상 10자 이하로 입력하세요.")
+                               String nickname) {
         memberService.updateNickname(memberId, nickname);
     }
 

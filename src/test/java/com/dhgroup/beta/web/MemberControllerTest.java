@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.*;
@@ -60,11 +59,10 @@ public class MemberControllerTest {
         String url = "/api/v1/member/login";
         String googleId = member.getGoogleId();
 
-//        given(memberService.isValidMember(googleId)).willReturn(true);
         given(memberService.logIn(googleId)).willReturn(member);
         //when
                     mockMvc.perform(
-                                post(url)
+                                get(url)
                                 .content(googleId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
@@ -80,7 +78,6 @@ public class MemberControllerTest {
         //given
         String url = "/api/v1/member/{memberId}";
         String newNickname = "홍길동";
-//        given(memberService.updateNickname())
         //when
         mockMvc.perform(
                         patch(url,1L)

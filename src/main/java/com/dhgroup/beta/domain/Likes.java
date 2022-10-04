@@ -1,6 +1,7 @@
 package com.dhgroup.beta.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,4 +26,11 @@ public class Likes {
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Builder
+    public Likes(Long id, Posts posts, Member member) {
+        this.id = id;
+        this.posts = posts;
+        this.member = member;
+    }
 }

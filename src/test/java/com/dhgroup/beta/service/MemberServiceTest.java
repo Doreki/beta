@@ -2,56 +2,78 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.OverlapMemberException;
+import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.assertj.core.api.Assertions.*;
+import java.util.Optional;
 
-@Transactional
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.verify;
+
+@Import({MemberRepository.class, MemberService.class})
+@ExtendWith(SpringExtension.class)
 public class MemberServiceTest {
+
+    @MockBean
+    MemberRepository memberRepository;
 
     @Autowired
     MemberService memberService;
 
-    @Autowired
-    MemberRepository memberRepository;
+
+    @Test
+     public void 로그인_실패() throws Exception{
+        //given
+        Member member = createMember(1L,"1", "글쓴이");
+        given(memberRepository.findByGoogleId(anyString())).willReturn(Optional.of(member));
+        //when
+
+        //then
+        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.logIn(null));
+        assertThat(e.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
 
     @Test
      public void 회원가입() throws Exception{
+        Member member = createMember(1L,"1", "글쓴이");
+        MemberRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
-        Long memberId = memberService.signUp(memberRequestDto);
+        given(memberRepository.saveAndFlush(any(Member.class))).willReturn(member);
         //when
-        Member member = memberRepository.findById(memberId).get(); //db에 저장된 닉네임
-        String userTag = member.createUserTag(); //userTag메서드가 만들어준 닉네임
-
+        memberService.signUp(requestDto);
         //then
-        assertThat(member.getNickname()).isEqualTo("글쓴이"+userTag);
+        verify(memberRepository).saveAndFlush(any(Member.class));
     }
 
     @Test
-    public void 회원수정() throws Exception{
+     public void 닉네임중복발생() throws Exception{
         //given
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1","글쓴이");
-        Long memberId = memberService.signUp(memberRequestDto);
+        String googleId = "1";
+        given(memberRepository.existsByGoogleId(googleId)).willReturn(true);
         //when
-        Member member = memberRepository.findById(memberId).get(); //db에 저장된 닉네임
-        String userTag = member.createUserTag(); //userTag메서드가 만들어준 닉네임
-        member.updateNickname("홍길동");
-
+        OverlapMemberException e = assertThrows(OverlapMemberException.class, () -> memberService.isDuplicated(googleId));
         //then
-        assertThat(member.getNickname()).isEqualTo("홍길동"+userTag);
+        assertThat(e.getMessage()).isEqualTo("이미 존재하는 회원입니다.");
     }
 
-    private static MemberRequestDto createMemberRequestDto(String googleId, String nickname) {
+    private static MemberRequestDto createRequestDto(String googleId, String nickname) {
         return MemberRequestDto.builder().googleId(googleId).nickname(nickname).build();
     }
 
-    private static Member createMember(String googleId, String nickname) {
-        return Member.builder().googleId(googleId).nickname(nickname).build();
+    private static Member createMember(Long id,String googleId, String nickname) {
+        return Member.builder()
+                .id(id)
+                .googleId(googleId)
+                .nickname(nickname)
+                .build();
     }
 }

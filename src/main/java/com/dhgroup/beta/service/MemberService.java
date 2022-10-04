@@ -31,7 +31,7 @@ public class MemberService {
 
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
         member.updateNickname(nickname);
     }
 

@@ -1,21 +1,23 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.web.dto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.web.dto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -27,29 +29,32 @@ public class PostsService {
 
     private final MemberRepository memberRepository;
 
-    public Posts findById(Long id) {
+    private final LikesRepository likesRepository;
+
+    private Posts findPostsById(Long id) {
         return postsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+                .orElseThrow(() -> new NotFoundPostsException("해당 게시글이 없습니다."));
         //시간 차로 인해 게시글이 없을 수도 있기 때문에 예외 던져줌
         //DB에서 해당 게시글을 찾아오고 없으면 예외 던짐
         //자주 사용되는 메서드이기 때문에 메서드로 분리
+    }
+
+    private Member findMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
     @Transactional
     public Long write(PostsRequestDto postsRequestDto) {
         Long memberId = postsRequestDto.getMemberId();
         Member member = memberRepository.findById(memberId).get();
-        Posts posts = Posts.builder()
-                .title(postsRequestDto.getTitle())
-                .content(postsRequestDto.getContent())
-                .member(member).build();
-        return postsRepository.save(posts).getId(); //반환값 PostsRepository
+        return postsRepository.save(postsRequestDto.toEntity(member)).getId(); //반환값 PostsRepository
     }
 
     @Transactional
     public void update(Long id, PostsUpdateDto postsUpdateDto) {
 
-        Posts posts = findById(id); //영속성 컨테스트에 올린다.
+        Posts posts = findPostsById(id); //영속성 컨테스트에 올린다.
         posts.update(postsUpdateDto.getTitle(), postsUpdateDto.getContent());
         //게시글이 있으면 글 내용을 수정
     }
@@ -57,26 +62,27 @@ public class PostsService {
 
     @Transactional //삭제할 게시물이 없을 경우 예외처리해줘야함
     public void delete(Long id) {
-        Posts posts = findById(id);
-        postsRepository.delete(posts);
+        postsRepository.delete(findPostsById(id));
     }
 
 
 
     @Transactional
-    public void likeIncrease(Long id) {
-        Posts posts = findById(id);
-        posts.likeIncrease();
+    public void likeIncrease(LikesRequestDto likesRequestDto) {
+        Member member = findMemberById(likesRequestDto.getMemberId());
+        Posts posts = findPostsById(likesRequestDto.getPostsId());
+        Likes likes = likesRequestDto.toEntity(member, posts);
+        likesRepository.save(likes);
     }
 
     //프론트 단에서 기능 구현해야함
     @Transactional
     public void likeRollback(Long id) {
-        Posts posts = findById(id);
+        Posts posts = findPostsById(id);
         posts.likeCancle();
     }
 
-    public List<PostsResponseDto> viewPostsList(Pageable pageable) {
+    public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
         List<PostsResponseDto> postsList = postsRepository.findAllByOrderByIdDesc(pageable)
                 .stream().map(PostsResponseDto::new).collect(Collectors.toList());
@@ -86,22 +92,6 @@ public class PostsService {
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
 
         return postsList;
-    }
-
-    public Optional<Long> findRecentPostsId() {
-        Optional<Posts> opt = Optional.ofNullable(postsRepository.findTopByOrderByIdDesc());
-                opt.orElseThrow(() -> new NotFoundPostsException("마지막 게시글 입니다."));
-        return Optional.of(opt.get().getId()); //null값 반환될 수 있기 때문
-    }
-
-    public Long postsCount() {
-        return postsRepository.count();
-    }
-
-    public PostsResponseDto read(Long id) {
-        Posts posts = findById(id);
-        //Entity의 내용을 Dto에 담는다
-        return new PostsResponseDto(posts);
     }
 
     public boolean authorCheck(Long postsId, String googleId) {

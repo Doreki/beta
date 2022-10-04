@@ -1,239 +1,178 @@
-//package com.dhgroup.beta.service;
-//
-//import com.dhgroup.beta.domain.Member;
-//import com.dhgroup.beta.domain.repository.MemberRepository;
-//import com.dhgroup.beta.exception.NotFoundPostsException;
-//import com.dhgroup.beta.domain.Posts;
-//import com.dhgroup.beta.domain.repository.PostsRepository;
-//import com.dhgroup.beta.web.dto.PostsResponseDto;
-//import com.dhgroup.beta.web.dto.PostsUpdateDto;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.time.LocalDateTime;
-//import java.util.List;
-//
-//import static org.assertj.core.api.Assertions.*;
-//import static org.junit.Assert.assertThrows;
-//
-//@SpringBootTest
-//@Transactional
-//public class PostsServiceTest {
-//
-//    private final static Integer LIMIT=10; //
-//    private final static Long START_ID=11L;
-//    private final static Long LAST_VALUE=START_ID-LIMIT+1;
-//    @Autowired
-//    PostsRepository postsRepository;
-//
-//    @Autowired
-//    MemberRepository memberRepository;
-//    @Autowired
-//    PostsService postsService;
-//
-//    @Test
-//    public void 글작성() {
-//        Long id= postsWrite("글제목","글내용");
-//        assertThat(postsRepository.findById(id).get().getId()).isEqualTo(id);
-//    }
-//
-//    @Test
-//    public void 글_수정() {
-//        Long id= postsWrite("글제목","글내용");
-//
-//                PostsUpdateDto postsUpdateDto = PostsUpdateDto
-//                        .builder()
-//                        .title("글제목 수정")
-//                        .content("글내용 수정")
-//                        .build();
-//        //when - 실행
-//                postsService.update(id, postsUpdateDto); //repositroy 내용 수정
-//            Posts posts = postsRepository.findById(id).get(); //DB에서 수정된 객체를 가져옴
-//        //then - 검증
-//        assertThat(posts.getTitle()).isEqualTo("글제목 수정");
-//        assertThat(posts.getContent()).isEqualTo("글내용 수정");
-//        assertThat(posts.getMember().getNickname()).isEqualTo("글쓴이");
-//
-//    }
-//
-////    @Test
-////     public void 글수정_시간() throws Exception{
-////        //given
-////        Long id= postsWrite("글제목","글내용");
-////        Posts posts = postsRepository.findById(id).get();
-////        LocalDateTime createdDate = posts.getCreatedDate(); //게시글 날짜
-////
-////        //when
-////        PostsUpdateDto postsUpdateDto = PostsUpdateDto
-////                .builder()
-////                .title("글제목 수정")
-////                .content("글내용 수정")
-////                .build();
-////        //then
-////        postsService.update(id, postsUpdateDto); //repositroy 내용 수정
-////        postsRepository.flush();
-////
-////        LocalDateTime modifiedDate = posts.getModifiedDate();
-////
-////        assertThat(modifiedDate).isAfter(createdDate); //글 수정 후에 수정시간이 바꼈는지 확인
-////    }
-//
-//    @Test
-//    public void 글수정_실패() {
-//        Long id= postsWrite("글제목","글내용");
-//        Long wrongId = id+1;
-//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> postsService.update(wrongId, PostsUpdateDto
-//                .builder()
-//                .title("글제목 수정")
-//                .content("글내용 수정")
-//                .build()));
-//        assertThat(e.getMessage()).isEqualTo("해당 게시글이 없습니다.");
-//    }
-//
-//
-//    @Test
-//    public void 글삭제() {
-//        Long id= postsWrite("글제목","글내용");
-//        //given
-//        String nickName = "글쓴이"; //session으로 부터 얻어온 이름
-//        //when
-//        postsService.delete(id);
-//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,() -> postsService.findById(id));
-//        //글을 찾을때 글이 없으면 삭제가 성공한 것
-//        //then
-//        assertThat(e.getMessage()).isEqualTo("해당 게시글이 없습니다.");
-//    }
-//
-////    @Test
-////    public void 글삭제_실패() {
-////        Long id= postsWrite("글제목","글내용");
-////        //given - 상황
-////        Long wrongId = id+1;
-////        String nickName = "작성자 아님";
-////        //when - 실행
-////        postsService.delete(wrongId);
-////        //then - 검증, 글이 존재한다면 삭제 실패한 것
-////        Posts posts = postsRepository.findById(id).get();
-////        assertThat(posts.getMember().getNickname()).isEqualTo("글쓴이");
-////    }
-//
-//    @Test
-//    public void 글조회() {
-//        Long id= postsWrite("글제목","글내용");
-//        LocalDateTime now = LocalDateTime.now();
-//        PostsResponseDto responseDto = postsService.read(id);
-//        assertThat(responseDto.getTitle()).isEqualTo("글제목");
-//        assertThat(responseDto.getCreatedDate()).isBefore(now); //Dto에 생성시간 잘 들어갔는지 확인,생성이 먼저이기 때문에 생성 시간이 지금보다 더 전이어야함
-//    }
-//
-//    @Test
-//    public void 좋아요버튼() {
-//        Long id= postsWrite("글제목","글내용");
-//        //given
-//        postsService.likeIncrease(id);
-//        postsService.likeIncrease(id);
-//        //when
-//        Posts posts = postsRepository.findById(id).get();
-//        //then
-//        assertThat(posts.getLikeCnt()).isEqualTo(2);
-//    }
-//
-//    @Test
-//    public void 좋아요취소() {
-//        Long id= postsWrite("글제목","글내용");
-//        //given
-//        postsService.likeIncrease(id);
-//        postsService.likeIncrease(id);
-//        postsService.likeRollback(id);
-//        postsService.likeRollback(id);
-//
-//        Posts posts = postsRepository.findById(id).get();
-//        //when
-//        //then
-//        assertThat(posts.getLikeCnt()).isEqualTo(0);
-//    }
-//
-//    @Test
-//    public void 좋아요취소실패() {
-//        Long id= postsWrite("글제목","글내용");
-//        postsService.likeRollback(id);
-//
-//        Posts posts = postsRepository.findById(id).get();
-//
-//        assertThat(posts.getLikeCnt()).isEqualTo(0);
-//    }
-//
-//    @Test
-//    public void 글목록불러오기() {
-//        //given 총 글 11개추가
-//        for(int i=1;i<=11;i++) {
-//            Member member = Member.builder().googleId(""+i).nickname("글쓴이").build();
-//            memberRepository.save(member);
-//
-//        postsWrite("글제목"+i,"글내용"+i,member);
-//        }
-//
-//        //when
-//        List<PostsResponseDto> postsList = postsService.viewList(START_ID);
-//        PostsResponseDto firstPosts = postsList.get(0);
-//        PostsResponseDto lastPosts = postsList.get(9);
-//        //then
-//        assertThat(postsList.size()).isEqualTo(LIMIT);
-//        assertThat(firstPosts.getTitle()).isEqualTo("글제목"+START_ID);
-//        assertThat(lastPosts.getTitle()).isEqualTo("글제목"+(START_ID-9));
-//
-//        //then
-//        postsList = postsService.viewList(lastPosts.getId()-1);
-//        assertThat(postsList.size()).isEqualTo(START_ID-10);
-//        assertThat(postsList.get(0).getTitle()).isEqualTo("글제목"+(START_ID-10));
-//    }
-//
-//    @Test
-//    public void 글목록불러오기_마지막_페이지() {
-//        Member member = Member.builder().googleId("1").nickname("글쓴이").build();
-//        memberRepository.save(member);
-//
-//        //given
-//        //게시글이 아무 것도 없을때
-//        System.out.println("postsRepository.findTopByOrderByIdDesc() = " + postsRepository.findTopByOrderByIdDesc());
-//        NotFoundPostsException e = assertThrows(NotFoundPostsException.class,() -> postsService.viewList(START_ID));
-//        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
-//
-//        for(int i=1;i<=START_ID;i++) {
-//            postsWrite("글제목"+i,"글내용"+i,member);
-//        }
-//
-//        //when 마지막 게시글을 불러올때
-//        e = assertThrows(NotFoundPostsException.class,() -> postsService.viewList(1L));
-//
-//        //then
-//        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
-//    }
-//
-//    public Long postsWrite(String title, String content) {
-//        Member member = Member.builder().nickname("글쓴이").build();
-//
-//        Posts posts = Posts
-//                .builder()
-//                .title(title)
-//                .content(content)
-//                .member(member)
-//                .build();
-//
-//        return postsRepository.save(posts).getId();
-//    }
-//
-//    public Posts postsWrite(String title, String content, Member member) {
-//        Posts posts = Posts
-//                .builder()
-//                .title(title)
-//                .content(content)
-//                .member(member)
-//                .build();
-////        posts.setMember(member);
-//
-//        return postsRepository.save(posts);
-//    }
-//}
+package com.dhgroup.beta.service;
+
+import com.dhgroup.beta.domain.Likes;
+import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.repository.LikesRepository;
+import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.domain.repository.PostsRepository;
+import com.dhgroup.beta.exception.NotFoundPostsException;
+import com.dhgroup.beta.web.dto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsResponseDto;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.*;
+@ExtendWith(SpringExtension.class)
+@Import({PostsRepository.class, PostsService.class})
+public class PostsServiceTest {
+
+    @MockBean
+    private PostsRepository postsRepository;
+
+    @MockBean
+    private MemberRepository memberRepository;
+
+    @MockBean
+    private LikesRepository likesRepository;
+
+    @Autowired
+    PostsService postsService;
+
+
+    @Test
+     public void 글목록_불러오기() throws Exception{
+        //given
+        List<Posts> postsList = new ArrayList<>();
+        Member member = createMember("글쓴이", "1", 1L);
+
+        //게시글 생성
+        for (int i = 0; i < 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용", 1L);
+            postsList.add(posts);
+        }
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Posts> page = new PageImpl<>(postsList);
+
+        given(postsRepository.findAllByOrderByIdDesc(pageRequest)).willReturn(page);
+        //when
+        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageRequest);
+        //then
+        verify(postsRepository).findAllByOrderByIdDesc(any(PageRequest.class));
+        assertThat(postsResponseDtos.size()).isEqualTo(10);
+        assertThat(postsResponseDtos.get(0).getTitle()).isEqualTo("글제목");
+    }
+
+    @Test
+    public void 글목록_불러오기_실패() throws Exception{
+        //given
+        List<Posts> postsList = new ArrayList<>();
+        Page<Posts> page = new PageImpl<>(postsList);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        //빈 리스트 반환
+        given(postsRepository.findAllByOrderByIdDesc(pageRequest)).willReturn(page);
+        //when
+
+        NotFoundPostsException e = assertThrows(NotFoundPostsException.class, () -> postsService.viewPosts(pageRequest));
+        //then
+        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
+    }
+
+    @Test
+     public void 작성자체크() throws Exception{
+        //given
+        Long postsId = 1L;
+        String googleId = "1";
+
+        Member member = createMember("글쓴이",googleId, 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L);
+
+        given(memberRepository.findByGoogleId(googleId)).willReturn(Optional.of(member));//멤버
+        given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
+        //when
+        boolean value = postsService.authorCheck(postsId, googleId);
+        //then
+        verify(postsRepository).findById(postsId);
+        verify(memberRepository).findByGoogleId(googleId);
+
+        assertThat(value).isEqualTo(true);
+    }
+
+    @Test
+    public void 작성자체크실패() throws Exception{
+        //given
+        Long postsId = 1L;
+        String googleId = "1";
+        String wrongGoogleId = "2";
+
+        Member wrongMember = createMember("홍길동",wrongGoogleId, 1L);
+
+        Member member = createMember("글쓴이",googleId, 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L);
+
+
+        given(memberRepository.findByGoogleId(wrongGoogleId)).willReturn(Optional.of(wrongMember));//다른멤버
+        given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
+        //when
+        boolean value = postsService.authorCheck(postsId, wrongGoogleId);
+        //then
+        verify(postsRepository).findById(postsId);
+        verify(memberRepository).findByGoogleId(wrongGoogleId);
+
+        assertThat(value).isEqualTo(false);
+    }
+
+    @Test
+     public void 글작성() throws Exception{
+        //given
+        Member member = createMember("글쓴이","1", 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L);
+        PostsRequestDto requestDto = createPostsRequestDto(1L, "글제목", "글내용");
+
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(postsRepository.save(any(Posts.class))).willReturn(posts);
+        //when
+        Long postsId = postsService.write(requestDto); //requestDto가 Posts 엔티티로 변환되는지 확인
+        //then
+        verify(postsRepository).save(any(Posts.class));
+        verify(memberRepository).findById(member.getId());
+        assertThat(postsId).isEqualTo(1L);
+    }
+
+    @Test
+     public void 좋아요() throws Exception{
+        //given
+        Member member = createMember("글쓴이", "1", 1L);
+        Posts posts = createPosts(member, "글제목", "글내용", 1L);
+        LikesRequestDto likesRequestDto = createLikesRequestDto(member.getId(), posts.getId());
+
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(postsRepository.findById(posts.getId())).willReturn(Optional.of(posts));
+
+        //when
+        postsService.likeIncrease(likesRequestDto);
+        //then
+        verify(likesRepository).save(any(Likes.class));
+    }
+
+    private static PostsRequestDto createPostsRequestDto(Long memberId, String title, String content) {
+        return PostsRequestDto.builder().memberId(memberId).title(title).content(content).build();
+    }
+
+    private static LikesRequestDto createLikesRequestDto(Long memberId, Long postsId) {
+        return LikesRequestDto.builder().postsId(postsId).memberId(memberId).build();
+    }
+
+    private static Posts createPosts(Member member, String title, String content, Long memberId) {
+        return Posts.builder().id(memberId).title(title).content(content).member(member).build();
+    }
+
+    private static Member createMember(String nickName, String googleId, Long postsId) {
+        return Member.builder().id(postsId).nickname(nickName).googleId(googleId).build();
+    }
+}

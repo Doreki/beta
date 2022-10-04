@@ -5,6 +5,7 @@ import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.MemberNotMatchException;
 import com.dhgroup.beta.service.PostsService;
+import com.dhgroup.beta.web.dto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsUpdateDto;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/v1/posts")
 public class PostsController {
 
     private final PostsService postsService;
@@ -29,38 +31,43 @@ public class PostsController {
 
 
 
-    @GetMapping("/api/v1/posts")
-    public List<PostsResponseDto> viewPostsList(Pageable pageable) {
+    @GetMapping("/")
+    public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
-        return postsService.viewPostsList(pageable);
+        return postsService.viewPosts(pageable);
     }
 
-    @PostMapping("/api/v1/posts")
+    @PostMapping("/")
     public Long write(@RequestBody PostsRequestDto postsRequestDto) {
         return postsService.write(postsRequestDto);
     }
 
-    @PatchMapping("/api/v1/posts/{postsId}")
+    @PatchMapping("/{postsId}")
     public void update(@PathVariable Long postsId,
-                       @RequestBody PostsUpdateDto postsUpdateDto
-                       ) {
+                       @RequestBody PostsUpdateDto postsUpdateDto) {
+
         if(postsService.authorCheck(postsId, postsUpdateDto.getGoogleId()))
             postsService.update(postsId, postsUpdateDto);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
     }
 
-    @DeleteMapping("/api/v1/posts/{postsId}")
-    public void delete(@PathVariable Long postsId) {
-        postsService.delete(postsId);
+    @DeleteMapping("/{postsId}")
+    public void delete(@PathVariable Long postsId,
+                       @RequestBody String googleId) {
+
+        if(postsService.authorCheck(postsId, googleId))
+            postsService.delete(postsId);
+        else
+            throw new MemberNotMatchException("권한이 없습니다.");
     }
 
-    @PatchMapping("/api/v1/posts/like/{postsId}")
-    public void like(@PathVariable Long postsId) {
-        postsService.likeIncrease(postsId);
+    @PostMapping("/like/")
+    public void like(@RequestBody LikesRequestDto likesRequestDto) {
+        postsService.likeIncrease(likesRequestDto);
     }
 
-    @PatchMapping("/api/v1/posts/likeRollback/{id}")
+    @PatchMapping("/likeRollback/{id}")
     public void likeRollback(@PathVariable Long id) {
         postsService.likeRollback(id);
     }
