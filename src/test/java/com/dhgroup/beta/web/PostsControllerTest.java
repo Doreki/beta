@@ -222,7 +222,7 @@ public class PostsControllerTest {
         PostsRequestDto postsRequestDto = PostsRequestDto.builder()
                 .title(title)
                 .content(content)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         mockMvc.perform(post(url)

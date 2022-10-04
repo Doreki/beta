@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
@@ -36,7 +37,13 @@ public class PostsService {
 
     @Transactional
     public Long write(PostsRequestDto postsRequestDto) {
-            return postsRepository.save(postsRequestDto.toEntity()).getId(); //반환값 PostsRepository
+        Long memberId = postsRequestDto.getMemberId();
+        Member member = memberRepository.findById(memberId).get();
+        Posts posts = Posts.builder()
+                .title(postsRequestDto.getTitle())
+                .content(postsRequestDto.getContent())
+                .member(member).build();
+        return postsRepository.save(posts).getId(); //반환값 PostsRepository
     }
 
     @Transactional

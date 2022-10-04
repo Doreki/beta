@@ -12,14 +12,13 @@ import lombok.NoArgsConstructor;
 public class PostsRequestDto {
     private String title;
     private String content;
-    private Member member
-            ;
+    private Long memberId;
 
     @Builder
-    public PostsRequestDto(String title, String content, Member member) {
+    public PostsRequestDto(String title, String content, Long memberId) {
         this.title = title;
         this.content = content;
-        this.member = member;
+        this.memberId = memberId;
     }
 
     /*
@@ -29,7 +28,7 @@ public class PostsRequestDto {
         return Posts.builder()
                 .title(title)
                 .content(content)
-                .member(member)
+//                .member(member)
                 .build();
     }
 

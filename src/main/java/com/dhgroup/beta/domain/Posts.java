@@ -38,7 +38,8 @@ public class Posts extends BaseTimeEntity {
     id는 자동생성,likeCnt,commentCnt는 메서드로 값 주입예정;
      */
     @Builder
-    public Posts(String title, String content, Member member) {
+    public Posts(Long id,String title, String content, Member member) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.member = member;

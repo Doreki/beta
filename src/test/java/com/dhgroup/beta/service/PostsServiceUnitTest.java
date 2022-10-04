@@ -6,6 +6,7 @@ import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.NotFoundPostsException;
+import com.dhgroup.beta.web.dto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -121,11 +122,32 @@ public class PostsServiceUnitTest {
         assertThat(value).isEqualTo(false);
     }
 
+    @Test
+     public void 글작성() throws Exception{
+        //given
+        Member member = createMember("글쓴이","1");
+        Posts posts = createPosts(member,"글제목","글내용");
+        PostsRequestDto requestDto = createRequestDto(1L, "글제목", "글내용");
+
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(postsRepository.save(any(Posts.class))).willReturn(posts);
+        //when
+        Long postsId = postsService.write(requestDto);
+        //then
+        verify(postsRepository).save(any(Posts.class));
+        verify(memberRepository).findById(member.getId());
+        assertThat(postsId).isEqualTo(1L);
+    }
+
+    private static PostsRequestDto createRequestDto(long memberId, String title, String content) {
+        return PostsRequestDto.builder().memberId(memberId).title(title).content(content).build();
+    }
+
     private static Posts createPosts(Member member, String title, String content) {
-        return Posts.builder().title(title).content(content).member(member).build();
+        return Posts.builder().id(1L).title(title).content(content).member(member).build();
     }
 
     private static Member createMember(String nickName, String googleId) {
-        return Member.builder().nickname(nickName).googleId(googleId).build();
+        return Member.builder().id(1L).nickname(nickName).googleId(googleId).build();
     }
 }
