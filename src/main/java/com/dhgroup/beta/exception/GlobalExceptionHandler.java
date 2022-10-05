@@ -20,13 +20,6 @@ public class GlobalExceptionHandler {
         return map;
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(value = IllegalArgumentException.class)
-    public Map<String, String> handleException(IllegalArgumentException e) {
-        Map<String, String> map = putErrorMessage("POST_ERR");
-        return map;
-    }
-
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public Map<String, String> handleException(Exception e) {
@@ -34,10 +27,10 @@ public class GlobalExceptionHandler {
         return map;
     }
 
-    @ResponseStatus(HttpStatus.SEE_OTHER)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(value = NotExistMemberException.class)
     public Map<String, String> handleException(NotExistMemberException e) {
-        Map<String, String> map = putErrorMessage("REDIRECT_TO_SIGNUP");
+        Map<String, String> map = putErrorMessage("NOT_MEMBER");
         return map;
     }
 

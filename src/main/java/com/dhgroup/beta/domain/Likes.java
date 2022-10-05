@@ -1,7 +1,6 @@
 package com.dhgroup.beta.domain;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +11,7 @@ import static javax.persistence.FetchType.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
+@Table(name="likes")
 public class Likes {
 
     @Id
@@ -27,10 +27,12 @@ public class Likes {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Builder
-    public Likes(Long id, Posts posts, Member member) {
-        this.id = id;
+    private Likes(Posts posts, Member member) {
         this.posts = posts;
         this.member = member;
+    }
+
+    public static Likes createLikes(Posts posts, Member member) {
+        return new Likes(posts, member);
     }
 }

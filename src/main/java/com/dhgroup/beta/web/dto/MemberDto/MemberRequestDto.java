@@ -1,15 +1,22 @@
-package com.dhgroup.beta.web.dto;
+package com.dhgroup.beta.web.dto.MemberDto;
 
 import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.web.validation.ValidationGroups;
 import lombok.*;
+
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @NoArgsConstructor
 @Getter
 public class MemberRequestDto {
 
     private String googleId;
-    @Pattern(regexp = "^[0-9a-zA-Z가-힇]{2,10}$",message = "특수문자, 공백을 제외하고 2자 이상 10자 이하로 입력하세요.")
+
+    @NotBlank(message = "NOT_BLANK",groups = ValidationGroups.NotBlankGroup.class)
+    @Size(min = 2,max =8,message = "LENGTH(2,8)",groups = ValidationGroups.SizeGroup.class)
+    @Pattern(regexp = "^[0-9a-zA-Z가-힣]*$",message = "NOT_SIGN",groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
     @Builder

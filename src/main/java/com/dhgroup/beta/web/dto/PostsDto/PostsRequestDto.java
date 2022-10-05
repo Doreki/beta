@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.dto;
+package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.Posts;
@@ -6,10 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 @NoArgsConstructor
 @Getter
 public class PostsRequestDto {
+
+    @NotBlank(message = "NOT_BLANK")
     private String title;
+    @NotBlank(message = "NOT_BLANK")
     private String content;
     private Long memberId;
 

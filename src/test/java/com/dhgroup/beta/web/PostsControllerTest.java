@@ -1,13 +1,12 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.service.PostsService;
-import com.dhgroup.beta.web.dto.LikesRequestDto;
-import com.dhgroup.beta.web.dto.PostsRequestDto;
-import com.dhgroup.beta.web.dto.PostsResponseDto;
-import com.dhgroup.beta.web.dto.PostsUpdateDto;
+import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +67,7 @@ public class PostsControllerTest {
         Long postsId = 1L;
         String googleId = updateDto.getGoogleId();
 
-        given(postsService.authorCheck(postsId,googleId)).willReturn(true);
+        given(postsService.isWriter(postsId,googleId)).willReturn(true);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
@@ -76,7 +75,7 @@ public class PostsControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         //then
-        verify(postsService).authorCheck(postsId,googleId);
+        verify(postsService).isWriter(postsId,googleId);
         verify(postsService).update(eq(postsId),any(PostsUpdateDto.class));
     }
 
@@ -88,7 +87,7 @@ public class PostsControllerTest {
         Long postsId = 1L;
         String googleId = updateDto.getGoogleId();
 
-        given(postsService.authorCheck(postsId,googleId)).willReturn(false);
+        given(postsService.isWriter(postsId,googleId)).willReturn(false);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
@@ -127,7 +126,7 @@ public class PostsControllerTest {
         //given
         Long postsId = 1L;
         String googleId = "1";
-        given(postsService.authorCheck(postsId,googleId)).willReturn(true);
+        given(postsService.isWriter(postsId,googleId)).willReturn(true);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.delete("/api/v1/posts/{postsId}", postsId)
@@ -153,7 +152,7 @@ public class PostsControllerTest {
         verify(postsService).likeIncrease(any(LikesRequestDto.class));
     }
 
-    private static LikesRequestDto createLikesRequestDto(long memberId, long postsId) {
+    private static LikesRequestDto createLikesRequestDto(Long memberId, Long postsId) {
         return LikesRequestDto.builder().memberId(memberId).postsId(postsId).build();
     }
 
@@ -170,4 +169,5 @@ public class PostsControllerTest {
                 .content(content)
                 .build();
     }
+
 }

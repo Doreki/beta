@@ -3,7 +3,8 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
-import com.dhgroup.beta.web.dto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,9 @@ public class MemberControllerTest {
         Member member = createMember("1","글쓴이");
         String url = "/api/v1/member/login";
         String googleId = member.getGoogleId();
+        MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
 
-        given(memberService.logIn(googleId)).willReturn(member);
+        given(memberService.logIn(googleId)).willReturn(memberResponseDto);
         //when
                     mockMvc.perform(
                                 get(url)
@@ -77,19 +79,17 @@ public class MemberControllerTest {
      public void 닉네임변경() throws Exception{
         //given
         String url = "/api/v1/member/{memberId}";
-        String newNickname = "홍길동";
+        MemberRequestDto memberRequestDto = createMemberRequestDto("1", "홍길동");
         //when
         mockMvc.perform(
                         patch(url,1L)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(newNickname))
+                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
                 .andExpect(status().isOk())
                 .andDo(print());
         //then
-        verify(memberService).updateNickname(1L,newNickname);
+        verify(memberService).updateNickname(1L,memberRequestDto.getNickname());
     }
-
-
 
     private static Member createMember(String googleId, String nickname) {
         return Member.builder().googleId(googleId).nickname(nickname).build();

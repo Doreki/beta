@@ -30,8 +30,8 @@ public class Posts extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    private Integer likeCnt;
-    private Integer commentCnt;
+    private Integer likeCount;
+    private Integer commentCount;
 
 
     /*
@@ -43,8 +43,8 @@ public class Posts extends BaseTimeEntity {
         this.title = title;
         this.content = content;
         this.member = member;
-        likeCnt=0;
-        commentCnt=0;
+        likeCount =0;
+        commentCount =0;
     }
 
     //updateDto에서 받은 내용으로 글을 수정해줌
@@ -53,12 +53,4 @@ public class Posts extends BaseTimeEntity {
         this.content = content;
     }
 
-    public void likeIncrease() {
-        ++this.likeCnt;
-    }
-
-    public void likeCancle() {
-        if(likeCnt>0)
-           this.likeCnt = likeCnt-1;
-    }
 }

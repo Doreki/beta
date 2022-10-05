@@ -37,7 +37,7 @@ public class Member extends BaseTimeEntity {
     public Member(Long id,String googleId, String nickname) {
         this.id = id;
         this.googleId = googleId;
-        this.nickname = nickname;
+        this.nickname = nickname; //엔티티가 db에 들어가서 id값을 받아와야 하기때문에 service 로직에서 처리함
     }
 
     public void updateNickname(String nickname) {

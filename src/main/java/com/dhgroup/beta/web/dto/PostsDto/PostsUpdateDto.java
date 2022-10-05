@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.dto;
+package com.dhgroup.beta.web.dto.PostsDto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -18,4 +18,6 @@ public class PostsUpdateDto {
         this.title = title;
         this.content = content;
     }
+
+//    public static PostsUpdateDto
 }

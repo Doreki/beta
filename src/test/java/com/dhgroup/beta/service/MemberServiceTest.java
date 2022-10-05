@@ -4,7 +4,7 @@ import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.exception.NotExistMemberException;
-import com.dhgroup.beta.web.dto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,11 +7,11 @@ import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
-import com.dhgroup.beta.web.dto.LikesRequestDto;
-import com.dhgroup.beta.web.dto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.domain.repository.PostsRepository;
-import com.dhgroup.beta.web.dto.PostsResponseDto;
-import com.dhgroup.beta.web.dto.PostsUpdateDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -71,21 +71,16 @@ public class PostsService {
     public void likeIncrease(LikesRequestDto likesRequestDto) {
         Member member = findMemberById(likesRequestDto.getMemberId());
         Posts posts = findPostsById(likesRequestDto.getPostsId());
-        Likes likes = likesRequestDto.toEntity(member, posts);
+        Likes likes = likesRequestDto.toEntity(posts,member);
         likesRepository.save(likes);
     }
 
     //프론트 단에서 기능 구현해야함
-    @Transactional
-    public void likeRollback(Long id) {
-        Posts posts = findPostsById(id);
-        posts.likeCancle();
-    }
 
     public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
         List<PostsResponseDto> postsList = postsRepository.findAllByOrderByIdDesc(pageable)
-                .stream().map(PostsResponseDto::new).collect(Collectors.toList());
+                .stream().map(PostsResponseDto::createPostsResponseDto).collect(Collectors.toList());
         //Posts형태의 데이터를 PostsResponseDto로 변환시켜서 List에 담아서 보냄
 
         if(postsList.size()==0)
@@ -94,10 +89,13 @@ public class PostsService {
         return postsList;
     }
 
-    public boolean authorCheck(Long postsId, String googleId) {
+    public boolean isWriter(Long postsId, String googleId) {
         String nicknameByMobile = memberRepository.findByGoogleId(googleId).get().getNickname();
         String nicknameByPosts = postsRepository.findById(postsId).get().getMember().getNickname();
-        if(nicknameByMobile==nicknameByPosts) return true;
-        else return false;
+
+        if(nicknameByMobile==nicknameByPosts)
+            return true;
+        else
+            return false;
     }
 }

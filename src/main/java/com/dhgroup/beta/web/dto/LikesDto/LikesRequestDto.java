@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.dto;
+package com.dhgroup.beta.web.dto.LikesDto;
 
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Member;
@@ -20,7 +20,7 @@ public class LikesRequestDto {
         this.postsId = postsId;
     }
 
-    public Likes toEntity(Member member, Posts posts){
-        return Likes.builder().member(member).posts(posts).build();
+    public Likes toEntity(Posts posts, Member member){
+        return Likes.createLikes(posts, member);
     }
 }

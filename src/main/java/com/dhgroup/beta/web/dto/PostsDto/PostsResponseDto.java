@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.dto;
+package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
 import lombok.Builder;
@@ -15,29 +15,35 @@ public class PostsResponseDto {
     private String title;
     private String content;
     private String writer;
-    private Integer likeCnt;
-    private Integer commentCnt;
+    private Integer likeCount;
+    private Integer commentCount;
     private LocalDateTime createdDate;
 
 
-    public PostsResponseDto(Posts posts) {
+
+    private PostsResponseDto(Posts posts) {
         this.id = posts.getId();
         this.title = posts.getTitle();
         this.content = posts.getContent();
         this.writer = posts.getMember().getNickname();
-        this.likeCnt = posts.getLikeCnt();
-        this.commentCnt = posts.getCommentCnt();
+        this.likeCount = posts.getLikeCount();
+        this.commentCount = posts.getCommentCount();
         this.createdDate = posts.getCreatedDate();
     }
 
     @Builder
-    public PostsResponseDto(Long id, String title, String content, String writer, Integer likeCnt, Integer commentCnt, LocalDateTime createdDate) {
+    public PostsResponseDto(Long id, String title, String content, String writer, Integer likeCount, Integer commentCount, LocalDateTime createdDate) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.writer = writer;
-        this.likeCnt = likeCnt;
-        this.commentCnt = commentCnt;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
         this.createdDate = createdDate;
     }
+
+    public static PostsResponseDto createPostsResponseDto(Posts posts) {
+        return new PostsResponseDto(posts);
+    }
+
 }

@@ -2,9 +2,9 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.exception.NotExistMemberException;
-import com.dhgroup.beta.web.dto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,19 +25,30 @@ public class MemberService {
         return member.getId();
     }
 
-    public Member logIn(String googleId) {
-        return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+    public MemberResponseDto logIn(String googleId) {
+        Member member = findMemberByGoogleId(googleId);
+        return MemberResponseDto.createMemberResponseDto(member);
     }
+
 
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+        Member member = findMemberByMemberId(memberId);
         member.updateNickname(nickname);
     }
 
-    @Transactional
-    public void isDuplicated(String googleId) {
+    private Member findMemberByMemberId(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+    }
+
+    public boolean isDuplicated(String googleId) {
         if(memberRepository.existsByGoogleId(googleId))
-            throw new OverlapMemberException("이미 존재하는 회원입니다.");
+            return true;
+        else
+            return false;
+    }
+
+    private Member findMemberByGoogleId(String googleId) {
+        return memberRepository.findByGoogleId(googleId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 }

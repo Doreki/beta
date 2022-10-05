@@ -7,9 +7,9 @@ import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.NotFoundPostsException;
-import com.dhgroup.beta.web.dto.LikesRequestDto;
-import com.dhgroup.beta.web.dto.PostsRequestDto;
-import com.dhgroup.beta.web.dto.PostsResponseDto;
+import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class PostsServiceTest {
         given(memberRepository.findByGoogleId(googleId)).willReturn(Optional.of(member));//멤버
         given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
         //when
-        boolean value = postsService.authorCheck(postsId, googleId);
+        boolean value = postsService.isWriter(postsId, googleId);
         //then
         verify(postsRepository).findById(postsId);
         verify(memberRepository).findByGoogleId(googleId);
@@ -119,7 +119,7 @@ public class PostsServiceTest {
         given(memberRepository.findByGoogleId(wrongGoogleId)).willReturn(Optional.of(wrongMember));//다른멤버
         given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
         //when
-        boolean value = postsService.authorCheck(postsId, wrongGoogleId);
+        boolean value = postsService.isWriter(postsId, wrongGoogleId);
         //then
         verify(postsRepository).findById(postsId);
         verify(memberRepository).findByGoogleId(wrongGoogleId);
