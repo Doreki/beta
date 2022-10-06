@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -40,9 +38,12 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickname; //엔티티가 db에 들어가서 id값을 받아와야 하기때문에 service 로직에서 처리함
     }
 
-    public void updateNickname(String nickname) {
-        this.userTag = createUserTag(); //member객체 생성과 수정 둘 다 userTag 필요함, id값은 불변하기 때문에 userTag를 다시 생성해도 똑같은 값이 들어감
-        this.nickname = nickname+createUserTag();
+    public void updateNicknameAddUserTag(String nickname) {
+        this.nickname = nickname+this.userTag;
+    }
+
+    public void addUserTag(){
+        this.userTag = createUserTag();
     }
 
     public String createUserTag() {

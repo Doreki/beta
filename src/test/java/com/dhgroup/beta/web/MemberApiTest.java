@@ -3,6 +3,7 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
+import com.dhgroup.beta.web.controller.MemberApi;
 import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(MemberController.class)
+@WebMvcTest(MemberApi.class)
 @MockBean(JpaMetamodelMappingContext.class) //Auditing 기능을 위해 mock객체로 올려둠
-public class MemberControllerTest {
+public class MemberApiTest {
 
     @MockBean
     private MemberService memberService;
@@ -41,39 +42,59 @@ public class MemberControllerTest {
         String url = "/api/v1/member/1h2g2yysh297h2s";
         MemberRequestDto memberRequestDto = createMemberRequestDto("1","홍길동");
         //when
+        given(memberService.isDuplicated(memberRequestDto.getGoogleId())).willReturn(false);
         given(memberService.signUp(any(MemberRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
                         post(url)
                                 .content(new ObjectMapper().writeValueAsString(memberRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().string("1"))
-                .andDo(print());
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status",is(1)))
+                                .andDo(print());
 
         verify(memberService).signUp(any(MemberRequestDto.class));
+    }
+    @Test
+    public void 회원가입_실패() throws Exception{
+        //given
+        String url = "/api/v1/member/1h2g2yysh297h2s";
+        MemberRequestDto memberRequestDto = createMemberRequestDto("1","홍길동");
+
+        given(memberService.isDuplicated(memberRequestDto.getGoogleId())).willReturn(true);
+        given(memberService.signUp(any(MemberRequestDto.class))).willReturn(1L);
+        //then
+        mockMvc.perform(
+                        post(url)
+                                .content(new ObjectMapper().writeValueAsString(memberRequestDto))
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isConflict())
+                                .andExpect(jsonPath("$.status",is(-1)))
+                                .andExpect(jsonPath("$.msg",is("DUPLICATED_ID")))
+                                .andDo(print());
     }
     @Test
      public void 로그인() throws Exception{
         //given
         Member member = createMember("1","글쓴이");
-        String url = "/api/v1/member/login";
+        String url = "/api/v1/member/login/{googleId}";
         String googleId = member.getGoogleId();
         MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
+
 
         given(memberService.logIn(googleId)).willReturn(memberResponseDto);
         //when
                     mockMvc.perform(
-                                get(url)
-                                .content(googleId)
+                                get(url,googleId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
-                                .andExpect(jsonPath("$.googleId",is("1")))
-                                .andExpect(jsonPath("$.nickname",is("글쓴이")))
+                                .andExpect(jsonPath("$.status",is(1)))
+                                .andExpect(jsonPath("$.data.nickname",is("글쓴이")))
                                 .andDo(print());
         //then
         verify(memberService).logIn(googleId);
     }
+
 
     @Test
      public void 닉네임변경() throws Exception{
@@ -85,8 +106,8 @@ public class MemberControllerTest {
                         patch(url,1L)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
-                .andExpect(status().isOk())
-                .andDo(print());
+                                .andExpect(status().isOk())
+                                .andDo(print());
         //then
         verify(memberService).updateNickname(1L,memberRequestDto.getNickname());
     }

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @Getter
 public class PostsUpdateDto {
-    private String googleId;
+    private Long memberId;
     @NotBlank
     private String title;
     @NotBlank
@@ -17,8 +17,8 @@ public class PostsUpdateDto {
 
 
     @Builder
-    public PostsUpdateDto(String googleId,String title, String content) {
-        this.googleId = googleId;
+    public PostsUpdateDto(Long memberId,String title, String content) {
+        this.memberId = memberId;
         this.title = title;
         this.content = content;
     }

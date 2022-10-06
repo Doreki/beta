@@ -3,6 +3,7 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.service.PostsService;
+import com.dhgroup.beta.web.controller.PostsApi;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
@@ -17,18 +18,21 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PostsController.class)
+@WebMvcTest(PostsApi.class)
 @MockBean(JpaMetamodelMappingContext.class)
-public class PostsControllerTest {
+public class PostsApiTest {
 
     @MockBean
     private PostsService postsService;
@@ -53,7 +57,8 @@ public class PostsControllerTest {
                 MockMvcRequestBuilders.post("/api/v1/posts/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isCreated())
+                        .andExpect(jsonPath("$.status",is(1)));
 
         verify(postsService).writePosts(any(PostsRequestDto.class));
     }
@@ -63,19 +68,21 @@ public class PostsControllerTest {
      public void 글수정() throws Exception{
         //given
 
-        PostsUpdateDto updateDto = PostsUpdateDto.builder().googleId("1").content("글내용").title("글제목").build();
+        PostsUpdateDto updateDto = PostsUpdateDto.builder().memberId(1L).content("글내용").title("글제목").build();
         Long postsId = 1L;
-        String googleId = updateDto.getGoogleId();
+        Long memberId = updateDto.getMemberId();
 
-        given(postsService.isWriter(postsId,googleId)).willReturn(true);
+        given(postsService.isWriter(postsId,memberId)).willReturn(true);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
                                 .content(new ObjectMapper().writeValueAsString(updateDto))
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.status",is(1)))
+                                .andDo(print());
         //then
-        verify(postsService).isWriter(postsId,googleId);
+        verify(postsService).isWriter(postsId,memberId);
         verify(postsService).updatePosts(eq(postsId),any(PostsUpdateDto.class));
     }
 
@@ -83,17 +90,17 @@ public class PostsControllerTest {
     public void 글수정_실패() throws Exception{
         //given
 
-        PostsUpdateDto updateDto = PostsUpdateDto.builder().googleId("1").content("글내용").title("글제목").build();
+        PostsUpdateDto updateDto = PostsUpdateDto.builder().memberId(1L).content("글내용").title("글제목").build();
         Long postsId = 1L;
-        String googleId = updateDto.getGoogleId();
+        Long memberId = updateDto.getMemberId();
 
-        given(postsService.isWriter(postsId,googleId)).willReturn(false);
+        given(postsService.isWriter(postsId,memberId)).willReturn(false);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.patch("/api/v1/posts/{postsId}", postsId)
                                 .content(new ObjectMapper().writeValueAsString(updateDto))
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
+                                .andExpect(status().isForbidden());
         //then
     }
 
@@ -125,14 +132,14 @@ public class PostsControllerTest {
      public void 글삭제() throws Exception{
         //given
         Long postsId = 1L;
-        String googleId = "1";
-        given(postsService.isWriter(postsId,googleId)).willReturn(true);
+        Long memberId = 1L;
+        given(postsService.isWriter(postsId,memberId)).willReturn(true);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.delete("/api/v1/posts/{postsId}", postsId)
-                                .content(googleId)
+                                .content(new ObjectMapper().writeValueAsString(memberId))
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                                .andExpect(status().isOk());
         //then
         verify(postsService).deletePosts(postsId);
     }
@@ -147,7 +154,7 @@ public class PostsControllerTest {
                         MockMvcRequestBuilders.post("/api/v1/posts/like/")
                                 .content(new ObjectMapper().writeValueAsString(likesRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                                .andExpect(status().isOk());
         //then
         verify(postsService).likeIncrease(any(LikesRequestDto.class));
     }
@@ -161,7 +168,7 @@ public class PostsControllerTest {
                         MockMvcRequestBuilders.delete("/api/v1/posts/like/")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(new ObjectMapper().writeValueAsString(likesRequestDto)))
-                .andExpect(status().isOk());
+                                .andExpect(status().isOk());
         //then
         verify(postsService).likeRollback(any(LikesRequestDto.class));
     }

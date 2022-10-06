@@ -18,10 +18,12 @@ public class MemberService {
     @Transactional
     public Long signUp(MemberRequestDto memberRequestDto) {
 
+        //userTag를 생성하기 위해 우선적으로 DB에 저장
         Member member = memberRequestDto.toEntity();
         member = memberRepository.saveAndFlush(member);
-        String nickname = member.getNickname();
-        member.updateNickname(nickname);
+        member.addUserTag();
+
+        member.updateNicknameAddUserTag(member.getNickname());
         return member.getId();
     }
 
@@ -34,11 +36,7 @@ public class MemberService {
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
         Member member = findMemberByMemberId(memberId);
-        member.updateNickname(nickname);
-    }
-
-    private Member findMemberByMemberId(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+        member.updateNicknameAddUserTag(nickname);
     }
 
     public boolean isDuplicated(String googleId) {
@@ -46,6 +44,9 @@ public class MemberService {
             return true;
         else
             return false;
+    }
+    private Member findMemberByMemberId(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
     private Member findMemberByGoogleId(String googleId) {

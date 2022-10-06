@@ -1,9 +1,10 @@
-package com.dhgroup.beta.web;
+package com.dhgroup.beta.web.controller;
 
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.MemberNotMatchException;
 import com.dhgroup.beta.service.PostsService;
+import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
@@ -11,16 +12,19 @@ import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.*;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/posts")
-public class PostsController {
+public class PostsApi {
 
     private final PostsService postsService;
 
@@ -30,9 +34,11 @@ public class PostsController {
 
 
     @GetMapping("/")
-    public List<PostsResponseDto> viewPosts(Pageable pageable) {
+    public ResponseEntity<?> viewPosts(Pageable pageable) {
 
-        return postsService.viewPosts(pageable);
+        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageable);
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", postsResponseDtos));
     }
 
     @PostMapping("/")
@@ -40,7 +46,9 @@ public class PostsController {
                                        @RequestBody PostsRequestDto postsRequestDto) {
 
         Long postsId = postsService.writePosts(postsRequestDto);
-        return ResponseEntity.ok(postsId);
+        return ResponseEntity
+                .status(CREATED)
+                .body(CMResponseDto.createCMResponseDto(1,"게시글이 등록되었습니다.",postsId));
     }
 
     @PatchMapping("/{postsId}")
@@ -48,31 +56,42 @@ public class PostsController {
                                  @Validated(ValidationSequence.class)
                                  @RequestBody PostsUpdateDto postsUpdateDto) {
 
-        if(postsService.isWriter(postsId, postsUpdateDto.getGoogleId()))
+        if(postsService.isWriter(postsId, postsUpdateDto.getMemberId()))
             postsService.updatePosts(postsId, postsUpdateDto);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity
+                .status(CREATED)
+                .body(CMResponseDto.createCMResponseDto(1,"게시글이 수정되었습니다.",null));
     }
 
     @DeleteMapping("/{postsId}")
-    public void delete(@PathVariable Long postsId,
-                       @RequestBody String googleId) {
+    public ResponseEntity<?> delete(@PathVariable Long postsId,
+                       @RequestBody Long memberId) {
 
-        if(postsService.isWriter(postsId, googleId))
+        if(postsService.isWriter(postsId, memberId))
             postsService.deletePosts(postsId);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));
     }
 
     @PostMapping("/like")
-    public void likeIncrease(@RequestBody LikesRequestDto likesRequestDto) {
+    public ResponseEntity<?> likeIncrease(@RequestBody LikesRequestDto likesRequestDto) {
         postsService.likeIncrease(likesRequestDto);
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1,"게시글에 좋아요를 눌렀습니다.",null));
     }
 
     @DeleteMapping("/like")
-    public void likeRollback(@RequestBody LikesRequestDto likesRequestDto) {
+    public ResponseEntity<?> likeRollback(@RequestBody LikesRequestDto likesRequestDto) {
         postsService.likeRollback(likesRequestDto);
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1,"게시글에 좋아요를 취소하셨습니다.",null));
     }
 }

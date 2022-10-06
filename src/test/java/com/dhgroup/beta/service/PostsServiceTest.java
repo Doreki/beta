@@ -87,18 +87,18 @@ public class PostsServiceTest {
      public void 작성자체크() throws Exception{
         //given
         Long postsId = 1L;
-        String googleId = "1";
+        Long memberId = 1L;
 
-        Member member = createMember("글쓴이",googleId, 1L);
+        Member member = createMember("글쓴이","1", 1L);
         Posts posts = createPosts(member,"글제목","글내용", 1L);
 
-        given(memberRepository.findByGoogleId(googleId)).willReturn(Optional.of(member));//멤버
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));//멤버
         given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
         //when
-        boolean value = postsService.isWriter(postsId, googleId);
+        boolean value = postsService.isWriter(postsId, memberId);
         //then
         verify(postsRepository).findById(postsId);
-        verify(memberRepository).findByGoogleId(googleId);
+        verify(memberRepository).findById(memberId);
 
         assertThat(value).isEqualTo(true);
     }
@@ -107,22 +107,21 @@ public class PostsServiceTest {
     public void 작성자체크실패() throws Exception{
         //given
         Long postsId = 1L;
-        String googleId = "1";
-        String wrongGoogleId = "2";
+        Long memberId = 1L;
+        Long wrongMemberId = 2L;
 
-        Member wrongMember = createMember("홍길동",wrongGoogleId, 1L);
-
-        Member member = createMember("글쓴이",googleId, 1L);
+        Member wrongMember = createMember("홍길동","1", wrongMemberId);
+        Member member = createMember("글쓴이","2", memberId);
         Posts posts = createPosts(member,"글제목","글내용", 1L);
 
 
-        given(memberRepository.findByGoogleId(wrongGoogleId)).willReturn(Optional.of(wrongMember));//다른멤버
+        given(memberRepository.findById(wrongMemberId)).willReturn(Optional.of(wrongMember));//다른멤버
         given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
         //when
-        boolean value = postsService.isWriter(postsId, wrongGoogleId);
+        boolean value = postsService.isWriter(postsId, wrongMemberId);
         //then
         verify(postsRepository).findById(postsId);
-        verify(memberRepository).findByGoogleId(wrongGoogleId);
+        verify(memberRepository).findById(wrongMemberId);
 
         assertThat(value).isEqualTo(false);
     }
@@ -181,11 +180,11 @@ public class PostsServiceTest {
         return LikesRequestDto.builder().postsId(postsId).memberId(memberId).build();
     }
 
-    private static Posts createPosts(Member member, String title, String content, Long memberId) {
-        return Posts.builder().id(memberId).title(title).content(content).member(member).build();
+    private static Posts createPosts(Member member, String title, String content, Long postsId) {
+        return Posts.builder().id(postsId).title(title).content(content).member(member).build();
     }
 
-    private static Member createMember(String nickName, String googleId, Long postsId) {
-        return Member.builder().id(postsId).nickname(nickName).googleId(googleId).build();
+    private static Member createMember(String nickName, String googleId, Long memberId) {
+        return Member.builder().id(memberId).nickname(nickName).googleId(googleId).build();
     }
 }

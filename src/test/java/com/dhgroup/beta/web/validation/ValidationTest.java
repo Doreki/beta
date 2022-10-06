@@ -38,7 +38,7 @@ public class ValidationTest {
         Set<ConstraintViolation<MemberRequestDto>> violations = validator.validate(memberRequestDto, ValidationGroups.NotBlankGroup.class);
         //then
         violations.forEach(error -> {
-            assertThat(error.getMessage()).isEqualTo("NOT_BLANK");
+            assertThat(error.getMessage()).isEqualTo("공백일 수 없습니다");
         });
     }
 
@@ -50,7 +50,7 @@ public class ValidationTest {
         Set<ConstraintViolation<MemberRequestDto>> violations = validator.validate(memberRequestDto, ValidationGroups.SizeGroup.class);
         //then
         violations.forEach(error -> {
-            assertThat(error.getMessage()).isEqualTo("LENGTH(2,8)");
+            assertThat(error.getMessage()).isEqualTo("2자에서 8자 사이로 입력하시오");
         });
     }
 
@@ -62,7 +62,7 @@ public class ValidationTest {
         Set<ConstraintViolation<MemberRequestDto>> violations = validator.validate(memberRequestDto, ValidationGroups.PatternCheckGroup.class);
         //then
         violations.forEach(error -> {
-            assertThat(error.getMessage()).isEqualTo("NOT_SIGN");
+            assertThat(error.getMessage()).isEqualTo("특수문자, 공백은 입력할 수 없습니다.");
         });
     }
 

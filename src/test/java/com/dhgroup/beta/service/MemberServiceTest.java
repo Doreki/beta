@@ -2,7 +2,6 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import org.junit.jupiter.api.Test;
@@ -52,17 +51,7 @@ public class MemberServiceTest {
         memberService.signUp(requestDto);
         //then
         verify(memberRepository).saveAndFlush(any(Member.class));
-    }
-
-    @Test
-     public void 닉네임중복발생() throws Exception{
-        //given
-        String googleId = "1";
-        given(memberRepository.existsByGoogleId(googleId)).willReturn(true);
-        //when
-        OverlapMemberException e = assertThrows(OverlapMemberException.class, () -> memberService.isDuplicated(googleId));
-        //then
-        assertThat(e.getMessage()).isEqualTo("이미 존재하는 회원입니다.");
+        assertThat(member.getNickname()).isEqualTo("글쓴이#0001");
     }
 
     private static MemberRequestDto createRequestDto(String googleId, String nickname) {

@@ -14,9 +14,9 @@ public class MemberRequestDto {
 
     private String googleId;
 
-    @NotBlank(message = "NOT_BLANK",groups = ValidationGroups.NotBlankGroup.class)
-    @Size(min = 2,max =8,message = "LENGTH(2,8)",groups = ValidationGroups.SizeGroup.class)
-    @Pattern(regexp = "^[0-9a-zA-Z가-힣]*$",message = "NOT_SIGN",groups = ValidationGroups.PatternCheckGroup.class)
+    @NotBlank(groups = ValidationGroups.NotBlankGroup.class)
+    @Size(min = 2,max =8,message = "2자에서 8자 사이로 입력하시오",groups = ValidationGroups.SizeGroup.class)
+    @Pattern(regexp = "^[0-9a-zA-Z가-힣]*$",message = "특수문자, 공백은 입력할 수 없습니다.",groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
     @Builder

@@ -13,9 +13,9 @@ import javax.validation.constraints.NotBlank;
 @Getter
 public class PostsRequestDto {
 
-    @NotBlank(message = "NOT_BLANK")
+    @NotBlank
     private String title;
-    @NotBlank(message = "NOT_BLANK")
+    @NotBlank
     private String content;
     private Long memberId;
 

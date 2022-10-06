@@ -1,25 +1,25 @@
-package com.dhgroup.beta.web;
+package com.dhgroup.beta.web.controller;
 
 import com.dhgroup.beta.aop.annotation.ValidAspect;
-import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
+import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
-import org.junit.runner.Request;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.ValidatorFactory;
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
 @RestController
-public class MemberController {
+public class MemberApi {
 
     private final MemberService memberService;
 
@@ -32,19 +32,23 @@ public class MemberController {
             throw new OverlapMemberException("이미 존재하는 회원입니다.");
 
         Long memberId = memberService.signUp(memberRequestDto);
-        return ResponseEntity.ok(memberId);
+        return ResponseEntity
+                .status(CREATED)
+                .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.",memberId));
     }
 
-    @GetMapping("/login")
-    public MemberResponseDto logIn(@RequestBody MemberRequestDto memberRequestDto) {
-            return memberService.logIn(memberRequestDto.getGoogleId());
+    @GetMapping("/login/{googleId}")
+    public ResponseEntity<?> logIn(@PathVariable String googleId) {
+        MemberResponseDto memberResponseDto = memberService.logIn(googleId);
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1, "성공적으로 로그인이 되었습니다.", memberResponseDto));
     }
 
     @PatchMapping("/{memberId}")
     public ResponseEntity<?> updateNickname(@PathVariable Long memberId,@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto) {
         memberService.updateNickname(memberId, memberRequestDto.getNickname());
 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",null));
     }
 
 }
