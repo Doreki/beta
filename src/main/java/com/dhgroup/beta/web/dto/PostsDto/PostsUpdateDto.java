@@ -4,11 +4,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 @NoArgsConstructor
 @Getter
 public class PostsUpdateDto {
     private String googleId;
+    @NotBlank
     private String title;
+    @NotBlank
     private String content;
 
 

@@ -152,6 +152,18 @@ public class PostsControllerTest {
         verify(postsService).likeIncrease(any(LikesRequestDto.class));
     }
 
+    @Test
+     public void 좋아요취소() throws Exception{
+        //given
+
+        //when
+        mockMvc.perform(
+                        MockMvcRequestBuilders.post("/api/v1/posts/likeRollback/{postsId}")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        //then
+    }
+
     private static LikesRequestDto createLikesRequestDto(Long memberId, Long postsId) {
         return LikesRequestDto.builder().memberId(memberId).postsId(postsId).build();
     }

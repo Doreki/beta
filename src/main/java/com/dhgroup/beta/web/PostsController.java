@@ -8,8 +8,11 @@ import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
+import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,18 +36,24 @@ public class PostsController {
     }
 
     @PostMapping("/")
-    public Long write(@RequestBody PostsRequestDto postsRequestDto) {
-        return postsService.write(postsRequestDto);
+    public ResponseEntity<?> write(@Validated(ValidationSequence.class)
+                                       @RequestBody PostsRequestDto postsRequestDto) {
+
+        Long postsId = postsService.write(postsRequestDto);
+        return ResponseEntity.ok(postsId);
     }
 
     @PatchMapping("/{postsId}")
-    public void update(@PathVariable Long postsId,
-                       @RequestBody PostsUpdateDto postsUpdateDto) {
+    public ResponseEntity<?> update(@PathVariable Long postsId,
+                                 @Validated(ValidationSequence.class)
+                                 @RequestBody PostsUpdateDto postsUpdateDto) {
 
         if(postsService.isWriter(postsId, postsUpdateDto.getGoogleId()))
             postsService.update(postsId, postsUpdateDto);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
+
+        return ResponseEntity.ok(null);
     }
 
     @DeleteMapping("/{postsId}")
@@ -58,7 +67,7 @@ public class PostsController {
     }
 
     @PostMapping("/like")
-    public void like(@RequestBody LikesRequestDto likesRequestDto) {
+    public void likeIncrease(@RequestBody LikesRequestDto likesRequestDto) {
         postsService.likeIncrease(likesRequestDto);
     }
 

@@ -8,10 +8,13 @@ import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
+import org.junit.runner.Request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.ValidatorFactory;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member")
@@ -38,8 +41,10 @@ public class MemberController {
     }
 
     @PatchMapping("/{memberId}")
-    public void updateNickname(@PathVariable Long memberId, @RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<?> updateNickname(@PathVariable Long memberId,@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto) {
         memberService.updateNickname(memberId, memberRequestDto.getNickname());
+
+        return ResponseEntity.ok(null);
     }
 
 }

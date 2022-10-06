@@ -2,6 +2,7 @@ package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.web.validation.ValidationGroups;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
