@@ -36,10 +36,10 @@ public class PostsController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> write(@Validated(ValidationSequence.class)
+    public ResponseEntity<?> writePosts(@Validated(ValidationSequence.class)
                                        @RequestBody PostsRequestDto postsRequestDto) {
 
-        Long postsId = postsService.write(postsRequestDto);
+        Long postsId = postsService.writePosts(postsRequestDto);
         return ResponseEntity.ok(postsId);
     }
 
@@ -49,7 +49,7 @@ public class PostsController {
                                  @RequestBody PostsUpdateDto postsUpdateDto) {
 
         if(postsService.isWriter(postsId, postsUpdateDto.getGoogleId()))
-            postsService.update(postsId, postsUpdateDto);
+            postsService.updatePosts(postsId, postsUpdateDto);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
 
@@ -61,7 +61,7 @@ public class PostsController {
                        @RequestBody String googleId) {
 
         if(postsService.isWriter(postsId, googleId))
-            postsService.delete(postsId);
+            postsService.deletePosts(postsId);
         else
             throw new MemberNotMatchException("권한이 없습니다.");
     }
@@ -71,4 +71,8 @@ public class PostsController {
         postsService.likeIncrease(likesRequestDto);
     }
 
+    @DeleteMapping("/like")
+    public void likeRollback(@RequestBody LikesRequestDto likesRequestDto) {
+        postsService.likeRollback(likesRequestDto);
+    }
 }

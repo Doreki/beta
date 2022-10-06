@@ -137,7 +137,7 @@ public class PostsServiceTest {
         given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
         given(postsRepository.save(any(Posts.class))).willReturn(posts);
         //when
-        Long postsId = postsService.write(requestDto); //requestDto가 Posts 엔티티로 변환되는지 확인
+        Long postsId = postsService.writePosts(requestDto); //requestDto가 Posts 엔티티로 변환되는지 확인
         //then
         verify(postsRepository).save(any(Posts.class));
         verify(memberRepository).findById(member.getId());
@@ -158,6 +158,19 @@ public class PostsServiceTest {
         postsService.likeIncrease(likesRequestDto);
         //then
         verify(likesRepository).save(any(Likes.class));
+    }
+
+    @Test
+    public void 좋아요_취소() throws Exception{
+        //given
+        Long memberId = 1L;
+        Long postsId = 1L;
+        LikesRequestDto likesRequestDto = createLikesRequestDto(memberId,postsId);
+
+        //when
+        postsService.likeRollback(likesRequestDto);
+        //then
+        verify(likesRepository).deleteByMemberIdAndPostsId(memberId,postsId);
     }
 
     private static PostsRequestDto createPostsRequestDto(Long memberId, String title, String content) {

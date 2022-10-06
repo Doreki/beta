@@ -47,7 +47,7 @@ public class PostsControllerTest {
     public void 글작성() throws Exception{
         PostsRequestDto postsRequestDto = createPostsReqeustDto("글제목","글내용");
 
-        given(postsService.write(any(PostsRequestDto.class))).willReturn(1L);
+        given(postsService.writePosts(any(PostsRequestDto.class))).willReturn(1L);
 
          mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/v1/posts/")
@@ -55,7 +55,7 @@ public class PostsControllerTest {
                         .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
                         .andExpect(status().isOk());
 
-        verify(postsService).write(any(PostsRequestDto.class));
+        verify(postsService).writePosts(any(PostsRequestDto.class));
     }
 
 
@@ -76,7 +76,7 @@ public class PostsControllerTest {
                 .andExpect(status().isOk());
         //then
         verify(postsService).isWriter(postsId,googleId);
-        verify(postsService).update(eq(postsId),any(PostsUpdateDto.class));
+        verify(postsService).updatePosts(eq(postsId),any(PostsUpdateDto.class));
     }
 
     @Test
@@ -134,7 +134,7 @@ public class PostsControllerTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         //then
-        verify(postsService).delete(postsId);
+        verify(postsService).deletePosts(postsId);
     }
 
     @Test
@@ -155,13 +155,15 @@ public class PostsControllerTest {
     @Test
      public void 좋아요취소() throws Exception{
         //given
-
+        LikesRequestDto likesRequestDto = createLikesRequestDto(1L, 1L);
         //when
         mockMvc.perform(
-                        MockMvcRequestBuilders.post("/api/v1/posts/likeRollback/{postsId}")
-                                .contentType(MediaType.APPLICATION_JSON))
+                        MockMvcRequestBuilders.delete("/api/v1/posts/like/")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(likesRequestDto)))
                 .andExpect(status().isOk());
         //then
+        verify(postsService).likeRollback(any(LikesRequestDto.class));
     }
 
     private static LikesRequestDto createLikesRequestDto(Long memberId, Long postsId) {

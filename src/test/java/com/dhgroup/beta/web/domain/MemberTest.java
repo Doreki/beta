@@ -1,5 +1,6 @@
-package com.dhgroup.beta.domain;
+package com.dhgroup.beta.web.domain;
 
+import com.dhgroup.beta.domain.Member;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;

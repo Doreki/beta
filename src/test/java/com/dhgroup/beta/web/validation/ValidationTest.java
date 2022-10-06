@@ -1,8 +1,7 @@
-package com.dhgroup.beta.domain;
+package com.dhgroup.beta.web.validation;
 
 import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
-import com.dhgroup.beta.web.validation.ValidationGroups;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
