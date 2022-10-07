@@ -76,14 +76,17 @@ public class PostsService {
 
     @Transactional
     public void likeIncrease(LikesRequestDto likesRequestDto) {
-        Member member = findMemberByMemberId(likesRequestDto.getMemberId());
-        Posts posts = findPostsByPostsId(likesRequestDto.getPostsId());
-        Likes likes = likesRequestDto.toEntity(posts,member);
+        Posts findPosts = findPostsByPostsId(likesRequestDto.getPostsId());
+        Member findMember = findMemberByMemberId(likesRequestDto.getMemberId());
+        findPosts.like();
+        Likes likes = likesRequestDto.toEntity(findPosts,findMember);
         likesRepository.save(likes);
     }
 
     @Transactional
     public void likeRollback(LikesRequestDto likesRequestDto) {
+        Posts findPosts = findPostsByPostsId(likesRequestDto.getPostsId());
+        findPosts.likeRollback();
         likesRepository.deleteByMemberIdAndPostsId(likesRequestDto.getMemberId(), likesRequestDto.getPostsId());
     }
 

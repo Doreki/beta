@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 
-@NoArgsConstructor
+@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostsResponseDto {
     private Long id;
     private String title;
@@ -17,9 +20,10 @@ public class PostsResponseDto {
     private String writer;
     private Integer likeCount;
     private Integer commentCount;
-    private LocalDateTime createdDate;
 
+    private boolean isLiked;
 
+    private LocalDateTime Date;
 
     private PostsResponseDto(Posts posts) {
         this.id = posts.getId();
@@ -29,17 +33,6 @@ public class PostsResponseDto {
         this.likeCount = posts.getLikeCount();
         this.commentCount = posts.getCommentCount();
         this.createdDate = posts.getCreatedDate();
-    }
-
-    @Builder
-    public PostsResponseDto(Long id, String title, String content, String writer, Integer likeCount, Integer commentCount, LocalDateTime createdDate) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.writer = writer;
-        this.likeCount = likeCount;
-        this.commentCount = commentCount;
-        this.createdDate = createdDate;
     }
 
     public static PostsResponseDto createPostsResponseDto(Posts posts) {

@@ -1,13 +1,16 @@
 package com.dhgroup.beta.web.dto.PostsDto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
-@NoArgsConstructor
+@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostsUpdateDto {
     private Long memberId;
     @NotBlank
@@ -15,13 +18,4 @@ public class PostsUpdateDto {
     @NotBlank
     private String content;
 
-
-    @Builder
-    public PostsUpdateDto(Long memberId,String title, String content) {
-        this.memberId = memberId;
-        this.title = title;
-        this.content = content;
-    }
-
-//    public static PostsUpdateDto
 }

@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.controller;
 
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
@@ -24,6 +25,7 @@ public class MemberApi {
     private final MemberService memberService;
 
 
+    @LogAspect
     @ValidAspect
     @PostMapping("/1h2g2yysh297h2s")
     public ResponseEntity<?> singUp(@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto, BindingResult bindingResult) {
@@ -45,7 +47,9 @@ public class MemberApi {
     }
 
     @PatchMapping("/{memberId}")
-    public ResponseEntity<?> updateNickname(@PathVariable Long memberId,@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<?> updateNickname(@PathVariable Long memberId,
+                                            @Validated(ValidationSequence.class)
+                                            @RequestBody MemberRequestDto memberRequestDto) {
         memberService.updateNickname(memberId, memberRequestDto.getNickname());
 
         return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",null));

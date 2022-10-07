@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.controller;
 
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.MemberNotMatchException;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,7 @@ public class PostsApi {
 
 
 
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<?> viewPosts(Pageable pageable) {
 
         List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageable);
@@ -42,8 +44,7 @@ public class PostsApi {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> writePosts(@Validated(ValidationSequence.class)
-                                       @RequestBody PostsRequestDto postsRequestDto) {
+    public ResponseEntity<?> writePosts(@Validated(ValidationSequence.class) @RequestBody PostsRequestDto postsRequestDto, BindingResult bindingResult) {
 
         Long postsId = postsService.writePosts(postsRequestDto);
         return ResponseEntity
@@ -67,8 +68,7 @@ public class PostsApi {
     }
 
     @DeleteMapping("/{postsId}")
-    public ResponseEntity<?> delete(@PathVariable Long postsId,
-                       @RequestBody Long memberId) {
+    public ResponseEntity<?> delete(@PathVariable Long postsId,@RequestBody Long memberId) {
 
         if(postsService.isWriter(postsId, memberId))
             postsService.deletePosts(postsId);
@@ -79,6 +79,7 @@ public class PostsApi {
                 .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));
     }
 
+    @LogAspect
     @PostMapping("/like")
     public ResponseEntity<?> likeIncrease(@RequestBody LikesRequestDto likesRequestDto) {
         postsService.likeIncrease(likesRequestDto);

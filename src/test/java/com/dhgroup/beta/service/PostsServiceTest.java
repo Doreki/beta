@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
@@ -157,19 +158,25 @@ public class PostsServiceTest {
         postsService.likeIncrease(likesRequestDto);
         //then
         verify(likesRepository).save(any(Likes.class));
+        assertThat(posts.getLikeCount()).isEqualTo(1);
     }
 
     @Test
     public void 좋아요_취소() throws Exception{
         //given
-        Long memberId = 1L;
-        Long postsId = 1L;
-        LikesRequestDto likesRequestDto = createLikesRequestDto(memberId,postsId);
+        Member member = createMember("글쓴이", "1", 1L);
+        Posts posts = createPosts(member, "글제목", "글내용", 1L);
+        LikesRequestDto likesRequestDto = createLikesRequestDto(member.getId(),posts.getId());
+
+        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(postsRepository.findById(posts.getId())).willReturn(Optional.of(posts));
 
         //when
+        postsService.likeIncrease(likesRequestDto);
         postsService.likeRollback(likesRequestDto);
         //then
-        verify(likesRepository).deleteByMemberIdAndPostsId(memberId,postsId);
+        verify(likesRepository).deleteByMemberIdAndPostsId(member.getId(),posts.getId());
+        assertThat(posts.getLikeCount()).isEqualTo(0);
     }
 
 
@@ -182,7 +189,7 @@ public class PostsServiceTest {
     }
 
     private static Posts createPosts(Member member, String title, String content, Long postsId) {
-        return Posts.builder().id(postsId).title(title).content(content).member(member).build();
+        return Posts.builder().id(postsId).title(title).content(content).member(member).likeCount(0).build();
     }
 
     private static Member createMember(String nickName, String googleId, Long memberId) {

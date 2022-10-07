@@ -8,8 +8,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@NoArgsConstructor
+@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberRequestDto {
 
     private String googleId;
@@ -19,11 +21,6 @@ public class MemberRequestDto {
     @Pattern(regexp = "^[0-9a-zA-Z가-힣]*$",message = "특수문자, 공백은 입력할 수 없습니다.",groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
-    @Builder
-    public MemberRequestDto(String googleId, String nickname) {
-        this.googleId = googleId;
-        this.nickname = nickname;
-    }
 
     public Member toEntity() {
         return Member.builder()

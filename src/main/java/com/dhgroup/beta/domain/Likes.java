@@ -1,17 +1,17 @@
 package com.dhgroup.beta.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 @Getter
 @Entity
-@Table(name="likes")
+@Table
 public class Likes {
 
     @Id
@@ -23,7 +23,7 @@ public class Likes {
     @JoinColumn(name = "posts_id")
     private Posts posts;
 
-    @OneToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -33,6 +33,6 @@ public class Likes {
     }
 
     public static Likes createLikes(Posts posts, Member member) {
-        return new Likes(posts, member);
+        return Likes.builder().posts(posts).member(member).build();
     }
 }
