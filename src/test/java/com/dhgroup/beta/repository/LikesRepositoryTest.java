@@ -50,19 +50,17 @@ public class LikesRepositoryTest {
     }
 
     @Test
-     public void 좋아요_갯수() throws Exception{
+     public void 좋아요_여부() throws Exception{
         //given
         Member member = createMember("1", "홍길동");
         Posts posts = createPosts(member, "글제목", "글내용");
-        for (int i = 0; i < 100; i++) {
-            member = createMember("1"+i, "홍길동"+i);
-            Likes likes = Likes.createLikes(posts, member);
-            likesRepository.save(likes);
-        }
+        Likes likes = Likes.createLikes(posts, member);
+
+        likesRepository.save(likes);
         //when
-        Integer countLikes = likesRepository.countByPostsId(posts.getId());
+        boolean isExisted = likesRepository.existsByMemberIdAndPostsId(member.getId(),posts.getId());
         //then
-        assertThat(countLikes).isEqualTo(100);
+        assertThat(isExisted).isEqualTo(true);
     }
 
 

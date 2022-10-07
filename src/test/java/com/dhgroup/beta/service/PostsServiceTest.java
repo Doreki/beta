@@ -4,6 +4,7 @@ import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.PostsStatus;
 import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
@@ -141,7 +142,7 @@ public class PostsServiceTest {
         //then
         verify(postsRepository).save(any(Posts.class));
         verify(memberRepository).findById(member.getId());
-        assertThat(postsId).isEqualTo(1L);
+        assertThat(posts.getPostsStatus()).isEqualTo(PostsStatus.CREATED);
     }
 
     @Test

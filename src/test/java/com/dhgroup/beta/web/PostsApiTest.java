@@ -58,7 +58,8 @@ public class PostsApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(postsRequestDto)))
                         .andExpect(status().isCreated())
-                        .andExpect(jsonPath("$.status",is(1)));
+                        .andExpect(jsonPath("$.status",is(1)))
+                        .andDo(print());
 
         verify(postsService).writePosts(any(PostsRequestDto.class));
     }
@@ -116,13 +117,15 @@ public class PostsApiTest {
         postsResponseDtos.add(createPostsResponseDto("글제목"+i, "글내용"+i));
         }
 
-        given(postsService.viewPosts(pageRequest)).willReturn(postsResponseDtos);
+
+        given(postsService.viewPosts(any(PageRequest.class))).willReturn(postsResponseDtos);
         //when
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/v1/posts/")
+                        MockMvcRequestBuilders.get("/api/v1/posts/list")
                                 .content(new ObjectMapper().writeValueAsString(pageRequest))
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.data.size()",is(5)))
                                 .andDo(print());
         //then
         verify(postsService).viewPosts(any(PageRequest.class));

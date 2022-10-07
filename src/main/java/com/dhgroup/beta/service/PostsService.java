@@ -35,7 +35,6 @@ public class PostsService {
     @Transactional
     public Long writePosts(PostsRequestDto postsRequestDto) {
         Member member = findMemberByMemberId(postsRequestDto.getMemberId());
-
         return postsRepository.save(postsRequestDto.toEntity(member)).getId(); //반환값 PostsRepository
     }
 

@@ -2,6 +2,7 @@ package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.PostsStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class PostsRequestDto {
                 .member(member)
                 .likeCount(0)
                 .commentCount(0)
+                .postsStatus(PostsStatus.CREATED)
                 .build();
     }
 

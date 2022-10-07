@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.PostsStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,9 +22,11 @@ public class PostsResponseDto {
     private Integer likeCount;
     private Integer commentCount;
 
+    private PostsStatus status;
+
     private boolean isLiked;
 
-    private LocalDateTime Date;
+    private LocalDateTime date;
 
     private PostsResponseDto(Posts posts) {
         this.id = posts.getId();
@@ -32,7 +35,11 @@ public class PostsResponseDto {
         this.writer = posts.getMember().getNickname();
         this.likeCount = posts.getLikeCount();
         this.commentCount = posts.getCommentCount();
-        this.createdDate = posts.getCreatedDate();
+        this.status = posts.getPostsStatus();
+        if(this.status == PostsStatus.CREATED)
+            this.date = posts.getCreatedDate();
+        else
+            this.date = posts.getModifiedDate();
     }
 
     public static PostsResponseDto createPostsResponseDto(Posts posts) {
