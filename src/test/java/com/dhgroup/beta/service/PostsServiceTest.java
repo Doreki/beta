@@ -172,6 +172,7 @@ public class PostsServiceTest {
         verify(likesRepository).deleteByMemberIdAndPostsId(memberId,postsId);
     }
 
+
     private static PostsRequestDto createPostsRequestDto(Long memberId, String title, String content) {
         return PostsRequestDto.builder().memberId(memberId).title(title).content(content).build();
     }

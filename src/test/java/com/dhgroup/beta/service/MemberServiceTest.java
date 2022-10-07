@@ -46,11 +46,11 @@ public class MemberServiceTest {
         Member member = createMember(1L,"1", "글쓴이");
         MemberRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
-        given(memberRepository.saveAndFlush(any(Member.class))).willReturn(member);
+        given(memberRepository.save(any(Member.class))).willReturn(member);
         //when
         memberService.signUp(requestDto);
         //then
-        verify(memberRepository).saveAndFlush(any(Member.class));
+        verify(memberRepository).save(any(Member.class));
         assertThat(member.getNickname()).isEqualTo("글쓴이#0001");
     }
 

@@ -34,17 +34,14 @@ public class Posts extends BaseTimeEntity {
     private Integer commentCount;
 
 
-    /*
-    id는 자동생성,likeCnt,commentCnt는 메서드로 값 주입예정;
-     */
     @Builder
-    public Posts(Long id,String title, String content, Member member) {
+    public Posts(Long id, String title, String content, Member member, Integer likeCount, Integer commentCount) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.member = member;
-        likeCount =0;
-        commentCount =0;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
     }
 
     //updateDto에서 받은 내용으로 글을 수정해줌

@@ -27,8 +27,6 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
-    @Column
-    private String userTag;
 
 
     @Builder
@@ -39,11 +37,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updateNicknameAddUserTag(String nickname) {
-        this.nickname = nickname+this.userTag;
-    }
-
-    public void addUserTag(){
-        this.userTag = createUserTag();
+        this.nickname = nickname+createUserTag();
     }
 
     public String createUserTag() {
@@ -59,7 +53,6 @@ public class Member extends BaseTimeEntity {
         }
         userTag = "#"+userTag;
 
-        this.userTag = userTag;
         return userTag;
     }
 }

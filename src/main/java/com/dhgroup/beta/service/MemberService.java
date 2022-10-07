@@ -20,9 +20,9 @@ public class MemberService {
 
         //userTag를 생성하기 위해 우선적으로 DB에 저장
         Member member = memberRequestDto.toEntity();
-        member = memberRepository.saveAndFlush(member);
-        member.addUserTag();
+        member = memberRepository.save(member);
 
+        //DB에서 받아온 id로 닉네임에 유저태그 더해줌
         member.updateNicknameAddUserTag(member.getNickname());
         return member.getId();
     }

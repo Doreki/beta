@@ -82,9 +82,14 @@ public class PostsService {
         likesRepository.save(likes);
     }
 
+    @Transactional
     public void likeRollback(LikesRequestDto likesRequestDto) {
         likesRepository.deleteByMemberIdAndPostsId(likesRequestDto.getMemberId(), likesRequestDto.getPostsId());
     }
+
+//    public Integer countLikes() {
+//
+//    }
 
     private Posts findPostsByPostsId(Long id) {
         return postsRepository.findById(id)
