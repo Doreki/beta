@@ -1,6 +1,5 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
@@ -67,6 +66,38 @@ public class PostsServiceTest {
         verify(postsRepository).findAllByOrderByIdDesc(any(PageRequest.class));
         assertThat(postsResponseDtos.size()).isEqualTo(10);
         assertThat(postsResponseDtos.get(0).getTitle()).isEqualTo("글제목");
+        assertThat(postsResponseDtos.get(0).isLiked()).isEqualTo(false);
+    }
+
+    @Test
+    public void 좋아요여부() throws Exception{
+        //given
+        List<Posts> postsList = new ArrayList<>();
+        Member memberByMobile = createMember("홍길동", "1", 1L);
+        Member writer = createMember("글쓴이", "2", 2L);
+
+        Posts likePosts = createPosts(writer, "글제목", "글내용", 1L);
+        Posts noneLikePosts = createPosts(writer, "글제목", "글내용", 2L);
+
+        postsList.add(likePosts);
+        postsList.add(noneLikePosts);
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Posts> page = new PageImpl<>(postsList);
+
+        given(postsRepository.findAllByOrderByIdDesc(pageRequest)).willReturn(page);
+        given(likesRepository.existsByMemberIdAndPostsId(memberByMobile.getId(), likePosts.getId())).willReturn(true);
+        given(likesRepository.existsByMemberIdAndPostsId(memberByMobile.getId(), noneLikePosts.getId())).willReturn(false);
+
+        //when
+        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageRequest,memberByMobile.getId());
+        PostsResponseDto likePostsDto = postsResponseDtos.get(0);
+        PostsResponseDto noneLikePostsDto = postsResponseDtos.get(1);
+
+        //then
+        verify(postsRepository).findAllByOrderByIdDesc(any(PageRequest.class));
+        assertThat(likePostsDto.isLiked()).isEqualTo(true);
+        assertThat(noneLikePostsDto.isLiked()).isEqualTo(false);
     }
 
     @Test
@@ -135,14 +166,13 @@ public class PostsServiceTest {
         Posts posts = createPosts(member,"글제목","글내용", 1L);
         PostsRequestDto requestDto = createPostsRequestDto(1L, "글제목", "글내용");
 
-        given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
+        given(memberRepository.findById(requestDto.getMemberId())).willReturn(Optional.of(member));
         given(postsRepository.save(any(Posts.class))).willReturn(posts);
         //when
         Long postsId = postsService.writePosts(requestDto); //requestDto가 Posts 엔티티로 변환되는지 확인
         //then
         verify(postsRepository).save(any(Posts.class));
-        verify(memberRepository).findById(member.getId());
-        assertThat(posts.getPostsStatus()).isEqualTo(PostsStatus.CREATED);
+        verify(memberRepository).findById(requestDto.getMemberId());
     }
 
     @Test

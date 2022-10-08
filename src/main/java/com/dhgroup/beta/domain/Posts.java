@@ -38,11 +38,18 @@ public class Posts extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostsStatus postsStatus;
 
+    @Transient
+    private boolean isLiked;
+
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
         this.postsStatus = PostsStatus.MODIFIED;
+    }
+
+    public void updateIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
     }
 
     public void like() {

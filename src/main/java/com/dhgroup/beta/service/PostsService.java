@@ -13,6 +13,7 @@ import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class PostsService {
     private final MemberRepository memberRepository;
 
     private final LikesRepository likesRepository;
+
 
 
     @Transactional
@@ -52,15 +54,42 @@ public class PostsService {
     }
 
 
-    public List<PostsResponseDto> viewPosts(Pageable pageable) {
+    public List<PostsResponseDto> viewPosts(Pageable pageable, Long memberId) {
 
-        List<PostsResponseDto> postsList = postsRepository.findAllByOrderByIdDesc(pageable)
-                .stream().map(PostsResponseDto::createPostsResponseDto).collect(Collectors.toList());
+        Page<Posts> findPosts = postsRepository.findAllByOrderByIdDesc(pageable);
+
+        updateWhetherIsLiked(memberId, findPosts);
+        List<PostsResponseDto> postsList = convertToDto(findPosts);
 
         if(postsList.size()==0)
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
 
         return postsList;
+    }
+
+    public List<PostsResponseDto> viewPosts(Pageable pageable) {
+
+        Page<Posts> findPosts = postsRepository.findAllByOrderByIdDesc(pageable);
+
+        List<PostsResponseDto> postsList = convertToDto(findPosts);
+
+        if(postsList.size()==0)
+            throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
+
+        return postsList;
+    }
+
+    private static List<PostsResponseDto> convertToDto(Page<Posts> findPosts) {
+        return findPosts
+                .stream()
+                .map(PostsResponseDto::createPostsResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private void updateWhetherIsLiked(Long memberId, Page<Posts> findPosts) {
+        findPosts
+                .stream()
+                .forEach(posts -> posts.updateIsLiked(likesRepository.existsByMemberIdAndPostsId(memberId, posts.getId())));
     }
 
     public boolean isWriter(Long postsId, Long memberId) {

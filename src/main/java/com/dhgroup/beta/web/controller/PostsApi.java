@@ -13,12 +13,12 @@ import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.*;
@@ -33,12 +33,14 @@ public class PostsApi {
     private final PostsRepository postsRepository;
     private final MemberRepository memberRepository;
 
+    @GetMapping("/list/{memberId}")
+    public ResponseEntity<?> viewPosts(@PathVariable Long memberId, Pageable pageable) {
+        List<PostsResponseDto> postsResponseDtos = new ArrayList<>();
+        if(memberId == 0L) //로그인 안한 상태라면
+             postsResponseDtos = postsService.viewPosts(pageable);
+        else
+             postsResponseDtos = postsService.viewPosts(pageable,memberId); //좋아요 여부 넘기기
 
-
-    @GetMapping("/list")
-    public ResponseEntity<?> viewPosts(Pageable pageable) {
-
-        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageable);
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", postsResponseDtos));
     }

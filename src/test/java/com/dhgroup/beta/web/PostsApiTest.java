@@ -18,7 +18,6 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +105,7 @@ public class PostsApiTest {
     }
 
     @Test
-    public void 글목록_불러오기() throws Exception{
+    public void 글목록_불러오기_로그인안함() throws Exception{
         //given
 
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -121,7 +120,7 @@ public class PostsApiTest {
         given(postsService.viewPosts(any(PageRequest.class))).willReturn(postsResponseDtos);
         //when
         mockMvc.perform(
-                        MockMvcRequestBuilders.get("/api/v1/posts/list")
+                        MockMvcRequestBuilders.get("/api/v1/posts/list/{memberId}",0L)
                                 .content(new ObjectMapper().writeValueAsString(pageRequest))
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
@@ -129,6 +128,32 @@ public class PostsApiTest {
                                 .andDo(print());
         //then
         verify(postsService).viewPosts(any(PageRequest.class));
+    }
+
+    @Test
+    public void 글목록_불러오기_로그인함() throws Exception{
+        //given
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        List<PostsResponseDto> postsResponseDtos = new ArrayList<>();
+
+        for (int i = 1; i <= 5; i++) {
+            postsResponseDtos.add(createPostsResponseDto("글제목"+i, "글내용"+i));
+        }
+
+
+        given(postsService.viewPosts(any(PageRequest.class),eq(1L))).willReturn(postsResponseDtos);
+        //when
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/posts/list/{memberId}",1L)
+                                .content(new ObjectMapper().writeValueAsString(pageRequest))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.size()",is(5)))
+                .andDo(print());
+        //then
+        verify(postsService).viewPosts(any(PageRequest.class),eq(1L));
     }
     
     @Test
