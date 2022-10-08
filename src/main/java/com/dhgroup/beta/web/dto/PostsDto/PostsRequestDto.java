@@ -32,7 +32,7 @@ public class PostsRequestDto {
                 .member(member)
                 .likeCount(0)
                 .commentCount(0)
-                .postsStatus(PostsStatus.CREATED)
+                .status(PostsStatus.CREATED)
                 .build();
     }
 

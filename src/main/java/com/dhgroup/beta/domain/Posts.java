@@ -36,7 +36,7 @@ public class Posts extends BaseTimeEntity {
     private Integer commentCount;
 
     @Enumerated(EnumType.STRING)
-    private PostsStatus postsStatus;
+    private PostsStatus status;
 
     @Transient
     private boolean isLiked;
@@ -45,7 +45,7 @@ public class Posts extends BaseTimeEntity {
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.postsStatus = PostsStatus.MODIFIED;
+        this.status = PostsStatus.MODIFIED;
     }
 
     public void updateIsLiked(boolean isLiked) {

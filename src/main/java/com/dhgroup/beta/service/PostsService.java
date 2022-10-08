@@ -118,10 +118,6 @@ public class PostsService {
         likesRepository.deleteByMemberIdAndPostsId(likesRequestDto.getMemberId(), likesRequestDto.getPostsId());
     }
 
-//    public Integer countLikes() {
-//
-//    }
-
     private Posts findPostsByPostsId(Long id) {
         return postsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundPostsException("해당 게시글이 없습니다."));
