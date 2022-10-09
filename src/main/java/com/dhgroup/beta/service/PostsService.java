@@ -7,12 +7,14 @@ import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.exception.OverlapLikesException;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -106,7 +108,12 @@ public class PostsService {
     public void likeIncrease(LikesRequestDto likesRequestDto) {
         Posts findPosts = findPostsByPostsId(likesRequestDto.getPostsId());
         Member findMember = findMemberByMemberId(likesRequestDto.getMemberId());
-        findPosts.like();
+
+        try{
+            findPosts.like();
+        } catch (DataIntegrityViolationException e) {
+            throw new OverlapLikesException("하나의 게시글에 중복으로 좋아요를 누를 수 없습니다.");
+        }
         Likes likes = likesRequestDto.toEntity(findPosts,findMember);
         likesRepository.save(likes);
     }

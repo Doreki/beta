@@ -11,12 +11,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.ConstraintViolation;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
@@ -61,6 +64,18 @@ public class LikesRepositoryTest {
         boolean isExisted = likesRepository.existsByMemberIdAndPostsId(member.getId(),posts.getId());
         //then
         assertThat(isExisted).isEqualTo(true);
+    }
+
+    @Test()
+     public void 좋아요_중복() throws Exception{
+        //given
+        Member member = createMember("1", "홍길동");
+        Posts posts = createPosts(member, "글제목", "글내용");
+        Likes likes1 = Likes.createLikes(posts, member);
+        Likes likes2 = Likes.createLikes(posts, member);
+        likesRepository.save(likes1);
+        //then)
+        assertThrows(DataIntegrityViolationException.class, () ->likesRepository.save(likes2));
     }
 
 

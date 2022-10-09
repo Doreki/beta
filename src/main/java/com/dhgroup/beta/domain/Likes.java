@@ -11,7 +11,9 @@ import static javax.persistence.FetchType.*;
 @Builder
 @Getter
 @Entity
-@Table
+@Table(uniqueConstraints =
+        {@UniqueConstraint(name = "likes_unique",
+                columnNames = {"posts_id", "member_id"})})
 public class Likes {
 
     @Id

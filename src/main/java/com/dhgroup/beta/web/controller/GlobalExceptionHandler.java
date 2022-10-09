@@ -63,6 +63,14 @@ public class GlobalExceptionHandler {
                 .body(CMResponseDto.createCMResponseDto(-1, e.getMessage(), e.getErrorMap()));
     }
 
+    @ExceptionHandler(value = OverlapLikesException.class)
+    public ResponseEntity<?> overlapLikesCatcher(OverlapLikesException e) {
+        Map<String, String> map = putErrorMessage(e.getMessage());
+        return ResponseEntity
+                .badRequest()
+                .body(CMResponseDto.createCMResponseDto(-1, "DUPLICATED_LIKES", map));
+    }
+
     private Map<String, String> putErrorMessage(String message) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("errMsg", message);

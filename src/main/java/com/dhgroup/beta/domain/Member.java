@@ -10,9 +10,7 @@ import javax.persistence.*;
 @Builder
 @Getter
 @Entity
-@Table(name = "member", uniqueConstraints =
-        {@UniqueConstraint(name = "google_id_nickname_UNIQUE",
-                columnNames = {"google_id", "nickname"})})
+@Table(name = "member")
 public class Member extends BaseTimeEntity {
 
     @Id //pk
@@ -20,10 +18,10 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false, name = "google_id")
+    @Column(nullable = false, name = "google_id", unique = true)
     private String googleId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     public void updateNicknameAddUserTag(String nickname) {
