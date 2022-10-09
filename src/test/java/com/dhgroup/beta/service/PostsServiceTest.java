@@ -3,7 +3,6 @@ package com.dhgroup.beta.service;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.Member;
-import com.dhgroup.beta.domain.PostsStatus;
 import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
@@ -69,6 +68,22 @@ public class PostsServiceTest {
         assertThat(postsResponseDtos.get(0).isLiked()).isEqualTo(false);
     }
 
+
+    @Test
+    public void 글목록_불러오기_실패() throws Exception{
+        //given
+        List<Posts> postsList = new ArrayList<>();
+        Page<Posts> page = new PageImpl<>(postsList);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        //빈 리스트 반환
+        given(postsRepository.findAllByOrderByIdDesc(pageRequest)).willReturn(page);
+        //when
+
+        NotFoundPostsException e = assertThrows(NotFoundPostsException.class, () -> postsService.viewPosts(pageRequest));
+        //then
+        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
+    }
     @Test
     public void 좋아요여부() throws Exception{
         //given
@@ -90,7 +105,7 @@ public class PostsServiceTest {
         given(likesRepository.existsByMemberIdAndPostsId(memberByMobile.getId(), noneLikePosts.getId())).willReturn(false);
 
         //when
-        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(pageRequest,memberByMobile.getId());
+        List<PostsResponseDto> postsResponseDtos = postsService.viewPosts(memberByMobile.getId(), pageRequest);
         PostsResponseDto likePostsDto = postsResponseDtos.get(0);
         PostsResponseDto noneLikePostsDto = postsResponseDtos.get(1);
 
@@ -98,22 +113,6 @@ public class PostsServiceTest {
         verify(postsRepository).findAllByOrderByIdDesc(any(PageRequest.class));
         assertThat(likePostsDto.isLiked()).isEqualTo(true);
         assertThat(noneLikePostsDto.isLiked()).isEqualTo(false);
-    }
-
-    @Test
-    public void 글목록_불러오기_실패() throws Exception{
-        //given
-        List<Posts> postsList = new ArrayList<>();
-        Page<Posts> page = new PageImpl<>(postsList);
-        PageRequest pageRequest = PageRequest.of(0, 10);
-
-        //빈 리스트 반환
-        given(postsRepository.findAllByOrderByIdDesc(pageRequest)).willReturn(page);
-        //when
-
-        NotFoundPostsException e = assertThrows(NotFoundPostsException.class, () -> postsService.viewPosts(pageRequest));
-        //then
-        assertThat(e.getMessage()).isEqualTo("더 이상 불러들일 게시글이 없습니다.");
     }
 
     @Test
@@ -208,6 +207,31 @@ public class PostsServiceTest {
         //then
         verify(likesRepository).deleteByMemberIdAndPostsId(member.getId(),posts.getId());
         assertThat(posts.getLikeCount()).isEqualTo(0);
+    }
+
+    @Test
+     public void 좋아요_게시물_찾아오기() throws Exception{
+        //given
+        Member member = createMember("글쓴이", "1", 1L);
+
+        List<Posts> postsList = new ArrayList();
+        List<Likes> likesList = new ArrayList();
+        for (int i = 0; i < 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용", 1L);
+            postsList.add(posts);
+            Likes likes = Likes.createLikes(posts, member);
+            likesList.add(likes);
+        }
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<Posts> page = new PageImpl<>(postsList);
+
+//        given(likesRepository.findLikesByMemberIdOrderByAsc(member.getId())).willReturn(likesList);
+//        given(postsRepository.findLikedPosts(any(List.class), eq(pageRequest))).willReturn(page);
+        //when
+        postsService.viewLikedPosts(member.getId(),pageRequest);
+        //then
+//        verify(likesRepository).findLikesByMemberIdOrderByAsc(member.getId());
+//        verify(postsRepository).findLikedPosts(any(List.class),eq(pageRequest));
     }
 
 

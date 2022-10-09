@@ -15,7 +15,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolation;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -66,7 +65,7 @@ public class LikesRepositoryTest {
         assertThat(isExisted).isEqualTo(true);
     }
 
-    @Test()
+    @Test
      public void 좋아요_중복() throws Exception{
         //given
         Member member = createMember("1", "홍길동");
@@ -76,6 +75,29 @@ public class LikesRepositoryTest {
         likesRepository.save(likes1);
         //then)
         assertThrows(DataIntegrityViolationException.class, () ->likesRepository.save(likes2));
+    }
+
+    @Test
+     public void 좋아요_목록_가져오기() throws Exception{
+        //given
+        Member member = createMember("1", "홍길동");
+        Member differentMember = createMember("2", "홍길동2");
+        Long memberId = member.getId();
+        Long differentMemberId = differentMember.getId();
+        for (int i = 0; i < 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용"+i);
+            Likes likes = Likes.createLikes(posts, member);
+            Likes differentLikes = Likes.createLikes(posts, differentMember);
+            likesRepository.save(likes);
+            likesRepository.save(differentLikes);
+        }
+        //when
+//        List<Likes> likedPosts = likesRepository.findLikesByMemberIdOrderByAsc(memberId);
+//        Posts LastLikedPosts = likedPosts.get(0).getPosts();
+        //then
+//        assertThat(likedPosts.size()).isEqualTo(10);
+
+//        assertThat(LastLikedPosts.getContent()).isEqualTo("글내용0");
     }
 
 

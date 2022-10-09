@@ -39,7 +39,7 @@ public class PostsApi {
         if(memberId == 0L) //로그인 안한 상태라면
              postsResponseDtos = postsService.viewPosts(pageable);
         else
-             postsResponseDtos = postsService.viewPosts(pageable,memberId); //좋아요 여부 넘기기
+             postsResponseDtos = postsService.viewPosts(memberId,pageable); //좋아요 여부 넘기기
 
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", postsResponseDtos));
@@ -96,5 +96,14 @@ public class PostsApi {
 
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1,"게시글에 좋아요를 취소하셨습니다.",null));
+    }
+
+    @GetMapping("/like/list/{memberId}")
+    public ResponseEntity<?> likeList(@PathVariable Long memberId, Pageable pageable){
+
+        List<PostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(memberId,pageable); //좋아요 여부 넘기기
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", postsResponseDtos));
     }
 }

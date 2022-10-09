@@ -16,5 +16,8 @@ public interface PostsRepository extends JpaRepository<Posts,Long> {
     @Query(value = "select p from Posts p join fetch p.member order by p.id desc",
             countQuery = "select count(p) from Posts p")
     Page<Posts> findAllByOrderByIdDesc(Pageable pageable);
+
+    @Query(value = "select p from Posts p join fetch p.member where p.id in :id")
+    List<Posts> findLikedPosts(@Param("id")List<Long> likedPostsId);
     Posts findTopByOrderByIdDesc();
 }

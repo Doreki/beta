@@ -37,6 +37,7 @@ public class PostsResponseDto {
         this.commentCount = posts.getCommentCount();
         this.status = posts.getStatus();
         this.isLiked = posts.isLiked();
+
         if(this.status == PostsStatus.CREATED)
             this.date = posts.getCreatedDate();
         else

@@ -1,5 +1,6 @@
 package com.dhgroup.beta.domain;
 
+import com.dhgroup.beta.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import static javax.persistence.FetchType.*;
 @Table(uniqueConstraints =
         {@UniqueConstraint(name = "likes_unique",
                 columnNames = {"posts_id", "member_id"})})
-public class Likes {
+public class Likes extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

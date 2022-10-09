@@ -1,5 +1,8 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.domain.Likes;
+import com.dhgroup.beta.domain.Posts;
+import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.service.PostsService;
@@ -41,6 +44,9 @@ public class PostsApiTest {
 
     @MockBean
     private MemberRepository memberRepository;
+
+    @MockBean
+    private LikesRepository likesRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -143,7 +149,7 @@ public class PostsApiTest {
         }
 
 
-        given(postsService.viewPosts(any(PageRequest.class),eq(1L))).willReturn(postsResponseDtos);
+        given(postsService.viewPosts(eq(1L),any(PageRequest.class))).willReturn(postsResponseDtos);
         //when
         mockMvc.perform(
                         MockMvcRequestBuilders.get("/api/v1/posts/list/{memberId}",1L)
@@ -153,7 +159,7 @@ public class PostsApiTest {
                 .andExpect(jsonPath("$.data.size()",is(5)))
                 .andDo(print());
         //then
-        verify(postsService).viewPosts(any(PageRequest.class),eq(1L));
+        verify(postsService).viewPosts(eq(1L),any(PageRequest.class));
     }
     
     @Test
@@ -200,6 +206,7 @@ public class PostsApiTest {
         //then
         verify(postsService).likeRollback(any(LikesRequestDto.class));
     }
+
 
     private static LikesRequestDto createLikesRequestDto(Long memberId, Long postsId) {
         return LikesRequestDto.builder().memberId(memberId).postsId(postsId).build();
