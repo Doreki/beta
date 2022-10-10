@@ -223,15 +223,15 @@ public class PostsServiceTest {
             likesList.add(likes);
         }
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Posts> page = new PageImpl<>(postsList);
+        Page<Likes> page = new PageImpl<>(likesList);
 
-//        given(likesRepository.findLikesByMemberIdOrderByAsc(member.getId())).willReturn(likesList);
-//        given(postsRepository.findLikedPosts(any(List.class), eq(pageRequest))).willReturn(page);
+        given(likesRepository.findLikesByMemberIdOrderByDesc(member.getId(),pageRequest)).willReturn(page);
+        given(postsRepository.findLikedPosts(any(List.class))).willReturn(postsList);
         //when
-        postsService.viewLikedPosts(member.getId(),pageRequest);
+        List<PostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(member.getId(), pageRequest);
         //then
-//        verify(likesRepository).findLikesByMemberIdOrderByAsc(member.getId());
-//        verify(postsRepository).findLikedPosts(any(List.class),eq(pageRequest));
+        verify(likesRepository).findLikesByMemberIdOrderByDesc(member.getId(),pageRequest);
+        verify(postsRepository).findLikedPosts(any(List.class));
     }
 
 

@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,7 +86,6 @@ public class LikesRepositoryTest {
         Member member = createMember("1", "홍길동");
         Member differentMember = createMember("2", "홍길동2");
         Long memberId = member.getId();
-        Long differentMemberId = differentMember.getId();
         for (int i = 0; i < 10; i++) {
             Posts posts = createPosts(member, "글제목", "글내용"+i);
             Likes likes = Likes.createLikes(posts, member);
@@ -92,12 +94,13 @@ public class LikesRepositoryTest {
             likesRepository.save(differentLikes);
         }
         //when
-//        List<Likes> likedPosts = likesRepository.findLikesByMemberIdOrderByAsc(memberId);
-//        Posts LastLikedPosts = likedPosts.get(0).getPosts();
-        //then
-//        assertThat(likedPosts.size()).isEqualTo(10);
 
-//        assertThat(LastLikedPosts.getContent()).isEqualTo("글내용0");
+        Pageable pageable = PageRequest.of(0,10);
+
+        Page<Likes> likedPosts = likesRepository.findLikesByMemberIdOrderByDesc(memberId,pageable);
+
+        //then
+        assertThat(likedPosts.get().count()).isEqualTo(10);
     }
 
 

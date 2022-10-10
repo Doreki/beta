@@ -5,6 +5,9 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import static javax.persistence.FetchType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED) //불필요한 생성자 접근을 막기 위함
@@ -40,6 +43,9 @@ public class Posts extends BaseTimeEntity {
 
     @Transient
     private boolean isLiked;
+
+    @Transient
+    private LocalDateTime likedDate;
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {

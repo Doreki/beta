@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.LikesRepository;
@@ -14,12 +15,14 @@ import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -146,11 +149,11 @@ public class PostsService {
                 .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
+    @LogAspect
     public List<PostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
         Page<Likes> findLikesList = getLikesListByLatestOrder(memberId, pageable);
-//        findLikesList.stream().sorted(Comparator.comparing(Likes::getId).reversed());
-        List<Long> findLikedPostsId = convertFromLikesToPostsId(findLikesList);
-        List<Posts> findLikedPosts = postsRepository.findLikedPosts(findLikedPostsId);
+        List<Long> findLikedPostsIds = convertFromLikesToPostsId(findLikesList);
+        List<Posts> findLikedPosts = postsRepository.findLikedPosts(findLikedPostsIds);
 
         updateWhetherIsLiked(memberId, findLikedPosts);
         List<PostsResponseDto> likedPostsList = convertFromToDto(findLikedPosts);
@@ -163,6 +166,7 @@ public class PostsService {
 
     private static List<Long> convertFromLikesToPostsId(Page<Likes> findLikesList) {
         return findLikesList.stream()
+                .sequential()
                 .map(Likes::getPosts).map(Posts::getId)
                 .collect(Collectors.toList());
     }

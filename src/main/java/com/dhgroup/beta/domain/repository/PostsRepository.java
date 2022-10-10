@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public interface PostsRepository extends JpaRepository<Posts,Long> {
@@ -17,7 +18,7 @@ public interface PostsRepository extends JpaRepository<Posts,Long> {
             countQuery = "select count(p) from Posts p")
     Page<Posts> findAllByOrderByIdDesc(Pageable pageable);
 
-    @Query(value = "select p from Posts p join fetch p.member where p.id in :id")
-    List<Posts> findLikedPosts(@Param("id")List<Long> likedPostsId);
+    @Query(value = "select p from Posts p join fetch p.member where p.id in :id order by field (p.id,:id)")
+    List<Posts> findLikedPosts(@Param("id") List<Long> likedPostsId);
     Posts findTopByOrderByIdDesc();
 }
