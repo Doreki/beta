@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import java.time.LocalDateTime;
+
 import static javax.persistence.FetchType.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,7 +17,7 @@ import static javax.persistence.FetchType.*;
 @Table(uniqueConstraints =
         {@UniqueConstraint(name = "likes_unique",
                 columnNames = {"posts_id", "member_id"})})
-public class Likes extends BaseTimeEntity {
+public class Likes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +32,16 @@ public class Likes extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Column
+    private LocalDateTime likedDate;
+
     private Likes(Posts posts, Member member) {
         this.posts = posts;
         this.member = member;
+        this.likedDate = LocalDateTime.now();
     }
 
     public static Likes createLikes(Posts posts, Member member) {
-        return Likes.builder().posts(posts).member(member).build();
+        return Likes.builder().posts(posts).member(member).likedDate(LocalDateTime.now()).build();
     }
 }

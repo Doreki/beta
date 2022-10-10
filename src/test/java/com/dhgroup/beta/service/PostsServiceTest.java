@@ -20,6 +20,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +54,7 @@ public class PostsServiceTest {
 
         //게시글 생성
         for (int i = 0; i < 10; i++) {
-            Posts posts = createPosts(member, "글제목", "글내용", 1L);
+            Posts posts = createPosts(member, "글제목", "글내용", 1L, true);
             postsList.add(posts);
         }
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -91,8 +93,8 @@ public class PostsServiceTest {
         Member memberByMobile = createMember("홍길동", "1", 1L);
         Member writer = createMember("글쓴이", "2", 2L);
 
-        Posts likePosts = createPosts(writer, "글제목", "글내용", 1L);
-        Posts noneLikePosts = createPosts(writer, "글제목", "글내용", 2L);
+        Posts likePosts = createPosts(writer, "글제목", "글내용", 1L, true);
+        Posts noneLikePosts = createPosts(writer, "글제목", "글내용", 2L, true);
 
         postsList.add(likePosts);
         postsList.add(noneLikePosts);
@@ -122,7 +124,7 @@ public class PostsServiceTest {
         Long memberId = 1L;
 
         Member member = createMember("글쓴이","1", 1L);
-        Posts posts = createPosts(member,"글제목","글내용", 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L, true);
 
         given(memberRepository.findById(memberId)).willReturn(Optional.of(member));//멤버
         given(postsRepository.findById(postsId)).willReturn(Optional.of(posts)); //포스트에 저장된멤버
@@ -144,7 +146,7 @@ public class PostsServiceTest {
 
         Member wrongMember = createMember("홍길동","1", wrongMemberId);
         Member member = createMember("글쓴이","2", memberId);
-        Posts posts = createPosts(member,"글제목","글내용", 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L, true);
 
 
         given(memberRepository.findById(wrongMemberId)).willReturn(Optional.of(wrongMember));//다른멤버
@@ -162,7 +164,7 @@ public class PostsServiceTest {
      public void 글작성() throws Exception{
         //given
         Member member = createMember("글쓴이","1", 1L);
-        Posts posts = createPosts(member,"글제목","글내용", 1L);
+        Posts posts = createPosts(member,"글제목","글내용", 1L, true);
         PostsRequestDto requestDto = createPostsRequestDto(1L, "글제목", "글내용");
 
         given(memberRepository.findById(requestDto.getMemberId())).willReturn(Optional.of(member));
@@ -178,7 +180,7 @@ public class PostsServiceTest {
      public void 좋아요() throws Exception{
         //given
         Member member = createMember("글쓴이", "1", 1L);
-        Posts posts = createPosts(member, "글제목", "글내용", 1L);
+        Posts posts = createPosts(member, "글제목", "글내용", 1L, true);
         LikesRequestDto likesRequestDto = createLikesRequestDto(member.getId(), posts.getId());
 
         given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
@@ -195,7 +197,7 @@ public class PostsServiceTest {
     public void 좋아요_취소() throws Exception{
         //given
         Member member = createMember("글쓴이", "1", 1L);
-        Posts posts = createPosts(member, "글제목", "글내용", 1L);
+        Posts posts = createPosts(member, "글제목", "글내용", 1L, true);
         LikesRequestDto likesRequestDto = createLikesRequestDto(member.getId(),posts.getId());
 
         given(memberRepository.findById(member.getId())).willReturn(Optional.of(member));
@@ -217,7 +219,7 @@ public class PostsServiceTest {
         List<Posts> postsList = new ArrayList();
         List<Likes> likesList = new ArrayList();
         for (int i = 0; i < 10; i++) {
-            Posts posts = createPosts(member, "글제목", "글내용", 1L);
+            Posts posts = createPosts(member, "글제목", "글내용", 1L, true);
             postsList.add(posts);
             Likes likes = Likes.createLikes(posts, member);
             likesList.add(likes);
@@ -226,12 +228,48 @@ public class PostsServiceTest {
         Page<Likes> page = new PageImpl<>(likesList);
 
         given(likesRepository.findLikesByMemberIdOrderByDesc(member.getId(),pageRequest)).willReturn(page);
-        given(postsRepository.findLikedPosts(any(List.class))).willReturn(postsList);
+        given(postsRepository.findLikedPostsByLatestOrder(any(List.class))).willReturn(postsList);
+        given(likesRepository.findByPostsIdAndMemberId(anyLong(),anyLong())).willReturn(Optional.of(likesList.get(0)));
         //when
         List<PostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(member.getId(), pageRequest);
         //then
         verify(likesRepository).findLikesByMemberIdOrderByDesc(member.getId(),pageRequest);
-        verify(postsRepository).findLikedPosts(any(List.class));
+        verify(postsRepository).findLikedPostsByLatestOrder(any(List.class));
+        assertThat(postsResponseDtos.size()).isEqualTo(10);
+    }
+    
+    @Test
+     public void 좋아요_여부_업데이트() throws Exception{
+        //given
+        Member member = createMember("홍길동", "1", 1L);
+        List<Posts> postsList = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용", i + 0L, false);
+            postsList.add(posts);
+        }
+        given(likesRepository.existsByMemberIdAndPostsId(eq(member.getId()), anyLong())).willReturn(true);
+        //when
+        postsService.updateWhetherIsLiked(member.getId(), postsList);
+        //then
+        assertThat(postsList.get(0).isLiked()).isEqualTo(true);
+    }
+
+    @Test
+     public void 좋아요_시간_업데이트() throws Exception{
+        //given
+        Member member = createMember("홍길동", "1", 1L);
+        List<Posts> postsList = new ArrayList<>();
+
+        Posts posts = createPosts(member, "글제목", "글내용", 1L, false);
+        postsList.add(posts);
+
+        Likes likes = Likes.createLikes(posts, member);
+
+        given(likesRepository.findByPostsIdAndMemberId(eq(member.getId()), anyLong())).willReturn(Optional.of(likes));
+        //when
+        postsService.updateLikedDate(member.getId(),postsList);
+        //then
+        assertThat(postsList.get(0).getLikedDate()).isEqualTo(likes.getLikedDate());
     }
 
 
@@ -243,8 +281,8 @@ public class PostsServiceTest {
         return LikesRequestDto.builder().postsId(postsId).memberId(memberId).build();
     }
 
-    private static Posts createPosts(Member member, String title, String content, Long postsId) {
-        return Posts.builder().id(postsId).title(title).content(content).member(member).likeCount(0).build();
+    private static Posts createPosts(Member member, String title, String content, Long postsId, boolean isLiked) {
+        return Posts.builder().id(postsId).title(title).content(content).member(member).likeCount(0).isLiked(isLiked).build();
     }
 
     private static Member createMember(String nickName, String googleId, Long memberId) {

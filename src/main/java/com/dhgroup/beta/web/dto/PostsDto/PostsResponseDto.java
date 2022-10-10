@@ -28,7 +28,7 @@ public class PostsResponseDto {
 
     private LocalDateTime date;
 
-    private LocalDateTime likedTime;
+    private LocalDateTime likedDate;
 
     private PostsResponseDto(Posts posts) {
         this.id = posts.getId();
@@ -45,8 +45,9 @@ public class PostsResponseDto {
         else
             this.date = posts.getModifiedDate();
 
-        this.likedTime = posts.getLikedDate();
+        this.likedDate = posts.getLikedDate();
     }
+
 
     public static PostsResponseDto createPostsResponseDto(Posts posts) {
         return new PostsResponseDto(posts);

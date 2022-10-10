@@ -152,7 +152,7 @@ public class PostsRepositoryTest {
         }
 
         //when
-        List<Posts> likedPage = postsRepository.findLikedPosts(likesList);
+        List<Posts> likedPage = postsRepository.findLikedPostsByLatestOrder(likesList);
         //then
         assertThat(likedPage.size()).isEqualTo(10);
         assertThat(likedPage.get(0).getTitle()).isEqualTo("글제목1");

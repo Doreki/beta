@@ -58,6 +58,10 @@ public class Posts extends BaseTimeEntity {
         this.isLiked = isLiked;
     }
 
+    public void updateLikedDate(LocalDateTime likedDate) {
+        this.likedDate = likedDate;
+    }
+
     public void like() {
         this.likeCount++;
     }
