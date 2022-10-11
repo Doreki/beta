@@ -51,7 +51,8 @@ public class MemberService {
         else
             return false;
     }
-    private Member findMemberByMemberId(Long memberId) {
+
+    public Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 

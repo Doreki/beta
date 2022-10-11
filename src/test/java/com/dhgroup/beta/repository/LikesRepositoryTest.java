@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -69,6 +70,25 @@ public class LikesRepositoryTest {
     }
 
     @Test
+    public void 좋아요_여부_리스트() throws Exception{
+        //given
+        Member member = createMember("1", "홍길동");
+        memberRepository.save(member);
+        List<Long> postsIds = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용");
+            postsIds.add(posts.getId());
+            postsRepository.save(posts);
+            Likes likes = Likes.createLikes(posts, member);
+            likesRepository.save(likes);
+        }
+        //when
+        List<Boolean> isLikedList = likesRepository.existsByMemberIdAndPostsId(member.getId(),postsIds);
+        //then
+        assertThat(isLikedList.get(0)).isEqualTo(true);
+    }
+
+    @Test
      public void 좋아요_중복() throws Exception{
         //given
         Member member = createMember("1", "홍길동");
@@ -102,6 +122,8 @@ public class LikesRepositoryTest {
         //then
         assertThat(likedPosts.get().count()).isEqualTo(10);
     }
+
+
 
 
     private Posts createPosts(Member member, String title, String content) {

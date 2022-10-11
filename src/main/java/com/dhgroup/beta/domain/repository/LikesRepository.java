@@ -12,9 +12,16 @@ import java.util.Optional;
 
 public interface LikesRepository extends JpaRepository<Likes,Long> {
     public void deleteByMemberIdAndPostsId(Long memberId, Long postsId);
+
+
     public boolean existsByMemberIdAndPostsId(Long memberId, Long postsId);
-    @Query(value = "select l from Likes l join fetch l.posts"+
-            " where l.member.id = :id order by l.id Desc",
+
+    @Query("select l from Likes l join fetch l.posts where exist " +
+            "(select p from Posts p where l.member.id = :memberId and l.postsId in :postsIds )")
+    public List<Boolean> existsByMemberIdAndPostsId(@Param("memberId") Long memberId, @Param("postsIds") List<Long> postsId);
+
+    @Query(value = "select l from Likes l join fetch l.posts "+
+            "where l.member.id = :id order by l.id Desc",
             countQuery = "select count(l) from Likes l")
     public Page<Likes> findLikesByMemberIdOrderByDesc(@Param("id") Long memberId, Pageable pageable);
 

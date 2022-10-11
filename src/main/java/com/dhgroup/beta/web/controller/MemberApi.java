@@ -2,14 +2,16 @@ package com.dhgroup.beta.web.controller;
 
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
+import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateRequest;
+import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateResponse;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -49,8 +51,10 @@ public class MemberApi {
     @PatchMapping("/{memberId}")
     public ResponseEntity<?> updateNickname(@PathVariable Long memberId,
                                             @Validated(ValidationSequence.class)
-                                            @RequestBody MemberRequestDto memberRequestDto) {
-        memberService.updateNickname(memberId, memberRequestDto.getNickname());
+                                            @RequestBody MemberUpdateRequest memberUpdateRequest) {
+        memberService.updateNickname(memberId, memberUpdateRequest.getNickname());
+        Member findMember = memberService.findMemberByMemberId(memberId);
+        MemberUpdateResponse response = MemberUpdateResponse.createMemberUpdateResponse(findMember.getId(), findMember.getNickname());
 
         return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",null));
     }
