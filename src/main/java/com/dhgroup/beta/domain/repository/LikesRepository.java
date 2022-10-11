@@ -16,14 +16,16 @@ public interface LikesRepository extends JpaRepository<Likes,Long> {
 
     public boolean existsByMemberIdAndPostsId(Long memberId, Long postsId);
 
-    @Query("select l from Likes l join fetch l.posts where exist " +
-            "(select p from Posts p where l.member.id = :memberId and l.postsId in :postsIds )")
-    public List<Boolean> existsByMemberIdAndPostsId(@Param("memberId") Long memberId, @Param("postsIds") List<Long> postsId);
+    @Query("select count(l) > 0 from Likes l" +
+            " where l.member.id = :memberId and" +
+            " l.posts.id in :postsIds")
+    public List<Boolean> existsByMemberIdAndPostsId(@Param("memberId") Long memberId, @Param("postsIds") List<Long> postsIds);
 
-    @Query(value = "select l from Likes l join fetch l.posts "+
-            "where l.member.id = :id order by l.id Desc",
+    @Query(value = "select l from Likes l" +
+            " join fetch l.posts"+
+            " where l.member.id = :id order by l.id Desc",
             countQuery = "select count(l) from Likes l")
     public Page<Likes> findLikesByMemberIdOrderByDesc(@Param("id") Long memberId, Pageable pageable);
 
-    public Optional<Likes> findByPostsIdAndMemberId(Long postsId,Long memberId);
+
 }

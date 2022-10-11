@@ -39,6 +39,8 @@ public class Likes {
         this.posts = posts;
         this.member = member;
         this.likedDate = LocalDateTime.now();
+        //연관관계 편의 메서드
+        posts.getLikesList().add(this);
     }
 
     public static Likes createLikes(Posts posts, Member member) {

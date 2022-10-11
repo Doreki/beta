@@ -13,7 +13,9 @@ public interface PostsRepository extends JpaRepository<Posts,Long> {
 
 //    List<Posts> findFirst10ByIdLessThanEqualOrderByIdDesc(@Param("id") Long id);
 
-    @Query(value = "select p from Posts p join fetch p.member order by p.id desc",
+    @Query(value = "select p from Posts p" +
+            " join fetch p.member" +
+            " order by p.id desc",
             countQuery = "select count(p) from Posts p")
     Page<Posts> findAllByOrderByIdDesc(Pageable pageable);
 

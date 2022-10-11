@@ -4,6 +4,8 @@ import com.dhgroup.beta.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -24,6 +26,7 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String nickname;
 
+
     public void updateNicknameAddUserTag(String nickname) {
         this.nickname = nickname + createUserTag();
     }
@@ -43,4 +46,5 @@ public class Member extends BaseTimeEntity {
 
         return userTag;
     }
+
 }

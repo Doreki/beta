@@ -7,6 +7,8 @@ import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.FetchType.*;
 
@@ -37,6 +39,9 @@ public class Posts extends BaseTimeEntity {
 
     @Column
     private Integer commentCount;
+
+    @OneToMany(mappedBy = "posts")
+    List<Likes> likesList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private PostsStatus status;
