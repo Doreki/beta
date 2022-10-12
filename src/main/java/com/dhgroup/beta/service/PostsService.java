@@ -62,7 +62,7 @@ public class PostsService {
 
         Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
         List<Long> findPostsId = findPostsPage.get().map(Posts::getId).collect(Collectors.toList());
-        updateWhetherIsLiked(memberId, findPostsId);
+//        updateWhetherIsLiked(memberId, findPostsId);
         List<PostsResponseDto> postsList = convertToDto(findPostsPage);
 
         postsListSizeCheck(postsList);
@@ -93,9 +93,9 @@ public class PostsService {
                 .collect(Collectors.toList());
     }
 
-    void updateWhetherIsLiked(Long memberId, List<Long> postsIds) {
-        likesRepository.existsByMemberIdAndPostsId(memberId, postsIds);
-    }
+//    void updateWhetherIsLiked(Long memberId, List<Long> postsIds) {
+//        likesRepository.existsByMemberIdAndPostsId(memberId, postsIds);
+//    }
 
 
     public boolean isWriter(Long postsId, Long memberId) {
@@ -142,18 +142,34 @@ public class PostsService {
     @LogAspect
     public List<PostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
         Page<Likes> findLikesPage = likesRepository.findLikesByMemberIdOrderByDesc(memberId,pageable);
+
         List<Posts> findPostsList = convertToPosts(findLikesPage);
-        List<Long> findLikedPostsIds = convertToPostsIds(findPostsList);
-        List<Posts> findLikedPosts = postsRepository.findLikedPostsByLatestOrder(findLikedPostsIds);
-
-        updateWhetherIsLiked(memberId, findLikedPostsIds);
-
+        for (Posts posts : findPostsList) {
+            System.out.println("posts.getId() = " + posts.getId());
+        }
         List<Likes> findLikesList = findLikesPage.stream().collect(Collectors.toList());
-        updateLikedDate(findLikedPosts,findLikesList);
-        List<PostsResponseDto> likedPostsDtos = convertToDto(findLikedPosts);
+        for (Likes likes : findLikesList) {
+            System.out.println("likes.getId() = " + likes.getId());
+        }
+        List<Long> findPostsIdList = findPostsList.stream().map(Posts::getId).collect(Collectors.toList());
+        for (Long aLong : findPostsIdList) {
+            System.out.println("aLong = " + aLong);
+        }
+        List<Boolean> isLikedList = getIsLikedList(memberId, findPostsIdList);
+        
+
+        updateWhetherIsLiked(findPostsList, isLikedList);
+        updateLikedDate(findPostsList,findLikesList);
+        List<PostsResponseDto> likedPostsDtos = convertToDto(findPostsList);
 
         postsListSizeCheck(likedPostsDtos);
         return likedPostsDtos;
+    }
+
+    private static void updateWhetherIsLiked(List<Posts> findPostsList, List<Boolean> isLikedList) {
+        for (int i = 0; i < isLikedList.size(); i++) {
+            findPostsList.get(i).updateIsLiked(isLikedList.get(i));
+        }
     }
 
     void updateLikedDate(List<Posts> findLikedPosts,List<Likes> findLikesList) {
@@ -164,9 +180,10 @@ public class PostsService {
         }
     }
 
+    List<Boolean> getIsLikedList(Long memberId, List<Long> postsIds) {
+        List<Boolean> isLiked = likesRepository.existsByMemberIdAndPostsId(memberId, postsIds);
 
-    private static List<Long> convertToPostsIds(List<Posts> findPostsList) {
-        return findPostsList.stream().map(Posts::getId).collect(Collectors.toList());
+        return isLiked;
     }
 
     private static List<Posts> convertToPosts(Page<Likes> findLikesList) {

@@ -20,8 +20,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,7 +66,7 @@ public class PostsServiceTest {
         verify(postsRepository).findAllByOrderByIdDesc(any(PageRequest.class));
         assertThat(postsResponseDtos.size()).isEqualTo(10);
         assertThat(postsResponseDtos.get(0).getTitle()).isEqualTo("글제목");
-        assertThat(postsResponseDtos.get(0).isLiked()).isEqualTo(false);
+        assertThat(postsResponseDtos.get(0).isLiked()).isEqualTo(true);
     }
 
 
@@ -245,34 +243,34 @@ public class PostsServiceTest {
         Member member = createMember("홍길동", "1", 1L);
         List<Posts> postsList = new ArrayList<>();
         for (int i = 1; i <= 10; i++) {
-            Posts posts = createPosts(member, "글제목", "글내용", i + 0L, false);
+            Posts posts = createPosts(member, "글제목", "글내용", i + 0L, true);
             postsList.add(posts);
         }
         List<Long> postsIds = postsList.stream().map(Posts::getId).collect(Collectors.toList());
         given(likesRepository.existsByMemberIdAndPostsId(eq(member.getId()), anyLong())).willReturn(true);
         //when
-        postsService.updateWhetherIsLiked(member.getId(), postsIds);
+        postsService.getIsLikedList(member.getId(), postsIds);
         //then
         assertThat(postsList.get(0).isLiked()).isEqualTo(true);
     }
 
-//    @Test
-//     public void 좋아요_시간_업데이트() throws Exception{
-//        //given
-//        Member member = createMember("홍길동", "1", 1L);
-//        List<Posts> postsList = new ArrayList<>();
-//
-//        Posts posts = createPosts(member, "글제목", "글내용", 1L, false);
-//        postsList.add(posts);
-//
-//        Likes likes = Likes.createLikes(posts, member);
-//
-////        given(likesRepository.findByPostsIdAndMemberId(eq(member.getId()), anyLong())).willReturn(Optional.of(likes));
-//        //when
-//        postsService.updateLikedDate(member.getId(),postsList);
-//        //then
-//        assertThat(postsList.get(0).getLikedDate()).isEqualTo(likes.getLikedDate());
-//    }
+    @Test
+     public void 좋아요_시간_업데이트() throws Exception{
+        //given
+        Member member = createMember("홍길동", "1", 1L);
+        List<Posts> postsList = new ArrayList<>();
+
+        Posts posts = createPosts(member, "글제목", "글내용", 1L, false);
+        postsList.add(posts);
+
+        Likes likes = Likes.createLikes(posts, member);
+
+//        given(likesRepository.findByPostsIdAndMemberId(eq(member.getId()), anyLong())).willReturn(Optional.of(likes));
+        //when
+        postsService.updateLikedDate(member.getId(),postsList);
+        //then
+        assertThat(postsList.get(0).getLikedDate()).isEqualTo(likes.getLikedDate());
+    }
 
 
     private static PostsRequestDto createPostsRequestDto(Long memberId, String title, String content) {
