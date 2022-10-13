@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -101,7 +102,7 @@ public class LikesRepositoryTest {
     }
 
     @Test
-     public void 좋아요_목록_가져오기() throws Exception{
+     public void 좋아요_목록_가져오기_멤버() throws Exception{
         //given
         Member member = createMember("1", "홍길동");
         Member differentMember = createMember("2", "홍길동2");
@@ -123,6 +124,25 @@ public class LikesRepositoryTest {
         assertThat(likedPosts.get().count()).isEqualTo(10);
     }
 
+    @Test
+     public void 좋아요_목록_가져오기_멤버_게시글() throws Exception{
+        //given
+        Member member = createMember("1", "홍길동");
+
+        List<Posts> postsList = new ArrayList<Posts>();
+        for (int i = 0; i < 10; i++) {
+            Posts posts = createPosts(member, "글제목", "글내용"+i);
+            Likes likes = Likes.createLikes(posts, member);
+            likesRepository.save(likes);
+            postsList.add(posts);
+        }
+
+        List<Long> postsIdList = postsList.stream().map(Posts::getId).collect(Collectors.toList());
+        //when
+        List<Likes> findLikesList = likesRepository.findLikesByMemberIdAndPostsIds(member.getId(), postsIdList);
+        //then
+        assertThat(findLikesList.size()).isEqualTo(postsList.size());
+    }
 
 
 

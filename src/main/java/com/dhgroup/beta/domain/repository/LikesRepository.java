@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface LikesRepository extends JpaRepository<Likes,Long> {
     public void deleteByMemberIdAndPostsId(Long memberId, Long postsId);
@@ -31,7 +30,7 @@ public interface LikesRepository extends JpaRepository<Likes,Long> {
             " join fetch l.posts" +
             " where l.member.id = :memberId" +
             " and l.posts.id in :postsIds")
-    public List<Likes> findLikesByPostsIds(@Param("memberId") Long memberId,@Param("postsIds")List<Long> postsIds);
+    public List<Likes> findLikesByMemberIdAndPostsIds(@Param("memberId") Long memberId, @Param("postsIds")List<Long> postsIds);
 
 
 }

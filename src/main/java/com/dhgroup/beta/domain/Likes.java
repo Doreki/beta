@@ -43,6 +43,9 @@ public class Likes {
         posts.getLikesList().add(this);
     }
 
+    /*
+   테스트를 위해 시간 생성분리
+     */
     public static Likes createLikes(Posts posts, Member member) {
         return Likes.builder().posts(posts).member(member).likedDate(LocalDateTime.now()).build();
     }

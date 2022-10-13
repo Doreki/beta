@@ -63,8 +63,8 @@ public class PostsService {
     public List<PostsResponseDto> viewPosts(Long memberId, Pageable pageable) {
 
         Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
-        List<Long> findPostsId = getPostsIds(findPostsPage.get());
-        List<Likes> findLikes = likesRepository.findLikesByPostsIds(memberId,findPostsId);
+        List<Long> findPostsIds = getPostsIds(findPostsPage.get());
+        List<Likes> findLikes = likesRepository.findLikesByMemberIdAndPostsIds(memberId,findPostsIds);
 
         List<Posts> findPostsList = findPostsPage.get().collect(Collectors.toList());
         updateWhetherIsLiked(findLikes, findPostsList);
@@ -153,7 +153,7 @@ public class PostsService {
         if(postsList.size()==0)
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
     }
-    private static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
+     static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
         for (int i = 0; i < findLikes.size(); i++) {
             for (int j = 0; j < findPostsList.size(); j++) {
                 Posts findPosts = findPostsList.get(j);
