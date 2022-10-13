@@ -17,6 +17,7 @@ import static javax.persistence.FetchType.*;
 @Builder
 @Getter
 @Entity
+@EqualsAndHashCode
 public class Posts extends BaseTimeEntity {
 
     @Id //pk

@@ -7,6 +7,7 @@ import com.dhgroup.beta.exception.MemberNotMatchException;
 import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.LikedPostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsUpdateDto;
@@ -101,7 +102,7 @@ public class PostsApi {
     @GetMapping("/like/list/{memberId}")
     public ResponseEntity<?> likeList(@PathVariable Long memberId, Pageable pageable){
 
-        List<PostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(memberId,pageable); //좋아요 여부 넘기기
+        List<LikedPostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(memberId,pageable); //좋아요 여부 넘기기
 
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", postsResponseDtos));

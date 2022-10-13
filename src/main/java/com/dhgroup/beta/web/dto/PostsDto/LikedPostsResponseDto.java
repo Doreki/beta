@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostsResponseDto {
+public class LikedPostsResponseDto {
     private Long id;
     private String title;
     private String content;
@@ -28,7 +28,9 @@ public class PostsResponseDto {
 
     private LocalDateTime date;
 
-    private PostsResponseDto(Posts posts) {
+    private LocalDateTime likedDate;
+
+    private LikedPostsResponseDto(Posts posts) {
         this.id = posts.getId();
         this.title = posts.getTitle();
         this.content = posts.getContent();
@@ -42,11 +44,13 @@ public class PostsResponseDto {
             this.date = posts.getCreatedDate();
         else
             this.date = posts.getModifiedDate();
+
+        this.likedDate = posts.getLikedDate();
     }
 
 
-    public static PostsResponseDto createPostsResponseDto(Posts posts) {
-        return new PostsResponseDto(posts);
+    public static LikedPostsResponseDto createPostsResponseDto(Posts posts) {
+        return new LikedPostsResponseDto(posts);
     }
 
 }

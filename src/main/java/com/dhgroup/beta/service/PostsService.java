@@ -10,6 +10,7 @@ import com.dhgroup.beta.exception.NotFoundPostsException;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.exception.OverlapLikesException;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
+import com.dhgroup.beta.web.dto.PostsDto.LikedPostsResponseDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -61,9 +63,12 @@ public class PostsService {
     public List<PostsResponseDto> viewPosts(Long memberId, Pageable pageable) {
 
         Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
-        List<Long> findPostsId = findPostsPage.get().map(Posts::getId).collect(Collectors.toList());
-//        updateWhetherIsLiked(memberId, findPostsId);
-        List<PostsResponseDto> postsList = convertToDto(findPostsPage);
+        List<Long> findPostsId = getPostsIds(findPostsPage.get());
+        List<Likes> findLikes = likesRepository.findLikesByPostsIds(memberId,findPostsId);
+
+        List<Posts> findPostsList = findPostsPage.get().collect(Collectors.toList());
+        updateWhetherIsLiked(findLikes, findPostsList);
+        List<PostsResponseDto> postsList = convertToLikedPostsDto(findPostsPage);
 
         postsListSizeCheck(postsList);
 
@@ -73,30 +78,11 @@ public class PostsService {
     public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
         Page<Posts> findPosts = postsRepository.findAllByOrderByIdDesc(pageable);
-        List<PostsResponseDto> postsList = convertToDto(findPosts);
+        List<PostsResponseDto> postsList = convertToLikedPostsDto(findPosts);
         postsListSizeCheck(postsList);
 
         return postsList;
     }
-
-    private static List<PostsResponseDto> convertToDto(Page<Posts> findPosts) {
-        return findPosts
-                .stream()
-                .map(PostsResponseDto::createPostsResponseDto)
-                .collect(Collectors.toList());
-    }
-
-    private static List<PostsResponseDto> convertToDto(List<Posts> findPosts) {
-        return findPosts
-                .stream()
-                .map(PostsResponseDto::createPostsResponseDto)
-                .collect(Collectors.toList());
-    }
-
-//    void updateWhetherIsLiked(Long memberId, List<Long> postsIds) {
-//        likesRepository.existsByMemberIdAndPostsId(memberId, postsIds);
-//    }
-
 
     public boolean isWriter(Long postsId, Long memberId) {
         String nicknameByMobile = memberRepository.findById(memberId).get().getNickname();
@@ -129,48 +115,26 @@ public class PostsService {
         likesRepository.deleteByMemberIdAndPostsId(likesRequestDto.getMemberId(), likesRequestDto.getPostsId());
     }
 
-    private Posts findPostsByPostsId(Long id) {
-        return postsRepository.findById(id)
-                .orElseThrow(() -> new NotFoundPostsException("해당 게시글이 없습니다."));
-    }
-
-    private Member findMemberByMemberId(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
-    }
 
     @LogAspect
-    public List<PostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
+    public List<LikedPostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
         Page<Likes> findLikesPage = likesRepository.findLikesByMemberIdOrderByDesc(memberId,pageable);
 
         List<Posts> findPostsList = convertToPosts(findLikesPage);
-        for (Posts posts : findPostsList) {
-            System.out.println("posts.getId() = " + posts.getId());
-        }
         List<Likes> findLikesList = findLikesPage.stream().collect(Collectors.toList());
-        for (Likes likes : findLikesList) {
-            System.out.println("likes.getId() = " + likes.getId());
-        }
-        List<Long> findPostsIdList = findPostsList.stream().map(Posts::getId).collect(Collectors.toList());
-        for (Long aLong : findPostsIdList) {
-            System.out.println("aLong = " + aLong);
-        }
-        List<Boolean> isLikedList = getIsLikedList(memberId, findPostsIdList);
-        
 
-        updateWhetherIsLiked(findPostsList, isLikedList);
+        updateWhetherIsLiked(findLikesList, findPostsList);
         updateLikedDate(findPostsList,findLikesList);
-        List<PostsResponseDto> likedPostsDtos = convertToDto(findPostsList);
+        List<LikedPostsResponseDto> likedPostsDtos = convertToLikedPostsDto(findPostsList);
 
         postsListSizeCheck(likedPostsDtos);
         return likedPostsDtos;
     }
 
-    private static void updateWhetherIsLiked(List<Posts> findPostsList, List<Boolean> isLikedList) {
-        for (int i = 0; i < isLikedList.size(); i++) {
-            findPostsList.get(i).updateIsLiked(isLikedList.get(i));
-        }
+    private static List<Long> getPostsIds(Stream<Posts> findPostsList) {
+        return findPostsList.map(Posts::getId).collect(Collectors.toList());
     }
+
 
     void updateLikedDate(List<Posts> findLikedPosts,List<Likes> findLikesList) {
         List<LocalDateTime> likedDateTimes = findLikesList.stream().map(Likes::getLikedDate).collect(Collectors.toList());
@@ -180,19 +144,54 @@ public class PostsService {
         }
     }
 
-    List<Boolean> getIsLikedList(Long memberId, List<Long> postsIds) {
-        List<Boolean> isLiked = likesRepository.existsByMemberIdAndPostsId(memberId, postsIds);
-
-        return isLiked;
-    }
-
     private static List<Posts> convertToPosts(Page<Likes> findLikesList) {
         return findLikesList.stream()
                 .map(Likes::getPosts).collect(Collectors.toList());
     }
 
-    private static void postsListSizeCheck(List<PostsResponseDto> postsList) {
+    private static void postsListSizeCheck(List<?> postsList) {
         if(postsList.size()==0)
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
+    }
+    private static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
+        for (int i = 0; i < findLikes.size(); i++) {
+            for (int j = 0; j < findPostsList.size(); j++) {
+                Posts findPosts = findPostsList.get(j);
+                Posts likedPosts = findLikes.get(i).getPosts();
+                if(likedPosts.getId()==findPosts.getId()) {
+                    findPosts.updateIsLiked(true);
+                    break;
+                }
+            }
+        }
+    }
+    private Posts findPostsByPostsId(Long id) {
+        return postsRepository.findById(id)
+                .orElseThrow(() -> new NotFoundPostsException("해당 게시글이 없습니다."));
+    }
+
+    private Member findMemberByMemberId(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+    }
+    private static List<PostsResponseDto> convertToLikedPostsDto(Page<Posts> findPosts) {
+        return findPosts
+                .stream()
+                .map(PostsResponseDto::createPostsResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private static List<PostsResponseDto> convertToPostsDto(List<Posts> findPosts) {
+        return findPosts
+                .stream()
+                .map(PostsResponseDto::createPostsResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private static List<LikedPostsResponseDto> convertToLikedPostsDto(List<Posts> findPosts) {
+        return findPosts
+                .stream()
+                .map(LikedPostsResponseDto::createPostsResponseDto)
+                .collect(Collectors.toList());
     }
 }

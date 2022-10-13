@@ -27,5 +27,11 @@ public interface LikesRepository extends JpaRepository<Likes,Long> {
             countQuery = "select count(l) from Likes l")
     public Page<Likes> findLikesByMemberIdOrderByDesc(@Param("id") Long memberId, Pageable pageable);
 
+    @Query("select l from Likes l" +
+            " join fetch l.posts" +
+            " where l.member.id = :memberId" +
+            " and l.posts.id in :postsIds")
+    public List<Likes> findLikesByPostsIds(@Param("memberId") Long memberId,@Param("postsIds")List<Long> postsIds);
+
 
 }
