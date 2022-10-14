@@ -2,55 +2,29 @@ package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.PostsStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 
-@Builder
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LikedPostsResponseDto {
-    private Long id;
-    private String title;
-    private String content;
-    private String writer;
-    private Integer likeCount;
-    private Integer commentCount;
-
-    private PostsStatus status;
-
-    private boolean isLiked;
-
-    private LocalDateTime date;
-
+public class LikedPostsResponseDto extends PostsResponseDto {
     private LocalDateTime likedDate;
 
+
     private LikedPostsResponseDto(Posts posts) {
-        this.id = posts.getId();
-        this.title = posts.getTitle();
-        this.content = posts.getContent();
-        this.writer = posts.getMember().getNickname();
-        this.likeCount = posts.getLikeCount();
-        this.commentCount = posts.getCommentCount();
-        this.status = posts.getStatus();
-        this.isLiked = posts.isLiked();
-
-        if(this.status == PostsStatus.CREATED)
-            this.date = posts.getCreatedDate();
-        else
-            this.date = posts.getModifiedDate();
-
+        super(posts);
         this.likedDate = posts.getLikedDate();
     }
 
-
     public static LikedPostsResponseDto createPostsResponseDto(Posts posts) {
         return new LikedPostsResponseDto(posts);
+    }
+
+    public void updateLikedDate(LocalDateTime likedDate) {
+        this.likedDate = likedDate;
     }
 
 }

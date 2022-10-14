@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.controller;
+package com.dhgroup.beta.web.controller.handler;
 
 import com.dhgroup.beta.exception.*;
 import com.dhgroup.beta.web.dto.CMResponseDto;

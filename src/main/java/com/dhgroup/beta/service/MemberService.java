@@ -4,7 +4,7 @@ import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.exception.OverlapMemberException;
-import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,10 +18,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long signUp(MemberRequestDto memberRequestDto) {
+    public Long join(JoinRequestDto joinRequestDto) {
 
         //userTag를 생성하기 위해 우선적으로 DB에 저장
-        Member member = memberRequestDto.toEntity();
+        Member member = joinRequestDto.toEntity();
         try{
             member = memberRepository.save(member);
         } catch (DataIntegrityViolationException e) {
@@ -46,7 +46,7 @@ public class MemberService {
     }
 
     public boolean isDuplicated(String googleId) {
-        if(memberRepository.existsByGoogleId(googleId))
+        if(memberRepository.findByGoogleId(googleId) != null)
             return true;
         else
             return false;

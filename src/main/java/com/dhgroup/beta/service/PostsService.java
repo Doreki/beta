@@ -66,25 +66,21 @@ public class PostsService {
         Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
         List<Long> findPostsIds = getPostsIds(findPostsPage.get());
         List<Likes> findLikes = likesRepository.findLikesByMemberIdAndPostsIds(memberId,findPostsIds);
-        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
-        List<Posts> findPostsList = findPostsPage.get().collect(Collectors.toList());
+        List<PostsResponseDto> postsList = toPostsDto(findPostsPage);
 
-        updateWhetherIsLiked(findLikes, findPostsList);
-        List<PostsResponseDto> postsList = toLikedPostsDto(findPostsPage);
+        updateWhetherIsLiked(findLikes, postsList);
 
         postsListSizeCheck(postsList);
 
         return postsList;
     }
 
-    private static Map<Long, Likes> toLikesMapByPostsId(List<Likes> findLikes) {
-        return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));
-    }
 
     public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
         Page<Posts> findPosts = postsRepository.findAllByOrderByIdDesc(pageable);
-        List<PostsResponseDto> postsList = toLikedPostsDto(findPosts);
+        List<PostsResponseDto> postsList = toPostsDto(findPosts);
+
         postsListSizeCheck(postsList);
 
         return postsList;
@@ -126,15 +122,27 @@ public class PostsService {
     public List<LikedPostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
         Page<Likes> findLikesPage = likesRepository.findLikesByMemberIdOrderByDesc(memberId,pageable);
 
-        List<Posts> findPostsList = convertToPosts(findLikesPage);
+        List<Posts> findPostsList = toPosts(findLikesPage);
         List<Likes> findLikesList = findLikesPage.stream().collect(Collectors.toList());
+        List<LikedPostsResponseDto> likedPostsDtos = toPostsDto(findPostsList);
 
-        updateWhetherIsLiked(findLikesList, findPostsList);
-        updateLikedDate(findPostsList,findLikesList);
-        List<LikedPostsResponseDto> likedPostsDtos = toLikedPostsDto(findPostsList);
+        updateWhetherIsLiked(findLikesList, likedPostsDtos);
+        updateLikedDate(likedPostsDtos,findLikesList);
 
         postsListSizeCheck(likedPostsDtos);
         return likedPostsDtos;
+    }
+    void updateLikedDate(List<LikedPostsResponseDto> findLikedPosts,List<Likes> findLikesList) {
+        Map<Long, LocalDateTime> likesDateMap = findLikesList.stream()
+                .collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l.getLikedDate()));
+        findLikedPosts.stream().forEach(p -> p.updateLikedDate(likesDateMap.get(p.getId())));
+    }
+    static void updateWhetherIsLiked(List<Likes> findLikes, List<? extends PostsResponseDto> findPostsList) {
+        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
+        findPostsList.stream().filter(p -> likesMap.containsKey(p.getId())).forEach(p -> p.updateIsLiked(true));
+    }
+    private static Map<Long, Likes> toLikesMapByPostsId(List<Likes> findLikes) {
+        return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));
     }
 
     private static List<Long> getPostsIds(Stream<Posts> findPostsList) {
@@ -142,13 +150,7 @@ public class PostsService {
     }
 
 
-    void updateLikedDate(List<Posts> findLikedPosts,List<Likes> findLikesList) {
-        Map<Long, LocalDateTime> likesDateMap = findLikesList.stream()
-                .collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l.getLikedDate()));
-        findLikedPosts.stream().forEach(p -> p.updateLikedDate(likesDateMap.get(p.getId())));
-    }
-
-    private static List<Posts> convertToPosts(Page<Likes> findLikesList) {
+    private static List<Posts> toPosts(Page<Likes> findLikesList) {
         return findLikesList.stream()
                 .map(Likes::getPosts).collect(Collectors.toList());
     }
@@ -158,10 +160,6 @@ public class PostsService {
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
     }
 
-    static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
-        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
-        findPostsList.stream().filter(p -> likesMap.containsKey(p.getId())).forEach(p -> p.updateIsLiked(true));
-    }
     private Posts findPostsByPostsId(Long id) {
         return postsRepository.findById(id)
                 .orElseThrow(() -> new NotFoundPostsException("해당 게시글이 없습니다."));
@@ -171,7 +169,7 @@ public class PostsService {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
-    private static List<PostsResponseDto> toLikedPostsDto(Page<Posts> findPosts) {
+    private static List<PostsResponseDto> toPostsDto(Page<Posts> findPosts) {
         return findPosts
                 .stream()
                 .map(PostsResponseDto::createPostsResponseDto)
@@ -179,7 +177,7 @@ public class PostsService {
     }
 
 
-    private static List<LikedPostsResponseDto> toLikedPostsDto(List<Posts> findPosts) {
+    private static List<LikedPostsResponseDto> toPostsDto(List<Posts> findPosts) {
         return findPosts
                 .stream()
                 .map(LikedPostsResponseDto::createPostsResponseDto)

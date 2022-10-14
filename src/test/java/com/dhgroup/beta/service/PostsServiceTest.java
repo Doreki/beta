@@ -222,7 +222,7 @@ public class PostsServiceTest {
         List<Posts> postsList = new ArrayList();
         List<Likes> likesList = new ArrayList();
         for (int i = 0; i < 10; i++) {
-            Posts posts = createPosts(member, "글제목", "글내용", 1L);
+            Posts posts = createPosts(member, "글제목", "글내용", 1L+i);
             postsList.add(posts);
             Likes likes = Likes.createLikes(posts, member);
             likesList.add(likes);
@@ -251,11 +251,16 @@ public class PostsServiceTest {
             likesList.add(Likes.createLikes(posts,member));
         }
         List<Long> postsIds = postsList.stream().map(Posts::getId).collect(Collectors.toList());
+        List<PostsResponseDto> postsResponseDtos = toPostsDto(postsList);
         given(likesRepository.findLikesByMemberIdAndPostsIds(member.getId(), postsIds)).willReturn(likesList);
         //when
-        postsService.updateWhetherIsLiked(likesList,postsList);
+        postsService.updateWhetherIsLiked(likesList,postsResponseDtos);
         //then
-        assertThat(postsList.get(0).isLiked()).isEqualTo(true);
+        assertThat(postsResponseDtos.get(0).isLiked()).isEqualTo(true);
+    }
+
+    private static List<PostsResponseDto> toPostsDto(List<Posts> postsList) {
+        return postsList.stream().map(PostsResponseDto::createPostsResponseDto).collect(Collectors.toList());
     }
 
     @Test
@@ -270,10 +275,15 @@ public class PostsServiceTest {
         List<Likes> likesList = new ArrayList<>();
         Likes likes = Likes.createLikes(posts, member);
         likesList.add(likes);
+        List<LikedPostsResponseDto> likedPostsResponseDtos = toLikedPostsDtos(postsList);
         //when
-        postsService.updateLikedDate(postsList,likesList);
+        postsService.updateLikedDate(likedPostsResponseDtos,likesList);
         //then
-        assertThat(postsList.get(0).getLikedDate()).isEqualTo(likes.getLikedDate());
+        assertThat(likedPostsResponseDtos.get(0).getLikedDate()).isEqualTo(likes.getLikedDate());
+    }
+
+    private static List<LikedPostsResponseDto> toLikedPostsDtos(List<Posts> postsList) {
+        return postsList.stream().map(LikedPostsResponseDto::createPostsResponseDto).collect(Collectors.toList());
     }
 
 

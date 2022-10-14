@@ -1,12 +1,10 @@
 package com.dhgroup.beta.web;
 
-import com.dhgroup.beta.domain.Likes;
-import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.service.PostsService;
-import com.dhgroup.beta.web.controller.PostsApi;
+import com.dhgroup.beta.web.controller.api.PostsApi;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsResponseDto;

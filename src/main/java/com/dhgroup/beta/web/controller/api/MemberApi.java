@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.controller;
+package com.dhgroup.beta.web.controller.api;
 
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
@@ -6,10 +6,10 @@ import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
-import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
-import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateRequest;
-import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateResponse;
+import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateResponseDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +30,12 @@ public class MemberApi {
     @LogAspect
     @ValidAspect
     @PostMapping("/1h2g2yysh297h2s")
-    public ResponseEntity<?> singUp(@Validated(ValidationSequence.class) @RequestBody MemberRequestDto memberRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<?> join(@Validated(ValidationSequence.class) @RequestBody JoinRequestDto joinRequestDto, BindingResult bindingResult) {
 
-        if(memberService.isDuplicated(memberRequestDto.getGoogleId()))//중복 회원
+        if(memberService.isDuplicated(joinRequestDto.getGoogleId()))//중복 회원
             throw new OverlapMemberException("이미 존재하는 회원입니다.");
 
-        Long memberId = memberService.signUp(memberRequestDto);
+        Long memberId = memberService.join(joinRequestDto);
         return ResponseEntity
                 .status(CREATED)
                 .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.",memberId));
@@ -51,10 +51,10 @@ public class MemberApi {
     @PatchMapping("/{memberId}")
     public ResponseEntity<?> updateNickname(@PathVariable Long memberId,
                                             @Validated(ValidationSequence.class)
-                                            @RequestBody MemberUpdateRequest memberUpdateRequest) {
-        memberService.updateNickname(memberId, memberUpdateRequest.getNickname());
+                                            @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
+        memberService.updateNickname(memberId, memberUpdateRequestDto.getNickname());
         Member findMember = memberService.findMemberByMemberId(memberId);
-        MemberUpdateResponse response = MemberUpdateResponse.createMemberUpdateResponse(findMember.getId(), findMember.getNickname());
+        MemberUpdateResponseDto response = MemberUpdateResponseDto.createMemberUpdateResponse(findMember.getId(), findMember.getNickname());
 
         return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",null));
     }

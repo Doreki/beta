@@ -2,16 +2,13 @@ package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.PostsStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 
 @Builder
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostsResponseDto {
@@ -28,7 +25,7 @@ public class PostsResponseDto {
 
     private LocalDateTime date;
 
-    private PostsResponseDto(Posts posts) {
+    protected PostsResponseDto(Posts posts) {
         this.id = posts.getId();
         this.title = posts.getTitle();
         this.content = posts.getContent();
@@ -36,7 +33,6 @@ public class PostsResponseDto {
         this.likeCount = posts.getLikeCount();
         this.commentCount = posts.getCommentCount();
         this.status = posts.getStatus();
-        this.isLiked = posts.isLiked();
 
         if(this.status == PostsStatus.CREATED)
             this.date = posts.getCreatedDate();
@@ -44,9 +40,12 @@ public class PostsResponseDto {
             this.date = posts.getModifiedDate();
     }
 
-
     public static PostsResponseDto createPostsResponseDto(Posts posts) {
         return new PostsResponseDto(posts);
+    }
+
+    public void updateIsLiked(boolean isLiked) {
+        this.isLiked = isLiked;
     }
 
 }

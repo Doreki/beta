@@ -1,4 +1,4 @@
-package com.dhgroup.beta.web.controller;
+package com.dhgroup.beta.web.controller.api;
 
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.repository.MemberRepository;

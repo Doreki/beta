@@ -3,8 +3,8 @@ package com.dhgroup.beta.web;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
-import com.dhgroup.beta.web.controller.MemberApi;
-import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.controller.api.MemberApi;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -40,33 +40,33 @@ public class MemberApiTest {
      public void 회원가입() throws Exception{
         //given
         String url = "/api/v1/member/1h2g2yysh297h2s";
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1","홍길동");
+        JoinRequestDto joinRequestDto = createMemberRequestDto("1","홍길동");
         //when
-        given(memberService.isDuplicated(memberRequestDto.getGoogleId())).willReturn(false);
-        given(memberService.signUp(any(MemberRequestDto.class))).willReturn(1L);
+        given(memberService.isDuplicated(joinRequestDto.getGoogleId())).willReturn(false);
+        given(memberService.join(any(JoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
                         post(url)
-                                .content(new ObjectMapper().writeValueAsString(memberRequestDto))
+                                .content(new ObjectMapper().writeValueAsString(joinRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isCreated())
                                 .andExpect(jsonPath("$.status",is(1)))
                                 .andDo(print());
 
-        verify(memberService).signUp(any(MemberRequestDto.class));
+        verify(memberService).join(any(JoinRequestDto.class));
     }
     @Test
     public void 회원가입_실패() throws Exception{
         //given
         String url = "/api/v1/member/1h2g2yysh297h2s";
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1","홍길동");
+        JoinRequestDto joinRequestDto = createMemberRequestDto("1","홍길동");
 
-        given(memberService.isDuplicated(memberRequestDto.getGoogleId())).willReturn(true);
-        given(memberService.signUp(any(MemberRequestDto.class))).willReturn(1L);
+        given(memberService.isDuplicated(joinRequestDto.getGoogleId())).willReturn(true);
+        given(memberService.join(any(JoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
                         post(url)
-                                .content(new ObjectMapper().writeValueAsString(memberRequestDto))
+                                .content(new ObjectMapper().writeValueAsString(joinRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isConflict())
                                 .andExpect(jsonPath("$.status",is(-1)))
@@ -100,23 +100,23 @@ public class MemberApiTest {
      public void 닉네임변경() throws Exception{
         //given
         String url = "/api/v1/member/{memberId}";
-        MemberRequestDto memberRequestDto = createMemberRequestDto("1", "홍길동");
+        JoinRequestDto joinRequestDto = createMemberRequestDto("1", "홍길동");
         //when
         mockMvc.perform(
                         patch(url,1L)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(memberRequestDto)))
+                                .content(new ObjectMapper().writeValueAsString(joinRequestDto)))
                                 .andExpect(status().isOk())
                                 .andDo(print());
         //then
-        verify(memberService).updateNickname(1L,memberRequestDto.getNickname());
+        verify(memberService).updateNickname(1L, joinRequestDto.getNickname());
     }
 
     private static Member createMember(String googleId, String nickname) {
         return Member.builder().googleId(googleId).nickname(nickname).build();
     }
 
-    private static MemberRequestDto createMemberRequestDto(String googleId,String nickname) {
-        return MemberRequestDto.builder().googleId(googleId).nickname(nickname).build();
+    private static JoinRequestDto createMemberRequestDto(String googleId, String nickname) {
+        return JoinRequestDto.builder().googleId(googleId).nickname(nickname).build();
     }
 }

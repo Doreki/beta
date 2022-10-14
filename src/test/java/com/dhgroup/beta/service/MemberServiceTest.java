@@ -3,7 +3,7 @@ package com.dhgroup.beta.service;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
-import com.dhgroup.beta.web.dto.MemberDto.MemberRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,18 +44,18 @@ public class MemberServiceTest {
     @Test
      public void 회원가입() throws Exception{
         Member member = createMember(1L,"1", "글쓴이");
-        MemberRequestDto requestDto = createRequestDto("1", "글쓴이");
+        JoinRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
         given(memberRepository.save(any(Member.class))).willReturn(member);
         //when
-        memberService.signUp(requestDto);
+        memberService.join(requestDto);
         //then
         verify(memberRepository).save(any(Member.class));
         assertThat(member.getNickname()).isEqualTo("글쓴이#0001");
     }
 
-    private static MemberRequestDto createRequestDto(String googleId, String nickname) {
-        return MemberRequestDto.builder().googleId(googleId).nickname(nickname).build();
+    private static JoinRequestDto createRequestDto(String googleId, String nickname) {
+        return JoinRequestDto.builder().googleId(googleId).nickname(nickname).build();
     }
 
     private static Member createMember(Long id,String googleId, String nickname) {

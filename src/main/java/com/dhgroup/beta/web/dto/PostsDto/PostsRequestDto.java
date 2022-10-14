@@ -3,15 +3,12 @@ package com.dhgroup.beta.web.dto.PostsDto;
 import com.dhgroup.beta.domain.Member;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.PostsStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Builder
-@Getter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostsRequestDto {
