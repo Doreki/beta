@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,20 +66,25 @@ public class PostsService {
         Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
         List<Long> findPostsIds = getPostsIds(findPostsPage.get());
         List<Likes> findLikes = likesRepository.findLikesByMemberIdAndPostsIds(memberId,findPostsIds);
-
+        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
         List<Posts> findPostsList = findPostsPage.get().collect(Collectors.toList());
+
         updateWhetherIsLiked(findLikes, findPostsList);
-        List<PostsResponseDto> postsList = convertToLikedPostsDto(findPostsPage);
+        List<PostsResponseDto> postsList = toLikedPostsDto(findPostsPage);
 
         postsListSizeCheck(postsList);
 
         return postsList;
     }
 
+    private static Map<Long, Likes> toLikesMapByPostsId(List<Likes> findLikes) {
+        return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));
+    }
+
     public List<PostsResponseDto> viewPosts(Pageable pageable) {
 
         Page<Posts> findPosts = postsRepository.findAllByOrderByIdDesc(pageable);
-        List<PostsResponseDto> postsList = convertToLikedPostsDto(findPosts);
+        List<PostsResponseDto> postsList = toLikedPostsDto(findPosts);
         postsListSizeCheck(postsList);
 
         return postsList;
@@ -125,7 +131,7 @@ public class PostsService {
 
         updateWhetherIsLiked(findLikesList, findPostsList);
         updateLikedDate(findPostsList,findLikesList);
-        List<LikedPostsResponseDto> likedPostsDtos = convertToLikedPostsDto(findPostsList);
+        List<LikedPostsResponseDto> likedPostsDtos = toLikedPostsDto(findPostsList);
 
         postsListSizeCheck(likedPostsDtos);
         return likedPostsDtos;
@@ -137,11 +143,9 @@ public class PostsService {
 
 
     void updateLikedDate(List<Posts> findLikedPosts,List<Likes> findLikesList) {
-        List<LocalDateTime> likedDateTimes = findLikesList.stream().map(Likes::getLikedDate).collect(Collectors.toList());
-
-        for (int i = 0; i < findLikedPosts.size(); i++) {
-            findLikedPosts.get(i).updateLikedDate(likedDateTimes.get(i));
-        }
+        Map<Long, LocalDateTime> likesDateMap = findLikesList.stream()
+                .collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l.getLikedDate()));
+        findLikedPosts.stream().forEach(p -> p.updateLikedDate(likesDateMap.get(p.getId())));
     }
 
     private static List<Posts> convertToPosts(Page<Likes> findLikesList) {
@@ -153,17 +157,10 @@ public class PostsService {
         if(postsList.size()==0)
             throw new NotFoundPostsException("더 이상 불러들일 게시글이 없습니다.");
     }
-     static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
-        for (int i = 0; i < findLikes.size(); i++) {
-            for (int j = 0; j < findPostsList.size(); j++) {
-                Posts findPosts = findPostsList.get(j);
-                Posts likedPosts = findLikes.get(i).getPosts();
-                if(likedPosts.getId()==findPosts.getId()) {
-                    findPosts.updateIsLiked(true);
-                    break;
-                }
-            }
-        }
+
+    static void updateWhetherIsLiked(List<Likes> findLikes, List<Posts> findPostsList) {
+        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
+        findPostsList.stream().filter(p -> likesMap.containsKey(p.getId())).forEach(p -> p.updateIsLiked(true));
     }
     private Posts findPostsByPostsId(Long id) {
         return postsRepository.findById(id)
@@ -174,21 +171,15 @@ public class PostsService {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
-    private static List<PostsResponseDto> convertToLikedPostsDto(Page<Posts> findPosts) {
+    private static List<PostsResponseDto> toLikedPostsDto(Page<Posts> findPosts) {
         return findPosts
                 .stream()
                 .map(PostsResponseDto::createPostsResponseDto)
                 .collect(Collectors.toList());
     }
 
-    private static List<PostsResponseDto> convertToPostsDto(List<Posts> findPosts) {
-        return findPosts
-                .stream()
-                .map(PostsResponseDto::createPostsResponseDto)
-                .collect(Collectors.toList());
-    }
 
-    private static List<LikedPostsResponseDto> convertToLikedPostsDto(List<Posts> findPosts) {
+    private static List<LikedPostsResponseDto> toLikedPostsDto(List<Posts> findPosts) {
         return findPosts
                 .stream()
                 .map(LikedPostsResponseDto::createPostsResponseDto)
