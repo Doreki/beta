@@ -30,19 +30,19 @@ public class MemberServiceTest {
 
 
     @Test
-     public void 로그인_실패() throws Exception{
+     public void 카카오_로그인_실패() throws Exception{
         //given
         Member member = createMember(1L,"1", "글쓴이");
         given(memberRepository.findByKakaoId(anyString())).willReturn(Optional.of(member));
         //when
 
         //then
-        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.logIn(null));
+        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.kakoLogIn(null));
         assertThat(e.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
     @Test
-     public void 회원가입() throws Exception{
+     public void 카카오_회원가입() throws Exception{
         Member member = createMember(1L,"1", "글쓴이");
         KakaoJoinRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
@@ -51,7 +51,7 @@ public class MemberServiceTest {
         memberService.join(requestDto);
         //then
         verify(memberRepository).save(any(Member.class));
-        assertThat(member.getNickname()).isEqualTo("글쓴이#0001");
+        assertThat(member.getNickname()).isEqualTo("글쓴이");
     }
 
     private static KakaoJoinRequestDto createRequestDto(String googleId, String nickname) {

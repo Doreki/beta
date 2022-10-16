@@ -30,8 +30,8 @@ public class MemberService {
         return member.getId();
     }
 
-    public MemberResponseDto logIn(String googleId) {
-        Member member = findMemberByGoogleId(googleId);
+    public MemberResponseDto kakoLogIn(String authId) {
+        Member member = findMemberByKakaoId(authId);
         return MemberResponseDto.createMemberResponseDto(member);
     }
 
@@ -42,8 +42,8 @@ public class MemberService {
         member.updateNickname(nickname);
     }
 
-    public boolean isDuplicated(String googleId) {
-        if(memberRepository.findByKakaoId(googleId).isPresent()) {
+    public boolean isDuplicatedByKakao(String authId) {
+        if(memberRepository.findByKakaoId(authId).isPresent()) {
             return true;
         }
         else
@@ -54,7 +54,7 @@ public class MemberService {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 
-    private Member findMemberByGoogleId(String googleId) {
-        return memberRepository.findByKakaoId(googleId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+    private Member findMemberByKakaoId(String kakoId) {
+        return memberRepository.findByKakaoId(kakoId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
     }
 }

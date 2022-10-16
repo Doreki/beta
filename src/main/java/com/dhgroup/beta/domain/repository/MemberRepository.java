@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member,Long> {
 
     boolean existsByNickname(String nickname);
-    @Query("select m from Member m where m.authId =:authId and m.provider = com.dhgroup.beta.domain.member.MemberProvider.KAKAO")
+    @Query("select m from Member m where m.authId =:authId and m.provider = com.dhgroup.beta.domain.member.Provider.KAKAO")
     Optional<Member> findByKakaoId(@Param("authId") String authId);
 }

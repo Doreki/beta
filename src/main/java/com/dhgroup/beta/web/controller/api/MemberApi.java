@@ -32,7 +32,7 @@ public class MemberApi {
     @PostMapping("/kakao/1h2g2yysh297h2s")
     public ResponseEntity<?> kakaoJoin(@Validated(ValidationSequence.class) @RequestBody KakaoJoinRequestDto kakaoJoinRequestDto, BindingResult bindingResult) {
 
-        if(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId()))//중복 회원
+        if(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId()))//중복 회원
             throw new OverlapMemberException("이미 존재하는 회원입니다.");
 
         Long memberId = memberService.join(kakaoJoinRequestDto);
@@ -41,9 +41,9 @@ public class MemberApi {
                 .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.",memberId));
     }
 
-    @GetMapping("/login/{googleId}")
-    public ResponseEntity<?> logIn(@PathVariable String googleId) {
-        MemberResponseDto memberResponseDto = memberService.logIn(googleId);
+    @GetMapping("/kakao/login/{authId}")
+    public ResponseEntity<?> logIn(@PathVariable String authId) {
+        MemberResponseDto memberResponseDto = memberService.kakoLogIn(authId);
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1, "성공적으로 로그인이 되었습니다.", memberResponseDto));
     }
@@ -56,7 +56,7 @@ public class MemberApi {
         Member findMember = memberService.findMemberByMemberId(memberId);
         MemberUpdateResponseDto response = MemberUpdateResponseDto.createMemberUpdateResponse(findMember.getId(), findMember.getNickname());
 
-        return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",null));
+        return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",response));
     }
 
 }

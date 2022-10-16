@@ -11,7 +11,6 @@ import java.util.List;
 
 public interface PostsRepository extends JpaRepository<Posts,Long> {
 
-//    List<Posts> findFirst10ByIdLessThanEqualOrderByIdDesc(@Param("id") Long id);
 
     @Query(value = "select p from Posts p" +
             " join fetch p.member" +
@@ -19,7 +18,4 @@ public interface PostsRepository extends JpaRepository<Posts,Long> {
             countQuery = "select count(p) from Posts p")
     Page<Posts> findAllByOrderByIdDesc(Pageable pageable);
 
-    @Query(value = "select p from Posts p join fetch p.member where p.id in :id order by field (p.id,:id)")
-    List<Posts> findLikedPostsByLatestOrder(@Param("id") List<Long> likedPostsId);
-    Posts findTopByOrderByIdDesc();
 }

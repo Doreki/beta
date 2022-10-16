@@ -39,10 +39,10 @@ public class MemberApiTest {
     @Test
      public void 카카오_회원가입() throws Exception{
         //given
-        String url = "/api/v1/kakao/member/1h2g2yysh297h2s";
+        String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
         //when
-        given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId())).willReturn(false);
+        given(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId())).willReturn(false);
         given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
@@ -61,7 +61,7 @@ public class MemberApiTest {
         String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
 
-        given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId())).willReturn(true);
+        given(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId())).willReturn(true);
         given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
@@ -74,25 +74,25 @@ public class MemberApiTest {
                                 .andDo(print());
     }
     @Test
-     public void 로그인() throws Exception{
+     public void 카카오_로그인() throws Exception{
         //given
         Member member = createMember("1","글쓴이");
-        String url = "/api/v1/member/login/{googleId}";
-        String googleId = member.getAuthId();
+        String url = "/api/v1/member/kakao/login/{authId}";
+        String authId = member.getAuthId();
         MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
 
 
-        given(memberService.logIn(googleId)).willReturn(memberResponseDto);
+        given(memberService.kakoLogIn(authId)).willReturn(memberResponseDto);
         //when
                     mockMvc.perform(
-                                get(url,googleId)
+                                get(url,authId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.status",is(1)))
                                 .andExpect(jsonPath("$.data.nickname",is("글쓴이")))
                                 .andDo(print());
         //then
-        verify(memberService).logIn(googleId);
+        verify(memberService).kakoLogIn(authId);
     }
 
 
@@ -101,6 +101,8 @@ public class MemberApiTest {
         //given
         String url = "/api/v1/member/{memberId}";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1", "홍길동");
+        Member member = createMember("1","홍길동");
+        given(memberService.findMemberByMemberId(1L)).willReturn(member);
         //when
         mockMvc.perform(
                         patch(url,1L)
@@ -112,8 +114,8 @@ public class MemberApiTest {
         verify(memberService).updateNickname(1L, kakaoJoinRequestDto.getNickname());
     }
 
-    private static Member createMember(String googleId, String nickname) {
-        return Member.builder().authId(googleId).nickname(nickname).build();
+    private static Member createMember(String authId, String nickname) {
+        return Member.builder().authId(authId).nickname(nickname).build();
     }
 
     private static KakaoJoinRequestDto createMemberRequestDto(String googleId, String nickname) {
