@@ -3,6 +3,7 @@ package com.dhgroup.beta.web.controller.api;
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
 import com.dhgroup.beta.domain.member.Member;
+import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
@@ -32,7 +33,7 @@ public class MemberApi {
     @PostMapping("/kakao/1h2g2yysh297h2s")
     public ResponseEntity<?> kakaoJoin(@Validated(ValidationSequence.class) @RequestBody KakaoJoinRequestDto kakaoJoinRequestDto, BindingResult bindingResult) {
 
-        if(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId()))//중복 회원
+        if(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId(), Provider.KAKAO))//중복 회원
             throw new OverlapMemberException("이미 존재하는 회원입니다.");
 
         Long memberId = memberService.join(kakaoJoinRequestDto);
@@ -42,8 +43,8 @@ public class MemberApi {
     }
 
     @GetMapping("/kakao/login/{authId}")
-    public ResponseEntity<?> logIn(@PathVariable String authId) {
-        MemberResponseDto memberResponseDto = memberService.kakoLogIn(authId);
+    public ResponseEntity<?> kakaoLogin(@PathVariable String authId) {
+        MemberResponseDto memberResponseDto = memberService.login(authId, Provider.KAKAO);
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1, "성공적으로 로그인이 되었습니다.", memberResponseDto));
     }

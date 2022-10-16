@@ -27,9 +27,9 @@ public class MemberRepositoryTest {
     @Test
      public void 카카오아이디로_멤버찾아오기() throws Exception{
         //given
-        Member member = createMember("1","nickname");
+        Member member = createMember("1","nickname", Provider.KAKAO);
         memberRepository.save(member);
-        Member memberByGoogleId = memberRepository.findByKakaoId(member.getAuthId()).get();
+        Member memberByGoogleId = memberRepository.findByAuthId(member.getAuthId(),member.getProvider()).get();
         //when
 
         //then
@@ -40,7 +40,7 @@ public class MemberRepositoryTest {
     @Test
     public void 닉네임중복체크() throws Exception{
         //given
-        Member member = createMember("1","nickname");
+        Member member = createMember("1","nickname", Provider.KAKAO);
         memberRepository.save(member);
         //when
         boolean existsByNickname = memberRepository.existsByNickname(member.getNickname());
@@ -51,8 +51,8 @@ public class MemberRepositoryTest {
     @Test
      public void 닉네임_중복() throws Exception{
         //given
-        Member member1 = createMember("1","nickname");
-        Member member2 = createMember("2","nickname");
+        Member member1 = createMember("1","nickname", Provider.KAKAO);
+        Member member2 = createMember("2","nickname", Provider.KAKAO);
         memberRepository.save(member1);
 
         //then
@@ -60,8 +60,8 @@ public class MemberRepositoryTest {
     }
 
 
-    private static Member createMember(String authId,String nickname) {
-        return Member.builder().authId(authId).nickname(nickname).userTag("#0001").provider(Provider.KAKAO).build();
+    private static Member createMember(String authId, String nickname, Provider provider) {
+        return Member.builder().authId(authId).nickname(nickname).userTag("#0001").provider(provider).build();
     }
 }
 

@@ -33,11 +33,11 @@ public class MemberServiceTest {
      public void 카카오_로그인_실패() throws Exception{
         //given
         Member member = createMember(1L,"1", "글쓴이");
-        given(memberRepository.findByKakaoId(anyString())).willReturn(Optional.of(member));
+        given(memberRepository.findByAuthId(anyString(),any())).willReturn(Optional.of(member));
         //when
 
         //then
-        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.kakoLogIn(null));
+        NotExistMemberException e = assertThrows(NotExistMemberException.class, () -> memberService.login(null,null));
         assertThat(e.getMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 

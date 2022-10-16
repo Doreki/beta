@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web;
 
 import com.dhgroup.beta.domain.member.Member;
+import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.controller.api.MemberApi;
@@ -42,7 +43,7 @@ public class MemberApiTest {
         String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
         //when
-        given(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId())).willReturn(false);
+        given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId(), Provider.KAKAO)).willReturn(false);
         given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
@@ -61,7 +62,7 @@ public class MemberApiTest {
         String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
 
-        given(memberService.isDuplicatedByKakao(kakaoJoinRequestDto.getAuthId())).willReturn(true);
+        given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId(),Provider.KAKAO)).willReturn(true);
         given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
@@ -82,7 +83,7 @@ public class MemberApiTest {
         MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
 
 
-        given(memberService.kakoLogIn(authId)).willReturn(memberResponseDto);
+        given(memberService.login(authId,Provider.KAKAO)).willReturn(memberResponseDto);
         //when
                     mockMvc.perform(
                                 get(url,authId)
@@ -92,7 +93,7 @@ public class MemberApiTest {
                                 .andExpect(jsonPath("$.data.nickname",is("글쓴이")))
                                 .andDo(print());
         //then
-        verify(memberService).kakoLogIn(authId);
+        verify(memberService).login(authId,Provider.KAKAO);
     }
 
 
