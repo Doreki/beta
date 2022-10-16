@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.dto.PostsDto;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.PostsStatus;
 import lombok.*;

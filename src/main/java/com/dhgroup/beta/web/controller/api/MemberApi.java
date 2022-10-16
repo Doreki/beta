@@ -2,11 +2,11 @@ package com.dhgroup.beta.web.controller.api;
 
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.exception.OverlapMemberException;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
-import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateResponseDto;
@@ -29,13 +29,13 @@ public class MemberApi {
 
     @LogAspect
     @ValidAspect
-    @PostMapping("/1h2g2yysh297h2s")
-    public ResponseEntity<?> join(@Validated(ValidationSequence.class) @RequestBody JoinRequestDto joinRequestDto, BindingResult bindingResult) {
+    @PostMapping("/kakao/1h2g2yysh297h2s")
+    public ResponseEntity<?> kakaoJoin(@Validated(ValidationSequence.class) @RequestBody KakaoJoinRequestDto kakaoJoinRequestDto, BindingResult bindingResult) {
 
-        if(memberService.isDuplicated(joinRequestDto.getGoogleId()))//중복 회원
+        if(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId()))//중복 회원
             throw new OverlapMemberException("이미 존재하는 회원입니다.");
 
-        Long memberId = memberService.join(joinRequestDto);
+        Long memberId = memberService.join(kakaoJoinRequestDto);
         return ResponseEntity
                 .status(CREATED)
                 .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.",memberId));

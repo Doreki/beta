@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.validation;
 
-import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,9 +33,9 @@ public class ValidationTest {
     @Test
      public void 닉네임_공백() throws Exception{
         //given
-        JoinRequestDto joinRequestDto = createMemberRequestDto("1", "");
+        KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1", "");
         //when
-        Set<ConstraintViolation<JoinRequestDto>> violations = validator.validate(joinRequestDto, ValidationGroups.NotBlankGroup.class);
+        Set<ConstraintViolation<KakaoJoinRequestDto>> violations = validator.validate(kakaoJoinRequestDto, ValidationGroups.NotBlankGroup.class);
         //then
         violations.forEach(error -> {
             assertThat(error.getMessage()).isEqualTo("공백일 수 없습니다");
@@ -45,9 +45,9 @@ public class ValidationTest {
     @Test
     public void 닉네임_사이즈() throws Exception{
         //given
-        JoinRequestDto joinRequestDto = createMemberRequestDto("1", "홍");
+        KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1", "홍");
         //when
-        Set<ConstraintViolation<JoinRequestDto>> violations = validator.validate(joinRequestDto, ValidationGroups.SizeGroup.class);
+        Set<ConstraintViolation<KakaoJoinRequestDto>> violations = validator.validate(kakaoJoinRequestDto, ValidationGroups.SizeGroup.class);
         //then
         violations.forEach(error -> {
             assertThat(error.getMessage()).isEqualTo("2자에서 8자 사이로 입력하시오");
@@ -57,9 +57,9 @@ public class ValidationTest {
     @Test
     public void 닉네임_패턴() throws Exception{
         //given
-        JoinRequestDto joinRequestDto = createMemberRequestDto("1", "!!");
+        KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1", "!!");
         //when
-        Set<ConstraintViolation<JoinRequestDto>> violations = validator.validate(joinRequestDto, ValidationGroups.PatternCheckGroup.class);
+        Set<ConstraintViolation<KakaoJoinRequestDto>> violations = validator.validate(kakaoJoinRequestDto, ValidationGroups.PatternCheckGroup.class);
         //then
         violations.forEach(error -> {
             assertThat(error.getMessage()).isEqualTo("특수문자, 공백은 입력할 수 없습니다.");
@@ -81,7 +81,7 @@ public class ValidationTest {
         return PostsRequestDto.builder().title(title).content(content).build();
     }
 
-    private static JoinRequestDto createMemberRequestDto(String googleId, String nickname) {
-        return JoinRequestDto.builder().googleId(googleId).nickname(nickname).build();
+    private static KakaoJoinRequestDto createMemberRequestDto(String googleId, String nickname) {
+        return KakaoJoinRequestDto.builder().authId(googleId).nickname(nickname).build();
     }
 }

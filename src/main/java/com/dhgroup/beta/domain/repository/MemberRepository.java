@@ -1,15 +1,15 @@
 package com.dhgroup.beta.domain.repository;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member,Long> {
 
-    boolean existsByGoogleId(String googleId);
     boolean existsByNickname(String nickname);
-    Optional<Member> findByGoogleId(String googleId);
+    @Query("select m from Member m where m.authId =:authId and m.provider = com.dhgroup.beta.domain.member.MemberProvider.KAKAO")
+    Optional<Member> findByKakaoId(@Param("authId") String authId);
 }

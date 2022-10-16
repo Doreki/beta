@@ -16,7 +16,6 @@ public class LikedPostsResponseDto extends PostsResponseDto {
 
     private LikedPostsResponseDto(Posts posts) {
         super(posts);
-        this.likedDate = posts.getLikedDate();
     }
 
     public static LikedPostsResponseDto createPostsResponseDto(Posts posts) {

@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.dto.MemberDto;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import lombok.*;
 
 @Builder
@@ -10,10 +10,16 @@ import lombok.*;
 public class MemberResponseDto {
 
     private  Long id;
-    private String googleId;
+    private String authId;
     private String nickname;
+    private String userTag;
 
     public static MemberResponseDto createMemberResponseDto(Member member) {
-        return new MemberResponseDto(member.getId(), member.getGoogleId(), member.getNickname());
+        return MemberResponseDto.builder()
+                .id(member.getId())
+                .authId(member.getAuthId())
+                .nickname(member.getNickname())
+                .userTag(member.getUserTag())
+                .build();
     }
 }

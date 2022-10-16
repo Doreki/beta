@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web.dto.MemberDto;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
+import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.web.validation.ValidationGroups;
 import lombok.*;
 
@@ -12,9 +13,9 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JoinRequestDto {
+public class KakaoJoinRequestDto {
 
-    private String googleId;
+    private String authId;
 
     @NotBlank(groups = ValidationGroups.NotBlankGroup.class)
     @Size(min = 2,max =8,message = "2자에서 8자 사이로 입력하시오",groups = ValidationGroups.SizeGroup.class)
@@ -24,8 +25,9 @@ public class JoinRequestDto {
 
     public Member toEntity() {
         return Member.builder()
-                .googleId(googleId)
+                .authId(authId)
                 .nickname(nickname)
+                .provider(Provider.KAKAO)
                 .build();
     }
 }

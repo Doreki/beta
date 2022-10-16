@@ -1,11 +1,9 @@
-package com.dhgroup.beta.domain;
+package com.dhgroup.beta.domain.member;
 
 import com.dhgroup.beta.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -20,15 +18,21 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    @Column(nullable = false, name = "google_id", unique = true)
-    private String googleId;
+    @Column(nullable = false)
+    private String authId;
 
     @Column(nullable = false, unique = true)
     private String nickname;
 
+    @Column(unique = true)
+    private String userTag;
 
-    public void updateNicknameAddUserTag(String nickname) {
-        this.nickname = nickname + createUserTag();
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String createUserTag() {
@@ -43,6 +47,7 @@ public class Member extends BaseTimeEntity {
             userTag = "" + id;
         }
         userTag = "#" + userTag;
+        this.userTag = userTag;
 
         return userTag;
     }

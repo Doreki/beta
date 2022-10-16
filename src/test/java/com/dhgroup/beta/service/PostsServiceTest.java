@@ -2,7 +2,7 @@ package com.dhgroup.beta.service;
 
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.Posts;
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
@@ -300,6 +300,6 @@ public class PostsServiceTest {
     }
 
     private static Member createMember(String nickName, String googleId, Long memberId) {
-        return Member.builder().id(memberId).nickname(nickName).googleId(googleId).build();
+        return Member.builder().id(memberId).nickname(nickName).authId(googleId).build();
     }
 }

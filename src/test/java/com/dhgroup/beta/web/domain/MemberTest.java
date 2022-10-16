@@ -1,8 +1,6 @@
 package com.dhgroup.beta.web.domain;
 
-import com.dhgroup.beta.domain.Member;
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
+import com.dhgroup.beta.domain.member.Member;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -33,6 +31,6 @@ public class MemberTest {
     }
 
     private static Member createMember(Long id, String nickname, String googleId) {
-        return Member.builder().id(id).nickname(nickname).googleId(googleId).build();
+        return Member.builder().id(id).nickname(nickname).authId(googleId).build();
     }
 }

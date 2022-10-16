@@ -1,6 +1,6 @@
 package com.dhgroup.beta.domain;
 
-import com.dhgroup.beta.BaseTimeEntity;
+import com.dhgroup.beta.domain.member.Member;
 import lombok.*;
 
 import javax.persistence.*;

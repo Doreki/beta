@@ -1,9 +1,9 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
-import com.dhgroup.beta.web.dto.MemberDto.JoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class MemberServiceTest {
      public void 로그인_실패() throws Exception{
         //given
         Member member = createMember(1L,"1", "글쓴이");
-        given(memberRepository.findByGoogleId(anyString())).willReturn(Optional.of(member));
+        given(memberRepository.findByKakaoId(anyString())).willReturn(Optional.of(member));
         //when
 
         //then
@@ -44,7 +44,7 @@ public class MemberServiceTest {
     @Test
      public void 회원가입() throws Exception{
         Member member = createMember(1L,"1", "글쓴이");
-        JoinRequestDto requestDto = createRequestDto("1", "글쓴이");
+        KakaoJoinRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
         given(memberRepository.save(any(Member.class))).willReturn(member);
         //when
@@ -54,14 +54,14 @@ public class MemberServiceTest {
         assertThat(member.getNickname()).isEqualTo("글쓴이#0001");
     }
 
-    private static JoinRequestDto createRequestDto(String googleId, String nickname) {
-        return JoinRequestDto.builder().googleId(googleId).nickname(nickname).build();
+    private static KakaoJoinRequestDto createRequestDto(String googleId, String nickname) {
+        return KakaoJoinRequestDto.builder().authId(googleId).nickname(nickname).build();
     }
 
     private static Member createMember(Long id,String googleId, String nickname) {
         return Member.builder()
                 .id(id)
-                .googleId(googleId)
+                .authId(googleId)
                 .nickname(nickname)
                 .build();
     }

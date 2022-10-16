@@ -1,9 +1,8 @@
 package com.dhgroup.beta.repository;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
+import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
-import org.junit.Assert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,27 +25,17 @@ public class MemberRepositoryTest {
     MemberRepository memberRepository;
 
     @Test
-     public void 구글아이디로_멤버찾아오기() throws Exception{
+     public void 카카오아이디로_멤버찾아오기() throws Exception{
         //given
         Member member = createMember("1","nickname");
         memberRepository.save(member);
-        Member memberByGoogleId = memberRepository.findByGoogleId(member.getGoogleId()).get();
+        Member memberByGoogleId = memberRepository.findByKakaoId(member.getAuthId()).get();
         //when
 
         //then
         assertThat(memberByGoogleId.getId()).isEqualTo(member.getId());
     }
 
-    @Test
-     public void 구글아이디로_멤버존재여부조회() throws Exception{
-        //given
-        Member member = createMember("1","nickname");
-        memberRepository.save(member);
-        //when
-        boolean existsByGoogleId = memberRepository.existsByGoogleId(member.getGoogleId());
-        //then
-        assertThat(existsByGoogleId).isEqualTo(true);
-    }
 
     @Test
     public void 닉네임중복체크() throws Exception{
@@ -71,7 +60,8 @@ public class MemberRepositoryTest {
     }
 
 
-    private static Member createMember(String googleId,String nickname) {
-        return Member.builder().googleId(googleId).nickname(nickname).build();
+    private static Member createMember(String authId,String nickname) {
+        return Member.builder().authId(authId).nickname(nickname).userTag("#0001").provider(Provider.KAKAO).build();
     }
 }
+

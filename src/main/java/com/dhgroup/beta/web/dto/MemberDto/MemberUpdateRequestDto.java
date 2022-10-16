@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.dto.MemberDto;
 
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.web.validation.ValidationGroups;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

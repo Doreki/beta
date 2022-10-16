@@ -1,7 +1,7 @@
 package com.dhgroup.beta.web.dto.LikesDto;
 
 import com.dhgroup.beta.domain.Likes;
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.Posts;
 import lombok.*;
 

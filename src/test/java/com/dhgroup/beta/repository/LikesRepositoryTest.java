@@ -1,7 +1,7 @@
 package com.dhgroup.beta.repository;
 
 import com.dhgroup.beta.domain.Likes;
-import com.dhgroup.beta.domain.Member;
+import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.repository.LikesRepository;
 import com.dhgroup.beta.domain.repository.MemberRepository;
@@ -153,7 +153,7 @@ public class LikesRepositoryTest {
     }
 
     private Member createMember(String googleId, String nickname) {
-        Member member = Member.builder().googleId(googleId).nickname(nickname).build();
+        Member member = Member.builder().authId(googleId).nickname(nickname).build();
         memberRepository.save(member);
         return member;
     }

@@ -1,12 +1,11 @@
 package com.dhgroup.beta.domain;
 
 import com.dhgroup.beta.BaseTimeEntity;
+import com.dhgroup.beta.domain.member.Member;
 import lombok.*;
 
 import javax.persistence.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,11 +46,6 @@ public class Posts extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostsStatus status;
 
-    @Transient
-    private boolean isLiked;
-
-    @Transient
-    private LocalDateTime likedDate;
 
     //updateDto에서 받은 내용으로 글을 수정해줌
     public void update(String title, String content) {
