@@ -3,7 +3,7 @@ package com.dhgroup.beta.web.controller.api;
 import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
-import com.dhgroup.beta.exception.MemberNotMatchException;
+import com.dhgroup.beta.exception.MemberMismatchException;
 import com.dhgroup.beta.service.PostsService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.LikesDto.LikesRequestDto;
@@ -63,7 +63,7 @@ public class PostsApi {
         if(postsService.isWriter(postsId, postsUpdateDto.getMemberId()))
             postsService.updatePosts(postsId, postsUpdateDto);
         else
-            throw new MemberNotMatchException("권한이 없습니다.");
+            throw new MemberMismatchException("권한이 없습니다.");
 
         return ResponseEntity
                 .status(CREATED)
@@ -76,7 +76,7 @@ public class PostsApi {
         if(postsService.isWriter(postsId, memberId))
             postsService.deletePosts(postsId);
         else
-            throw new MemberNotMatchException("권한이 없습니다.");
+            throw new MemberMismatchException("권한이 없습니다.");
 
         return ResponseEntity
                 .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));

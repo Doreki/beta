@@ -1,14 +1,18 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.member.BasicMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.MemberMismatchException;
 import com.dhgroup.beta.exception.NotExistMemberException;
 import com.dhgroup.beta.exception.OverlapMemberException;
-import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.JoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberLoginRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +23,10 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Long join(KakaoJoinRequestDto kakaoJoinRequestDto) {
+    public Long join(JoinRequestDto joinRequestDto) {
 
         //userTag를 생성하기 위해 우선적으로 DB에 저장
-        Member member = kakaoJoinRequestDto.toEntity();
+        Member member = joinRequestDto.toEntity();
         try{
             member = memberRepository.save(member);
         } catch (DataIntegrityViolationException e) {
@@ -38,6 +42,20 @@ public class MemberService {
         return MemberResponseDto.createMemberResponseDto(member);
     }
 
+    public MemberResponseDto login(MemberLoginRequestDto memberLoginRequestDto) {
+        BasicMember basicMember = memberRepository
+                                .findByMemberName(memberLoginRequestDto.getMemberName())
+                                .orElseThrow(() -> new MemberMismatchException("아이디 혹은 비밀번호가 일치하지 않습니다."));
+        if(isPassword(memberLoginRequestDto,basicMember)){
+            return MemberResponseDto.createMemberResponseDto(basicMember);
+        } else {
+            throw new MemberMismatchException("아이디 혹은 비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    private static boolean isPassword(MemberLoginRequestDto memberLoginRequestDto,BasicMember basicMember) {
+        return new BCryptPasswordEncoder().matches(memberLoginRequestDto.getPassword(),basicMember.getPassword());
+    }
 
     @Transactional
     public void updateNickname(Long memberId, String nickname) {

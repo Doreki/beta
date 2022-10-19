@@ -13,7 +13,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         default_batch_fetch_size: 100
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
   freemarker:
     cache: false
 logging:

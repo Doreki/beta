@@ -6,7 +6,7 @@ import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.controller.api.MemberApi;
-import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.KakaoJoinRequestDto;
 import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,10 @@ public class MemberApiTest {
         //given
         String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
+        Member member = createMember(kakaoJoinRequestDto.getAuthId(), "홍길동");
         //when
         given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId(), Provider.KAKAO)).willReturn(false);
+        given(memberService.findMemberByMemberId(1L)).willReturn(member);
         given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
         //then
         mockMvc.perform(
@@ -56,6 +58,7 @@ public class MemberApiTest {
                                 .andDo(print());
 
         verify(memberService).join(any(KakaoJoinRequestDto.class));
+        verify(memberService).findMemberByMemberId(1L);
     }
     @Test
     public void 카카오_로그인() throws Exception{
@@ -74,7 +77,7 @@ public class MemberApiTest {
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.status",is(1)))
-                                .andExpect(jsonPath("$.data.nickname",is("홍길동")))
+                                .andExpect(jsonPath("$.data.userTag",is("#0001")))
                                 .andDo(print());
         verify(memberService).login(kakaoJoinRequestDto.getAuthId(),Provider.KAKAO);
     }
@@ -98,7 +101,7 @@ public class MemberApiTest {
     }
 
     private static Member createMember(String authId, String nickname) {
-        return KakaoMember.builder().authId(authId).nickname(nickname).build();
+        return KakaoMember.builder().id(1L).authId(authId).nickname(nickname).userTag("#0001").build();
     }
 
     private static KakaoJoinRequestDto createMemberRequestDto(String authId, String nickname) {

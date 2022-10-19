@@ -47,8 +47,8 @@ public class GlobalExceptionHandler {
                 .body(CMResponseDto.createCMResponseDto(-1, "DUPLICATED_ID",map));
     }
 
-    @ExceptionHandler(value = MemberNotMatchException.class)
-    public ResponseEntity<?> memberNotMatchCatcher(MemberNotMatchException e) {
+    @ExceptionHandler(value = MemberMismatchException.class)
+    public ResponseEntity<?> memberNotMatchCatcher(MemberMismatchException e) {
         Map<String, String> map = putErrorMessage(e.getMessage());
         return ResponseEntity
                 .status(FORBIDDEN)

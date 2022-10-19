@@ -1,15 +1,19 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.member.BasicMember;
 import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
+import com.dhgroup.beta.exception.MemberMismatchException;
 import com.dhgroup.beta.exception.NotExistMemberException;
-import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.KakaoJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.MemberLoginRequestDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
@@ -33,7 +37,7 @@ public class MemberServiceTest {
     @Test
      public void 카카오_로그인_실패() throws Exception{
         //given
-        Member member = createMember(1L,"1", "글쓴이");
+        Member member = createKakaoMember(1L,"1", "글쓴이");
         given(memberRepository.findByAuthId(anyString(),any())).willReturn(Optional.of(member));
         //when
 
@@ -44,7 +48,7 @@ public class MemberServiceTest {
 
     @Test
      public void 카카오_회원가입() throws Exception{
-        Member member = createMember(1L,"1", "글쓴이");
+        Member member = createKakaoMember(1L,"1", "글쓴이");
         KakaoJoinRequestDto requestDto = createRequestDto("1", "글쓴이");
         //given
         given(memberRepository.save(any(Member.class))).willReturn(member);
@@ -55,14 +59,64 @@ public class MemberServiceTest {
         assertThat(member.getNickname()).isEqualTo("글쓴이");
     }
 
+
+    @Test
+     public void 기본_로그인_성공() throws Exception{
+        //given
+        MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", "123");
+        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getMemberName(),
+                                                memberLoginRequestDto.getPassword(), "홍길동");
+
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.of(basicMember));
+        //when
+        memberService.login(memberLoginRequestDto);
+        //then
+        verify(memberRepository).findByMemberName(memberLoginRequestDto.getMemberName());
+    }
+
+    @Test
+     public void 기본_로그인_없는_아이디() throws Exception{
+        //given
+        MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", "123");
+
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.empty());
+        //when
+        MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
+        //then
+        assertThat(e.getMessage()).isEqualTo("아이디 혹은 비밀번호가 일치하지 않습니다.");
+    }
+
+    @Test
+     public void 기본_로그인_비밀번호_불일치() throws Exception{
+        //given
+        String wrongPasswrod = "1234";
+        MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", wrongPasswrod);
+        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getMemberName(),
+                "123", "홍길동");
+
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.of(basicMember));
+        //when
+        MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
+        //then
+        assertThat(e.getMessage()).isEqualTo("아이디 혹은 비밀번호가 일치하지 않습니다.");
+    }
     private static KakaoJoinRequestDto createRequestDto(String googleId, String nickname) {
         return KakaoJoinRequestDto.builder().authId(googleId).nickname(nickname).build();
     }
 
-    private static Member createMember(Long id,String googleId, String nickname) {
+    private static Member createKakaoMember(Long id, String googleId, String nickname) {
         return KakaoMember.builder()
                 .id(id)
                 .authId(googleId)
+                .nickname(nickname)
+                .build();
+    }
+
+    private static BasicMember createBasicMember(Long id, String memberName,String password, String nickname) {
+        return BasicMember.builder()
+                .id(id)
+                .memberName(memberName)
+                .password(new BCryptPasswordEncoder().encode(password))
                 .nickname(nickname)
                 .build();
     }

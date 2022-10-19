@@ -4,13 +4,12 @@ import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.aop.annotation.ValidAspect;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
-import com.dhgroup.beta.exception.OverlapMemberException;
+import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
-import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
-import com.dhgroup.beta.web.dto.MemberDto.MemberResponseDto;
-import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateRequestDto;
-import com.dhgroup.beta.web.dto.MemberDto.MemberUpdateResponseDto;
+import com.dhgroup.beta.web.dto.MemberDto.*;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.BasicJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.KakaoJoinRequestDto;
 import com.dhgroup.beta.web.validation.ValidationSequence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +26,30 @@ public class MemberApi {
 
     private final MemberService memberService;
 
+    private final MemberRepository memberRepository;
+
+    @LogAspect
+    @ValidAspect
+    @PostMapping("/basic/571scsa234dsb")
+    public ResponseEntity<?> BasicJoin(@Validated(ValidationSequence.class) @RequestBody BasicJoinRequestDto basicJoinRequestDto, BindingResult bindingResult) {
+
+        Long memberId = memberService.join(basicJoinRequestDto);
+        Member findMember = memberService.findMemberByMemberId(memberId);
+        MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(findMember);
+        return ResponseEntity
+                .status(CREATED)
+                .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.", memberResponseDto));
+    }
+
+    @LogAspect
+    @ValidAspect
+    @PostMapping("/basic/login")
+    public ResponseEntity<?> BasicLogin(@Validated(ValidationSequence.class) @RequestBody MemberLoginRequestDto memberLoginRequestDto, BindingResult bindingResult) {
+
+        MemberResponseDto memberResponseDto = memberService.login(memberLoginRequestDto);
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1, "성공적으로 로그인이 되었습니다.", memberResponseDto));
+    }
 
     @LogAspect
     @ValidAspect

@@ -14,7 +14,7 @@ public class BasicMember extends Member{
     @Column
     private String memberName;
 
-    @Column
+    @Column(length = 500)
     private String password;
 
     @Builder

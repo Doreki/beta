@@ -3,8 +3,8 @@ package com.dhgroup.beta.exception;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class MemberNotMatchException extends RuntimeException {
-    public MemberNotMatchException(String message) {
+public class MemberMismatchException extends RuntimeException {
+    public MemberMismatchException(String message) {
         super(message);
     }
 

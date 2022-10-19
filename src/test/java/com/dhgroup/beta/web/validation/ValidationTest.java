@@ -1,6 +1,7 @@
 package com.dhgroup.beta.web.validation;
 
-import com.dhgroup.beta.web.dto.MemberDto.KakaoJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.BasicJoinRequestDto;
+import com.dhgroup.beta.web.dto.MemberDto.JoinRequest.KakaoJoinRequestDto;
 import com.dhgroup.beta.web.dto.PostsDto.PostsRequestDto;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -64,6 +65,16 @@ public class ValidationTest {
         violations.forEach(error -> {
             assertThat(error.getMessage()).isEqualTo("특수문자, 공백은 입력할 수 없습니다.");
         });
+    }
+
+    @Test
+    public void 회원_아이디_패턴() throws Exception{
+        //given
+        BasicJoinRequestDto basicJoinRequestDto = BasicJoinRequestDto.builder().memberName("asdf1!").build();
+        //when
+        Set<ConstraintViolation<BasicJoinRequestDto>> violations = validator.validate(basicJoinRequestDto, ValidationGroups.PatternCheckGroup.class);
+        //then
+        assertThat(violations.size()).isEqualTo(0);
     }
 
     @Test
