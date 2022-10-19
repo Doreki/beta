@@ -26,6 +26,7 @@ dependencies {
 	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.1")
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security'
 
 
 	compileOnly 'org.projectlombok:lombok'

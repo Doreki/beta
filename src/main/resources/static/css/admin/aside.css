@@ -1,0 +1,12 @@
+.admin-menus {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 0px 20px;
+    width: 264px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgb(127,127,127);
+    padding-bottom: 10px;
+}
+.admin-menus a {
+    padding: 6px;
+}

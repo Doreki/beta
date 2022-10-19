@@ -1,8 +1,7 @@
-package com.dhgroup.beta.web.controller.handler;
+package com.dhgroup.beta.web.controller.advice;
 
 import com.dhgroup.beta.exception.*;
 import com.dhgroup.beta.web.dto.CMResponseDto;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
