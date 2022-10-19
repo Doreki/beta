@@ -57,45 +57,26 @@ public class MemberApiTest {
         verify(memberService).join(any(KakaoJoinRequestDto.class));
     }
     @Test
-    public void 카카오_회원가입_실패() throws Exception{
+    public void 카카오_로그인() throws Exception{
         //given
         String url = "/api/v1/member/kakao/1h2g2yysh297h2s";
         KakaoJoinRequestDto kakaoJoinRequestDto = createMemberRequestDto("1","홍길동");
+        Member member = createMember(kakaoJoinRequestDto.getAuthId(), "홍길동");
+        MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
 
         given(memberService.isDuplicated(kakaoJoinRequestDto.getAuthId(),Provider.KAKAO)).willReturn(true);
-        given(memberService.join(any(KakaoJoinRequestDto.class))).willReturn(1L);
+        given(memberService.login(kakaoJoinRequestDto.getAuthId(),Provider.KAKAO)).willReturn(memberResponseDto);
         //then
         mockMvc.perform(
                         post(url)
                                 .content(new ObjectMapper().writeValueAsString(kakaoJoinRequestDto))
                                 .contentType(MediaType.APPLICATION_JSON))
-                                .andExpect(status().isConflict())
-                                .andExpect(jsonPath("$.status",is(-1)))
-                                .andExpect(jsonPath("$.msg",is("DUPLICATED_ID")))
-                                .andDo(print());
-    }
-    @Test
-     public void 카카오_로그인() throws Exception{
-        //given
-        Member member = createMember("1","글쓴이");
-        String url = "/api/v1/member/kakao/login/{authId}";
-        String authId = member.getAuthId();
-        MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(member);
-
-
-        given(memberService.login(authId,Provider.KAKAO)).willReturn(memberResponseDto);
-        //when
-                    mockMvc.perform(
-                                get(url,authId)
-                                .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.status",is(1)))
-                                .andExpect(jsonPath("$.data.nickname",is("글쓴이")))
+                                .andExpect(jsonPath("$.data.nickname",is("홍길동")))
                                 .andDo(print());
-        //then
-        verify(memberService).login(authId,Provider.KAKAO);
+        verify(memberService).login(kakaoJoinRequestDto.getAuthId(),Provider.KAKAO);
     }
-
 
     @Test
      public void 닉네임변경() throws Exception{
@@ -119,7 +100,7 @@ public class MemberApiTest {
         return Member.builder().authId(authId).nickname(nickname).build();
     }
 
-    private static KakaoJoinRequestDto createMemberRequestDto(String googleId, String nickname) {
-        return KakaoJoinRequestDto.builder().authId(googleId).nickname(nickname).build();
+    private static KakaoJoinRequestDto createMemberRequestDto(String authId, String nickname) {
+        return KakaoJoinRequestDto.builder().authId(authId).nickname(nickname).build();
     }
 }
