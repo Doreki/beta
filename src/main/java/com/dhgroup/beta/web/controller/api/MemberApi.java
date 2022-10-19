@@ -41,9 +41,11 @@ public class MemberApi {
                     .ok(CMResponseDto.createCMResponseDto(1, "성공적으로 로그인이 되었습니다.", memberResponseDto));
         } else {
             Long memberId = memberService.join(kakaoJoinRequestDto);
+            Member findMember = memberService.findMemberByMemberId(memberId);
+            MemberResponseDto memberResponseDto = MemberResponseDto.createMemberResponseDto(findMember);
             return ResponseEntity
                     .status(CREATED)
-                    .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.",memberId));
+                    .body(CMResponseDto.createCMResponseDto(1,"회원가입에 성공 하셨습니다.", memberResponseDto));
         }
     }
 
@@ -53,7 +55,7 @@ public class MemberApi {
                                             @RequestBody MemberUpdateRequestDto memberUpdateRequestDto) {
         memberService.updateNickname(memberId, memberUpdateRequestDto.getNickname());
         Member findMember = memberService.findMemberByMemberId(memberId);
-        MemberUpdateResponseDto response = MemberUpdateResponseDto.createMemberUpdateResponse(findMember.getId(), findMember.getNickname());
+        MemberUpdateResponseDto response = MemberUpdateResponseDto.createMemberUpdateResponse(findMember);
 
         return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",response));
     }

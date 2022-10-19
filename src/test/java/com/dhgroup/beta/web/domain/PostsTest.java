@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.domain;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.PostsStatus;
@@ -37,7 +38,7 @@ public class PostsTest {
     }
 
     private static Member createMember() {
-        return Member.builder().authId("1").nickname("홍길동").build();
+        return KakaoMember.builder().authId("1").nickname("홍길동").build();
     }
     private static Posts createPosts() {
         return Posts.builder().title("글제목").content("글내용").build();

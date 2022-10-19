@@ -1,5 +1,7 @@
 package com.dhgroup.beta.repository;
 
+import com.dhgroup.beta.domain.member.BasicMember;
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
@@ -27,23 +29,23 @@ public class MemberRepositoryTest {
     @Test
      public void 카카오아이디로_멤버찾아오기() throws Exception{
         //given
-        Member member = createMember("1","nickname", Provider.KAKAO);
-        memberRepository.save(member);
-        Member memberByGoogleId = memberRepository.findByAuthId(member.getAuthId(),member.getProvider()).get();
+        KakaoMember kakaoMember = createKakaoMember("1","nickname", Provider.KAKAO);
+        memberRepository.save(kakaoMember);
+        Member memberByAuthId = memberRepository.findByAuthId(kakaoMember.getAuthId(),kakaoMember.getProvider()).get();
         //when
 
         //then
-        assertThat(memberByGoogleId.getId()).isEqualTo(member.getId());
+        assertThat(memberByAuthId.getId()).isEqualTo(kakaoMember.getId());
     }
 
 
     @Test
     public void 닉네임중복체크() throws Exception{
         //given
-        Member member = createMember("1","nickname", Provider.KAKAO);
-        memberRepository.save(member);
+        KakaoMember kakaoMember = createKakaoMember("1","nickname", Provider.KAKAO);
+        memberRepository.save(kakaoMember);
         //when
-        boolean existsByNickname = memberRepository.existsByNickname(member.getNickname());
+        boolean existsByNickname = memberRepository.existsByNickname(kakaoMember.getNickname());
         //then
         assertThat(existsByNickname).isEqualTo(true);
     }
@@ -51,17 +53,32 @@ public class MemberRepositoryTest {
     @Test
      public void 닉네임_중복() throws Exception{
         //given
-        Member member1 = createMember("1","nickname", Provider.KAKAO);
-        Member member2 = createMember("2","nickname", Provider.KAKAO);
-        memberRepository.save(member1);
+        KakaoMember kakaoMember1 = createKakaoMember("1","nickname", Provider.KAKAO);
+        KakaoMember kakaoMember2 = createKakaoMember("2","nickname", Provider.KAKAO);
+        memberRepository.save(kakaoMember1);
 
         //then
-        assertThrows(DataIntegrityViolationException.class, () -> memberRepository.save(member2));
+        assertThrows(DataIntegrityViolationException.class, () -> memberRepository.save(kakaoMember2));
+    }
+
+    @Test
+     public void 아이디로_유저찾기() throws Exception{
+        //given
+        BasicMember member = createBasicMember("id","1234","nickname",Provider.BASIC);
+        memberRepository.save(member);
+        //when
+        BasicMember findMember = memberRepository.findByMemberName(member.getMemberName()).get();
+        //then
+        assertThat(findMember.getMemberName()).isEqualTo(member.getMemberName());
     }
 
 
-    private static Member createMember(String authId, String nickname, Provider provider) {
-        return Member.builder().authId(authId).nickname(nickname).userTag("#0001").provider(provider).build();
+    private static KakaoMember createKakaoMember(String authId, String nickname, Provider provider) {
+        return KakaoMember.builder().authId(authId).nickname(nickname).userTag("#0001").provider(provider).build();
+    }
+
+    private static BasicMember createBasicMember(String memberName,String password, String nickname, Provider provider) {
+        return BasicMember.builder().memberName(memberName).password(password).nickname(nickname).userTag("#0001").provider(provider).build();
     }
 }
 

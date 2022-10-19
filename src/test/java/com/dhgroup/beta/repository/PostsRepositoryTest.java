@@ -1,5 +1,6 @@
 package com.dhgroup.beta.repository;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.Posts;
 import com.dhgroup.beta.domain.repository.LikesRepository;
@@ -126,6 +127,6 @@ public class PostsRepositoryTest {
     }
 
     private static Member createMember(String nickName, String googleId) {
-        return Member.builder().nickname(nickName).authId(googleId).build();
+        return KakaoMember.builder().nickname(nickName).authId(googleId).build();
     }
 }

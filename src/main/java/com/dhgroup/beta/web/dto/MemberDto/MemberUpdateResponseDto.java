@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.dto.MemberDto;
 
+import com.dhgroup.beta.domain.member.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,7 @@ public class MemberUpdateResponseDto {
     Long id;
     String nickname;
 
-    public static MemberUpdateResponseDto createMemberUpdateResponse(Long id, String nickname) {
-        return MemberUpdateResponseDto.builder().id(id).nickname(nickname).build();
+    public static MemberUpdateResponseDto createMemberUpdateResponse(Member member) {
+        return MemberUpdateResponseDto.builder().id(member.getId()).nickname(member.getNickname()).build();
     }
 }

@@ -1,7 +1,9 @@
 package com.dhgroup.beta.web.dto.MemberDto;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
+import com.dhgroup.beta.domain.member.Role;
 import com.dhgroup.beta.web.validation.ValidationGroups;
 import lombok.*;
 
@@ -23,11 +25,12 @@ public class KakaoJoinRequestDto {
     private String nickname;
 
 
-    public Member toEntity() {
-        return Member.builder()
+    public KakaoMember toEntity() {
+        return KakaoMember.builder()
                 .authId(authId)
                 .nickname(nickname)
                 .provider(Provider.KAKAO)
+                .role(Role.MEMBER)
                 .build();
     }
 }

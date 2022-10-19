@@ -1,5 +1,6 @@
 package com.dhgroup.beta.service;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.exception.NotExistMemberException;
@@ -59,7 +60,7 @@ public class MemberServiceTest {
     }
 
     private static Member createMember(Long id,String googleId, String nickname) {
-        return Member.builder()
+        return KakaoMember.builder()
                 .id(id)
                 .authId(googleId)
                 .nickname(nickname)

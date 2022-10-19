@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web.domain;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +32,6 @@ public class MemberTest {
     }
 
     private static Member createMember(Long id, String nickname, String googleId) {
-        return Member.builder().id(id).nickname(nickname).authId(googleId).build();
+        return KakaoMember.builder().id(id).nickname(nickname).authId(googleId).build();
     }
 }

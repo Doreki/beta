@@ -2,34 +2,32 @@ package com.dhgroup.beta.domain.member;
 
 import com.dhgroup.beta.BaseTimeEntity;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
 @Getter
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
 @Entity
-@Table(name = "member")
-public class Member extends BaseTimeEntity {
+public abstract class Member extends BaseTimeEntity {
 
     @Id //pk
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
-
-    @Column(nullable = false)
-    private String authId;
-
     @Column(nullable = false)
     private String nickname;
-
     @Column(unique = true)
     private String userTag;
 
     @Enumerated(EnumType.STRING)
     private Provider provider;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;

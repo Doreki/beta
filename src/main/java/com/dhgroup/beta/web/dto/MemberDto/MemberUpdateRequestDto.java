@@ -22,9 +22,9 @@ public class MemberUpdateRequestDto {
     @Pattern(regexp = "^[0-9a-zA-Z가-힣]*$",message = "특수문자, 공백은 입력할 수 없습니다.",groups = ValidationGroups.PatternCheckGroup.class)
     private String nickname;
 
-    public Member toEntity() {
-        return Member.builder()
-                .nickname(nickname)
-                .build();
-    }
+//    public Member toEntity() {
+//        return Member.
+//                .nickname(nickname)
+//                .build();
+//    }
 }

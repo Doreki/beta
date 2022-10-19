@@ -1,5 +1,6 @@
 package com.dhgroup.beta.web;
 
+import com.dhgroup.beta.domain.member.KakaoMember;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.repository.MemberRepository;
@@ -97,7 +98,7 @@ public class MemberApiTest {
     }
 
     private static Member createMember(String authId, String nickname) {
-        return Member.builder().authId(authId).nickname(nickname).build();
+        return KakaoMember.builder().authId(authId).nickname(nickname).build();
     }
 
     private static KakaoJoinRequestDto createMemberRequestDto(String authId, String nickname) {
