@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/fragments/head :: head" />
-<head>
-  <link rel="stylesheet" href="/static/css/admin/main.css">
-  <link rel="stylesheet" href="/static/css/admin/aside.css">
-</head>
 <body>
 <div id="container">
   <header th:replace="/fragments/header :: header"/>
@@ -14,7 +10,7 @@
       <h1 class="admin-title">ADMIN PRODUCT REGISTRATION</h1>
       <div class="admin-container">
         <aside class="admin-menus">
-          <a href="/admin/products">상품 조회</a>
+          <a href="/admin/products">게시글 조회</a>
           <a href="/admin/product/addition">상품 등록</a>
           <a href="/admin/systems">시스템 정보</a>
           <a href="/logout">로그아웃</a>
