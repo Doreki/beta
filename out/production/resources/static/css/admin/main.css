@@ -1,5 +1,5 @@
 .admin {
-    width: 80%;
+    width: 90%;
     float: right;
 }
 .admin-title {
@@ -12,67 +12,7 @@
 
     margin: 0px auto;
 }
-.admin-menus {
-    position: relative;
-    left: 30%;
-}
 .admin-main {
+    width: 100%;
     padding: 0px 20px;
-}
-
-.regist-header {
-    margin-bottom: 15px;
-    position: relative;
-    left: 10%;
-}
-
-@keyframes visible {
-    from {
-        height: 0px;
-    }
-    to {
-        height: 200px;
-    }
-}
-
-@keyframes invisible {
-    from {
-        height: 200px;
-    }
-    to {
-        height: 0px;
-    }
-}
-
-.regist-info {
-    margin-bottom: 15px;
-
-    height: 200px;
-    animation: visible 0.2s linear alternate;
-}
-
-
-input[type="text"] {
-    height: 36px;
-    width: 30%;
-}
-
-textarea {
-    height: 100%;
-    width: 45%;
-    resize: none;
-    overflow-y: auto;
-}
-
-.regist-info-invisible {
-    display: none;
-}
-
-.regist-button {
-    width: 50%;
-    height: 40px;
-    color: white;
-    background-color: black;
-    position: relative;
-    left:20%;
 }

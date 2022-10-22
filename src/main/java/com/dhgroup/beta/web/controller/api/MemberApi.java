@@ -82,5 +82,4 @@ public class MemberApi {
 
         return ResponseEntity.ok(CMResponseDto.createCMResponseDto(1,"닉네임이 변경되었습니다.",response));
     }
-
 }
