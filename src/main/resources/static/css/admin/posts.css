@@ -1,0 +1,107 @@
+.posts {
+    display: flex;
+    justify-content: space-between;
+
+    width: 100%;
+
+    position: relative;
+        left: 100px;
+}
+
+.list-container {
+    margin-top: 30px;
+    width: 70%;
+    height: 715px;
+
+    overflow-y: auto;
+}
+.option-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-top: 20px;
+}
+
+.page-number-list {
+    display: flex;
+}
+
+.page-number-list li{
+    margin-right: 5px;
+    border: 1px solid rgb(198, 198, 198);
+    border-radius: 3px;
+
+    width: 30px;
+    height: 20px;
+
+    text-align: center;
+}
+
+.search-container {
+    display: flex;
+    justify-content: space-between;
+
+    width:250px;
+    height: 25px;
+}
+.search-input {
+    width: 200px;
+}
+.search-button {
+    color: white;
+    background-color: black;
+    padding: 6px;
+}
+.posts-list {
+    width: 100%;
+}
+
+.posts-list tbody {
+    max-height: 100%;
+}
+.posts-list td {
+    width: 8%;
+    padding: 0px 5px;
+}
+.posts-list td:nth-child(1) {
+    width: 10%;
+}
+
+.posts-list td:nth-child(2) {
+    width: 10%;
+}
+.posts-list td:nth-child(3) {
+    width: 36%;
+}
+.posts-list td:nth-child(4) {
+    width: 12%;
+}
+.posts-list button {
+    padding: 3px 7px;
+}
+.show-option {
+    width: 30%
+}
+
+.show-option label {
+    display:inline-block;
+    padding: 10px 0px 5px;
+    font-weight: bold;
+}
+.show-option textarea {
+    margin-bottom: 10px;
+    height: 30px;
+}
+table {
+    border-collapse: collapse;
+    border: 1px solid rgb(198, 198, 198);
+}
+
+th,td {
+    border: 1px solid rgb(198, 198, 198);
+
+    height: 30px;
+
+    text-align: center;
+}

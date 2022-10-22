@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/fragments/admin/admin_head :: head"/>
+<head>
+  <link rel="stylesheet" href="/static/css/admin/posts.css">
+</head>
+<body>
+<div class="container">
+  <main id="main">
+    <h1 class="admin-title">ADMIN POST LIST</h1>
+    <aside th:replace="/fragments/admin/aside :: aside"/>
+    <div class="admin">
+      <div class="admin-container">
+        <section class="admin-main">
+          <div class="posts">
+            <div class="list-container">
+              <table class="posts-list">
+                <thead>
+                <tr>
+                  <th>id</th>
+                  <th>게시글명</th>
+                  <th>내용</th>
+                  <th>작성자</th>
+                  <th>작성일</th>
+                  <th>삭제</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>test</td>
+                    <td>테스트 글입니다.</td>
+                    <td>홍길동</td>
+                    <td>2022-10-22</td>
+                    <td><button type="button">삭제</button></td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="option-container">
+                <ul class="page-number-list">
+                  <a href=""><li>&#60;</li></a>
+                  <a href=""><li>1</li></a>
+                  <a href=""><li>2</li></a>
+                  <a href=""><li>3</li></a>
+                  <a href=""><li>4</li></a>
+                  <a href=""><li>5</li></a>
+                  <a href=""><li>6</li></a>
+                  <a href=""><li>7</li></a>
+                  <a href=""><li>8</li></a>
+                  <a href=""><li>9</li></a>
+                  <a href=""><li>10</li></a>
+                  <a href=""><li>&#62;</li></a>
+                </ul>
+                <div class="search-container">
+                  <input type="search" class="search-input">
+                  <button type="button" class="btn search-button">검색</button>
+                </div>
+              </div>
+            </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/static/js/admin/posts.js"></script>
+</body>
+</html>

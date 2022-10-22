@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.dhgroup.beta.web.domain.PostsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2022-10-22T12:00:27" hostname="LAPTOP-IE47KD54" time="0.01">
+  <properties/>
+  <testcase name="게시글_생성_상태()" classname="com.dhgroup.beta.web.domain.PostsTest" time="0.009"/>
+  <testcase name="게시글_업데이트_상태()" classname="com.dhgroup.beta.web.domain.PostsTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
