@@ -1,76 +1,11 @@
-class ProductMst {
-    #category;
-    #name;
-    #price;
-    #simpleInfo;
-    #detailInfo;
-
-    constructor(category, name, price, simpleInfo, detailInfo, optionInfo, managementInfo, shippingInfo) {
-        this.#category = category;
-        this.#name = name;
-        this.#price = price;
-        this.#simpleInfo = simpleInfo;
-        this.#detailInfo = detailInfo;
-    }
-
-    getCategory() {return this.#category;}
-    setCategory(category) {this.#category = category;}
-
-    getName() {return this.#name;}
-    setName(name) {this.#name = name;}
-
-    getPrice() {return this.#price;}
-    setPrice(price) {this.#price = price;}
-
-    getSimpleInfo() {return this.#simpleInfo;}
-    setSimpleInfo(simpleInfo) {this.#simpleInfo = simpleInfo;}
-
-    getDetailInfo() {return this.#detailInfo;}
-    setDetailInfo(detailInfo) {this.#detailInfo = detailInfo;}
-
-    getObject() {
-        const obj = {
-            category: this.#category,
-            name: this.#name,
-            price: this.#price,
-            simpleInfo: this.#simpleInfo,
-            detailInfo: this.#detailInfo,
-        }
-        return obj;
-    }
-}
-
-class CommonApi {
-    getCategoryList() {
+class PostsApi {
+    getPostsList(page,size) {
         let responseResult = null;
 
         $.ajax({
             async: false,
             type: "get",
-            url: "/api/admin/product/category",
-            dataType : "json",
-            success: (response) => {
-                responseResult = response.data;
-            },
-            error: (error) => {
-                 console.log(error);
-            }
-        });
-        return responseResult;
-    }
-}
-
-
-class RegisterApi {
-    createProductRequest(productMst) {
-        let responseResult = null;
-
-        $.ajax({
-            async: false,
-            type: "post",
-            url: "/api/admin/product",
-            contentType: "application/json",
-            data: JSON.stringify(productMst),
+            url: "/api/v1/posts/list/0?page="+page+"&size="+size,
             dataType: "json",
             success: (response) => {
                 responseResult = response.data;
@@ -79,96 +14,30 @@ class RegisterApi {
                 console.log(error);
             }
         });
-
         return responseResult;
     }
-}
 
-class RegisterEventService {
-    #categorySelectObj;
-    #nameInputObj;
-    #priceInputObj;
-    #registButtonObj;
-    #infoTextareaObjs;
+    deletePosts(postsId) {
+    let responseResult = null;
 
-    constructor() {
-        this.#categorySelectObj = document.querySelectorAll(".product-inputs")[0];
-        this.#nameInputObj = document.querySelectorAll(".product-inputs")[1];
-        this.#priceInputObj = document.querySelectorAll(".product-inputs")[2];
-        this.#registButtonObj = document.querySelector(".regist-button");
-        this.#infoTextareaObjs = document.querySelectorAll(".product-inputs");
+            $.ajax({
+                async: false,
+                type: "delete",
+                url: "/api/v1/posts/"+postsId,
+                dataType: "json",
+                body: 1,
+                success: (response) => {
+                    responseResult = response.msg;
+                },
+                error: (error) => {
+                    console.log(error);
+                }
+            });
 
-        this.init();
-
-        this.addCategorySelectEvent();
-        this.addNameInputEvent();
-        this.addPriceInputEvent();
-        this.addRegistButtonEvent();
-    }
-
-    init() {
-        this.#nameInputObj.disabled = true;
-        this.#priceInputObj.disabled = true;
-        this.#registButtonObj.disabled = true;
-    }
-
-    addCategorySelectEvent() {
-        this.#categorySelectObj.onchange = () => {
-            if(this.#categorySelectObj.value != "none") {
-                this.#nameInputObj.disabled = false;
-            }else {
-                this.#nameInputObj.disabled = true;
-            }
-        }
-    }
-
-    addNameInputEvent() {
-        this.#nameInputObj.onkeyup = () => {
-            if(this.#nameInputObj.value.length != 0) {
-                this.#priceInputObj.disabled = false;
-            }else {
-                this.#priceInputObj.disabled = true;
-            }
-        }
-    }
-
-    addPriceInputEvent() {
-        this.#priceInputObj.onkeyup = () => {
-            const registInfo = document.querySelector(".regist-info");
-
-            if(this.#priceInputObj.value.length != 0) {
-                this.#registButtonObj.disabled = false;
-                registInfo.classList.remove("regist-info-invisible");
-
-            }else {
-                this.#registButtonObj.disabled = true;
-                registInfo.classList.add("regist-info-invisible");
-
-            }
-        }
-    }
-
-    addRegistButtonEvent() {
-        this.#registButtonObj.onclick = () => {
-            const category = this.#categorySelectObj.value;
-            const name = this.#nameInputObj.value;
-            const price = this.#priceInputObj.value;
-            const simpleInfo = this.#infoTextareaObjs[3].value;
-            const detailInfo = this.#infoTextareaObjs[4].value;
-
-            const productMst = new ProductMst(
-                category, name, price, simpleInfo, detailInfo);
-
-            const registerApi = new RegisterApi();
-            if(registerApi.createProductRequest(productMst.getObject())) {
-                 alert("상품 등록 완료");
-                 location.reload();
-           }
-        }
+            alert(msg);
     }
 }
-
-class RegisterService {
+class PostsService {
     static #instance = null;
 
     constructor() {
@@ -176,35 +45,49 @@ class RegisterService {
 
     static getInstance() {
         if(this.#instance == null) {
-            this.#instance = new RegisterService();
+            this.#instance = new PostsService();
         }
         return this.#instance;
     }
 
-    loadRegister() {
+    getPostsList() {
+        let page = null;
+        let size = null;
 
-    }
+        const urlSearch = new URLSearchParams(location.search);
+        if(urlSearch == null) {
+            page = 0;
+            size = 10;
+        } else {
+            page = urlSearch.get('page');
+            size = urlSearch.get('size');
+        }
 
-    getCategoryList() {
-        const commonApi = new CommonApi();
-        const productCategoryList = commonApi.getCategoryList();
+        const postsApi = new PostsApi();
+        const postsList = postsApi.getPostsList(page,size);
 
-        const productCategory = document.querySelector(".product-category")
-        productCategory.innerHTML = `<option value="none">상품 종류</option>`;
-
-        productCategoryList.forEach(category => {
-            productCategory.innerHTML += `
-            <option value="${category.id}">${category.name}</option>
+        const posts = document.querySelector(".posts-list-body");
+        postsList.forEach(postsList => {
+            posts.innerHTML += `
+                    <tr>
+                                <td>${postsList.id}</td>
+                                <td>${postsList.title}</td>
+                                <td>${postsList.content}</td>
+                                <td>${postsList.writer}</td>
+                                <td>${postsList.date}</td>
+                                <td><button value="${postsList.id}" type="button" class="delete-button">삭제</button></td>
+                              </tr>
             `
-        })
-    }
+        });
 
-    setRegisterHeaderEvent() {
-        new RegisterEventService();
     }
 }
 
+//const deleteButton = document.querySelector(".delete-button");
+//deleteButton.onclick = () => {
+//    const postsApi = new PostsApi();
+//    postsApi.deletePosts(deleteButton.value);
+//}
 window.onload = () => {
-    RegisterService.getInstance().getCategoryList();
-    RegisterService.getInstance().setRegisterHeaderEvent();
+    PostsService.getInstance().getPostsList();
 }
