@@ -26,7 +26,6 @@ public class MemberApi {
 
     private final MemberService memberService;
 
-    private final MemberRepository memberRepository;
 
     @LogAspect
     @ValidAspect

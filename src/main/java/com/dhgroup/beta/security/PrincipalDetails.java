@@ -1,6 +1,7 @@
 package com.dhgroup.beta.security;
 import com.dhgroup.beta.domain.member.BasicMember;
 import com.dhgroup.beta.domain.member.Member;
+import com.dhgroup.beta.domain.member.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -31,6 +32,8 @@ public class PrincipalDetails implements UserDetails {
     public String getUsername() {
         return basicMember.getMemberName();
     }
+
+    public Role getRole() {return  basicMember.getRole();}
 
     @Override
     public boolean isAccountNonExpired() {
