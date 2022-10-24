@@ -1,10 +1,9 @@
 package com.dhgroup.beta.web.controller.api;
 
-import com.dhgroup.beta.aop.annotation.LogAspect;
-import com.dhgroup.beta.aop.annotation.ValidAspect;
+import com.dhgroup.beta.annotation.LogAspect;
+import com.dhgroup.beta.annotation.ValidAspect;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Provider;
-import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.service.MemberService;
 import com.dhgroup.beta.web.dto.CMResponseDto;
 import com.dhgroup.beta.web.dto.MemberDto.*;

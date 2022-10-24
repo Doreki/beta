@@ -67,9 +67,9 @@ public class MemberRepositoryTest {
         BasicMember member = createBasicMember("id","1234","nickname",Provider.BASIC);
         memberRepository.save(member);
         //when
-        BasicMember findMember = memberRepository.findByMemberName(member.getMemberName()).get();
+        BasicMember findMember = memberRepository.findByMemberName(member.getUsername()).get();
         //then
-        assertThat(findMember.getMemberName()).isEqualTo(member.getMemberName());
+        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
     }
 
 
@@ -77,8 +77,8 @@ public class MemberRepositoryTest {
         return KakaoMember.builder().authId(authId).nickname(nickname).userTag("#0001").provider(provider).build();
     }
 
-    private static BasicMember createBasicMember(String memberName,String password, String nickname, Provider provider) {
-        return BasicMember.builder().memberName(memberName).password(password).nickname(nickname).userTag("#0001").provider(provider).build();
+    private static BasicMember createBasicMember(String username,String password, String nickname, Provider provider) {
+        return BasicMember.builder().username(username).password(password).nickname(nickname).userTag("#0001").provider(provider).build();
     }
 }
 

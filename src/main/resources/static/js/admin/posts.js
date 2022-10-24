@@ -28,11 +28,11 @@ class PostsApi {
                 success: (response) => {
                     responseResult = response.msg;
                     alert(responseResult);
+                    location.reload();
                 },
                 error: (error) => {
-                    responseResult = error.msg;
-                    alert("권한이 없습니다.");
-                    console.log(error);
+                    responseResult = error.responseJSON.data.errMsg;
+                    alert(responseResult);
                 }
             });
 
@@ -96,7 +96,6 @@ class PostsService {
                     if(confirm("정말로 삭제하시겠습니까?")) {
                         const postsApi = new PostsApi();
                         postsApi.deletePosts(deleteButton.value);
-                        location.reload();
                     }
                 }
             })

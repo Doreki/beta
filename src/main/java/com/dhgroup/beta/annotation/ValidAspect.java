@@ -1,4 +1,4 @@
-package com.dhgroup.beta.aop.annotation;
+package com.dhgroup.beta.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

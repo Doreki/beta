@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .and()
                 .formLogin()
-                .usernameParameter("memberName")
+                .usernameParameter("username")
                 .defaultSuccessUrl("/admin/posts");
     }
 }

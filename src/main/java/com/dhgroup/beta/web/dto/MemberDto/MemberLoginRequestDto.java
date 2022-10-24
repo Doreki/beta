@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Builder
 @Data
@@ -12,12 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @NoArgsConstructor
 public class MemberLoginRequestDto {
 
-    private String memberName;
+    private String username;
     private String password;
 
     public static MemberLoginRequestDto createMemberLoginRequestDto(String memberName, String password) {
         return MemberLoginRequestDto.builder()
-                .memberName(memberName)
+                .username(memberName)
                 .password(password)
                 .build();
     }

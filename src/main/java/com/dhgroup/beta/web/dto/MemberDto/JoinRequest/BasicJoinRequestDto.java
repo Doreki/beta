@@ -4,8 +4,6 @@ import com.dhgroup.beta.domain.member.BasicMember;
 import com.dhgroup.beta.domain.member.Provider;
 import com.dhgroup.beta.domain.member.Role;
 import com.dhgroup.beta.web.validation.ValidationGroups;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -22,7 +20,7 @@ public class BasicJoinRequestDto extends JoinRequestDto {
 
     @Pattern(regexp = "^[0-9a-zA-Z~!@#$%^&*_]*$",message = "한글은 입력할 수 없습니다.",groups = ValidationGroups.PatternCheckGroup.class)
     @NotBlank(message = "아이디는 비워 둘 수 없습니다.", groups = ValidationGroups.NotBlankGroup.class)
-    private String memberName;
+    private String username;
     @NotBlank(message = "비밀번호는 비워 둘 수 없습니다", groups = ValidationGroups.NotBlankGroup.class)
     @Size(min = 8, max = 16, message = "비밀번호는 8자 부터 16자까지 입력하여야 합니다", groups = ValidationGroups.SizeGroup.class)
     @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*_])[a-zA-Z\\d-~!@#$%^&*_]*$",
@@ -35,7 +33,7 @@ public class BasicJoinRequestDto extends JoinRequestDto {
 
     public BasicMember toEntity() {
         return BasicMember.builder()
-                .memberName(memberName)
+                .username(username)
                 .password(new BCryptPasswordEncoder().encode(password))
                 .nickname(nickname)
                 .provider(Provider.BASIC)

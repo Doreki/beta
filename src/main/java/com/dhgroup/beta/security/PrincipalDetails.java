@@ -1,6 +1,5 @@
 package com.dhgroup.beta.security;
 import com.dhgroup.beta.domain.member.BasicMember;
-import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.member.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +29,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return basicMember.getMemberName();
+        return basicMember.getUsername();
     }
 
     public Role getRole() {return  basicMember.getRole();}

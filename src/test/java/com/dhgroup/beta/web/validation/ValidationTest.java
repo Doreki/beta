@@ -70,7 +70,7 @@ public class ValidationTest {
     @Test
     public void 회원_아이디_패턴() throws Exception{
         //given
-        BasicJoinRequestDto basicJoinRequestDto = BasicJoinRequestDto.builder().memberName("asdf1!").build();
+        BasicJoinRequestDto basicJoinRequestDto = BasicJoinRequestDto.builder().username("asdf1!").build();
         //when
         Set<ConstraintViolation<BasicJoinRequestDto>> violations = validator.validate(basicJoinRequestDto, ValidationGroups.PatternCheckGroup.class);
         //then

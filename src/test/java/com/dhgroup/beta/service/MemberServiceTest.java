@@ -64,14 +64,14 @@ public class MemberServiceTest {
      public void 기본_로그인_성공() throws Exception{
         //given
         MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", "123");
-        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getMemberName(),
+        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getUsername(),
                                                 memberLoginRequestDto.getPassword(), "홍길동");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.of(basicMember));
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
         //when
         memberService.login(memberLoginRequestDto);
         //then
-        verify(memberRepository).findByMemberName(memberLoginRequestDto.getMemberName());
+        verify(memberRepository).findByMemberName(memberLoginRequestDto.getUsername());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MemberServiceTest {
         //given
         MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", "123");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.empty());
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.empty());
         //when
         MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
         //then
@@ -91,10 +91,10 @@ public class MemberServiceTest {
         //given
         String wrongPasswrod = "1234";
         MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", wrongPasswrod);
-        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getMemberName(),
+        BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getUsername(),
                 "123", "홍길동");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getMemberName())).willReturn(Optional.of(basicMember));
+        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
         //when
         MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
         //then
@@ -112,10 +112,10 @@ public class MemberServiceTest {
                 .build();
     }
 
-    private static BasicMember createBasicMember(Long id, String memberName,String password, String nickname) {
+    private static BasicMember createBasicMember(Long id, String username,String password, String nickname) {
         return BasicMember.builder()
                 .id(id)
-                .memberName(memberName)
+                .username(username)
                 .password(new BCryptPasswordEncoder().encode(password))
                 .nickname(nickname)
                 .build();

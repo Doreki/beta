@@ -44,7 +44,7 @@ public class MemberService {
 
     public MemberResponseDto login(MemberLoginRequestDto memberLoginRequestDto) {
         BasicMember basicMember = memberRepository
-                                .findByMemberName(memberLoginRequestDto.getMemberName())
+                                .findByMemberName(memberLoginRequestDto.getUsername())
                                 .orElseThrow(() -> new MemberMismatchException("아이디 혹은 비밀번호가 일치하지 않습니다."));
         if(isPassword(memberLoginRequestDto,basicMember)){
             return MemberResponseDto.createMemberResponseDto(basicMember);

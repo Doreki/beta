@@ -12,16 +12,16 @@ import javax.persistence.Entity;
 @Entity
 public class BasicMember extends Member{
     @Column
-    private String memberName;
+    private String username;
 
     @Column(length = 500)
     private String password;
 
     @Builder
-    public BasicMember(Long id,String nickname, String userTag,Provider provider,
-                       Role role, String memberName, String password) {
+    public BasicMember(Long id, String nickname, String userTag, Provider provider,
+                       Role role, String username, String password) {
         super(id,nickname,userTag,provider,role);
-        this.memberName = memberName;
+        this.username = username;
         this.password = password;
     }
 }
