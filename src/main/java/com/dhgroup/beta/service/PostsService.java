@@ -1,6 +1,6 @@
 package com.dhgroup.beta.service;
 
-import com.dhgroup.beta.annotation.LogAspect;
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.Likes;
 import com.dhgroup.beta.domain.member.Member;
 import com.dhgroup.beta.domain.repository.LikesRepository;
@@ -135,11 +135,11 @@ public class PostsService {
     void updateLikedDate(List<LikedPostsResponseDto> findLikedPosts,List<Likes> findLikesList) {
         Map<Long, LocalDateTime> likesDateMap = findLikesList.stream()
                 .collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l.getLikedDate()));
-        findLikedPosts.stream().forEach(p -> p.updateLikedDate(likesDateMap.get(p.getId())));
+        findLikedPosts.stream().forEach(p -> p.updateLikedDateAndId(likesDateMap.get(p.getPostsId())));
     }
     static void updateWhetherIsLiked(List<Likes> findLikes, List<? extends PostsResponseDto> findPostsList) {
         Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
-        findPostsList.stream().filter(p -> likesMap.containsKey(p.getId())).forEach(p -> p.updateIsLiked(true));
+        findPostsList.stream().filter(p -> likesMap.containsKey(p.getPostsId())).forEach(p -> p.updateIsLiked(true));
     }
     private static Map<Long, Likes> toLikesMapByPostsId(List<Likes> findLikes) {
         return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));

@@ -1,6 +1,6 @@
 package com.dhgroup.beta.web.controller.api;
 
-import com.dhgroup.beta.annotation.LogAspect;
+import com.dhgroup.beta.aop.annotation.LogAspect;
 import com.dhgroup.beta.domain.repository.MemberRepository;
 import com.dhgroup.beta.domain.repository.PostsRepository;
 import com.dhgroup.beta.exception.MemberMismatchException;

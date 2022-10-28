@@ -67,7 +67,7 @@ public class MemberRepositoryTest {
         BasicMember member = createBasicMember("id","1234","nickname",Provider.BASIC);
         memberRepository.save(member);
         //when
-        BasicMember findMember = memberRepository.findByMemberName(member.getUsername()).get();
+        BasicMember findMember = memberRepository.findByUsername(member.getUsername()).get();
         //then
         assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
     }

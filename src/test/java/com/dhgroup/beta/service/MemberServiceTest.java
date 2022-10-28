@@ -67,11 +67,11 @@ public class MemberServiceTest {
         BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getUsername(),
                                                 memberLoginRequestDto.getPassword(), "홍길동");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
+        given(memberRepository.findByUsername(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
         //when
         memberService.login(memberLoginRequestDto);
         //then
-        verify(memberRepository).findByMemberName(memberLoginRequestDto.getUsername());
+        verify(memberRepository).findByUsername(memberLoginRequestDto.getUsername());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class MemberServiceTest {
         //given
         MemberLoginRequestDto memberLoginRequestDto = MemberLoginRequestDto.createMemberLoginRequestDto("id", "123");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.empty());
+        given(memberRepository.findByUsername(memberLoginRequestDto.getUsername())).willReturn(Optional.empty());
         //when
         MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
         //then
@@ -94,7 +94,7 @@ public class MemberServiceTest {
         BasicMember basicMember = createBasicMember(1L, memberLoginRequestDto.getUsername(),
                 "123", "홍길동");
 
-        given(memberRepository.findByMemberName(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
+        given(memberRepository.findByUsername(memberLoginRequestDto.getUsername())).willReturn(Optional.of(basicMember));
         //when
         MemberMismatchException e = assertThrows(MemberMismatchException.class, () -> memberService.login(memberLoginRequestDto));
         //then

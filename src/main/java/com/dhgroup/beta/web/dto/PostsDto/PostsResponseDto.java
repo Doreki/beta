@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostsResponseDto {
-    private Long id;
+    private Long postsId;
     private String title;
     private String content;
     private String writer;
@@ -26,7 +26,7 @@ public class PostsResponseDto {
     private LocalDateTime date;
 
     protected PostsResponseDto(Posts posts) {
-        this.id = posts.getId();
+        this.postsId = posts.getId();
         this.title = posts.getTitle();
         this.content = posts.getContent();
         this.writer = posts.getMember().getNickname();

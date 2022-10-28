@@ -1,7 +1,6 @@
 package com.dhgroup.beta.web.dto.PostsDto;
 
 import com.dhgroup.beta.domain.Posts;
-import com.dhgroup.beta.domain.PostsStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,8 +21,7 @@ public class LikedPostsResponseDto extends PostsResponseDto {
         return new LikedPostsResponseDto(posts);
     }
 
-    public void updateLikedDate(LocalDateTime likedDate) {
+    public void updateLikedDateAndId(LocalDateTime likedDate) {
         this.likedDate = likedDate;
     }
-
 }
