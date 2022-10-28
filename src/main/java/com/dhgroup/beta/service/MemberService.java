@@ -53,9 +53,6 @@ public class MemberService {
         }
     }
 
-    private static boolean isPassword(MemberLoginRequestDto memberLoginRequestDto,BasicMember basicMember) {
-        return new BCryptPasswordEncoder().matches(memberLoginRequestDto.getPassword(),basicMember.getPassword());
-    }
 
     @Transactional
     public void updateNickname(Long memberId, String nickname) {
@@ -73,6 +70,9 @@ public class MemberService {
 
     public Member findMemberByMemberId(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException("존재하지 않는 회원입니다."));
+    }
+    private static boolean isPassword(MemberLoginRequestDto memberLoginRequestDto,BasicMember basicMember) {
+        return new BCryptPasswordEncoder().matches(memberLoginRequestDto.getPassword(),basicMember.getPassword());
     }
 
     private Member findMemberByAuthId(String authId,Provider provider) {

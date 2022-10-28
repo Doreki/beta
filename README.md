@@ -76,7 +76,29 @@ TDD를 중심으로 개발하며 더 나은 설계를 추구 하였습니다. �
     }
 ```
 
-가짜객체를 직접 정의하여서 스프링 시큐리티를 테스트하는 코드  
+가짜객체를 직접 정의하여서 스프링 시큐리티를 테스트하는 코드 
+
+``` java
+    public List<LikedPostsResponseDto> viewLikedPosts(Long memberId, Pageable pageable) {
+        Page<Likes> findLikesPage = likesRepository.findLikesByMemberIdOrderByDesc(memberId,pageable);
+
+        List<Posts> findPostsList = toPosts(findLikesPage);
+        List<Likes> findLikesList = findLikesPage.stream().collect(Collectors.toList());
+        List<LikedPostsResponseDto> likedPostsDtos = toPostsDto(findPostsList);
+
+        updateWhetherIsLiked(findLikesList, likedPostsDtos);
+        updateLikedDate(likedPostsDtos,findLikesList);
+
+        postsListSizeCheck(likedPostsDtos);
+        return likedPostsDtos;
+    }
+```
+위의 코드는 서비스 계층의 좋아요 누른 게시물 목록을 가져오는 메소드입니다.
+ 하나의 메소드 이지만 SRP의 기준에서 본다면 더 작은 단위의 메소드로 나눌 수 있습니다.
+
+* 좋아요한 게시물 목록을 가져와서 Dto로 변환하는 기능
+* 좋아요 여부(하트)를 업데이트 하는 기능
+* 좋아요 누른 시간을 업데이트 하는 기능
 
 ``` java
     @Test
@@ -147,15 +169,84 @@ TDD를 중심으로 개발하며 더 나은 설계를 추구 하였습니다. �
     }
 ```
 
-서비스 계층의 좋아요 누른 게시물 목록을 가져오는 메소드를 SRP의 기준에서 본다면 더 작은 단위의 메소드로 나눌 수 있습니다.
-    
-* 좋아요한 게시물 목록을 가져오는 기능
-* 좋아요 여부(하트)를 업데이트 하는 기능
-* 좋아요 누른 시간을 업데이트 하는 기능
-
-책임의 관점에서 여러가지 메소드로 분류할 수 있기 때문에 각 단위별로 나눠서 단위테스트를 진행하였습니다.
-
+단일 책임의 원칙의 관점에서 여러가지 메소드로 분류할 수 있기 때문에 각 단위별로 나눠서 단위테스트를 진행하였습니다.
+단위테스트를 진행함으로 인해 좀 더 명확하게 에러가 발생한 부분을 찾을 수 있습니다.
+단위테스트를 진행하지 않고 통합테스트를 할 경우 의존성 관계가 많이 엮이면 엮일 수록 에러가 어디서 발생했는지 찾기 힘들고 테스팅 하는 시간이 점점 무거워지는 단점이 있습니다.
 
 ### 객체지향적인 설계
+상속과 관심사의 분리를 통해 객체지향적인 설계를 지향하였습니다.
+공통의 관심사를 상속관계로 풀어내서 유지보수에 용이한 코드를 구현하고자 하였습니다.
+``` java
+    @Transactional
+    public Long join(JoinRequestDto joinRequestDto) {
+
+        //userTag를 생성하기 위해 우선적으로 DB에 저장
+        Member member = joinRequestDto.toEntity();
+        try{
+            member = memberRepository.save(member);
+        } catch (DataIntegrityViolationException e) {
+            throw new OverlapMemberException("중복된 회원입니다.");
+        }
+        member.createUserTag();
+        //DB에서 받아온 id로 닉네임에 유저태그 더해줌
+        return member.getId();
+    }
+```
+
+서비스계층의 join 메서드의 경우 JoinRequestDto라는 추상클래스를 매개변수로 받고 있습니다.
+JoinRequestDto는 BasicJoinRequestDto,KakaoJoinRequestDto의 조상이 되는 클래스입니다.
+이렇게 구현한 이유는 회원가입의 경우 일반 회원가입과 카카오 회원가입이 공통된 영역이 존재하지만 엔티티가 Dto로 변환돼서 데이터베이스에 저장될때 다른 방식으로 처리 되기 때문입니다.
+
+``` java
+@SuperBuilder
+@Data
+@NoArgsConstructor
+public class BasicJoinRequestDto extends JoinRequestDto {
+
+    @Pattern(regexp = "^[0-9a-zA-Z~!@#$%^&*_]*$",message = "한글은 입력할 수 없습니다.",groups = ValidationGroups.PatternCheckGroup.class)
+    @NotBlank(message = "아이디는 비워 둘 수 없습니다.", groups = ValidationGroups.NotBlankGroup.class)
+    private String username;
+    @NotBlank(message = "비밀번호는 비워 둘 수 없습니다", groups = ValidationGroups.NotBlankGroup.class)
+    @Size(min = 8, max = 16, message = "비밀번호는 8자 부터 16자까지 입력하여야 합니다", groups = ValidationGroups.SizeGroup.class)
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[~!@#$%^&*_])[a-zA-Z\\d-~!@#$%^&*_]*$",
+             message = "비밀번호는 특수기호, 영문, 숫자를 모두 포함해야합니다.",
+             groups = ValidationGroups.PatternCheckGroup.class)
+    private String password;
+
+
+
+
+    public BasicMember toEntity() {
+        return BasicMember.builder()
+                .username(username)
+                .password(new BCryptPasswordEncoder().encode(password))
+                .nickname(nickname)
+                .provider(Provider.BASIC)
+                .role(Role.MEMBER)
+                .build();
+    }
+}
+
+@SuperBuilder
+@Data
+@NoArgsConstructor
+public class KakaoJoinRequestDto extends JoinRequestDto {
+
+    private String authId;
+
+
+    public KakaoMember toEntity() {
+        return KakaoMember.builder()
+                .authId(authId)
+                .nickname(nickname)
+                .provider(Provider.KAKAO)
+                .role(Role.MEMBER)
+                .build();
+    }
+}
+```
+
+BasicJoinRequestDto의 경우 일반적인 회원가입이기 때문에 DB에 id와 password가 저장되어야 합니다. 반면에 KakaoJoinRequestDto의 경우는 authId만 저장되면 됩니다.
+그렇기에 공통적인 부분은 추상클래스로 빼놓고 toEntity 메서드를 오버라이딩을 통해 각자 따로 구현하였습니다. 
 
 ### 클린코드를 향한 노력

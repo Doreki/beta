@@ -1,3 +1,5 @@
+'use strict';
+
 class PostsApi {
     getPostsList(page,size) {
         let responseResult = null;
