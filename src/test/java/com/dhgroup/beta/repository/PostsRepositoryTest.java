@@ -122,6 +122,22 @@ public class PostsRepositoryTest {
         assertThat(postsList.getContent().get(2).getTitle()).isEqualTo("글제목1");
     }
 
+    @Test
+     public void 게시글_카운트() throws Exception{
+        //given
+            Member member = createMember("홍길동", "1");
+            memberRepository.save(member);
+
+        for (int i = 1; i <= 3; i++) {
+            Posts posts = createPosts(member, "글제목"+i, "글내용");
+            postsRepository.save(posts);
+        }
+        //when
+        Long count = postsRepository.count();
+        //then
+        assertThat(count).isEqualTo(3L);
+    }
+
     private static Posts createPosts(Member member, String title, String content) {
         return Posts.builder().title(title).content(content).member(member).build();
     }

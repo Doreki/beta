@@ -31,8 +31,6 @@ public class PostsApi {
 
     private final PostsService postsService;
 
-    private final PostsRepository postsRepository;
-    private final MemberRepository memberRepository;
 
     @GetMapping("/list/{memberId}")
     public ResponseEntity<?> viewPosts(@PathVariable Long memberId, Pageable pageable) {
@@ -49,10 +47,9 @@ public class PostsApi {
     @PostMapping("/")
     public ResponseEntity<?> writePosts(@Validated(ValidationSequence.class) @RequestBody PostsRequestDto postsRequestDto, BindingResult bindingResult) {
 
-        Long postsId = postsService.writePosts(postsRequestDto);
         return ResponseEntity
                 .status(CREATED)
-                .body(CMResponseDto.createCMResponseDto(1,"게시글이 등록되었습니다.",postsId));
+                .body(CMResponseDto.createCMResponseDto(1,"게시글이 등록되었습니다.",postsService.writePosts(postsRequestDto)));
     }
 
     @PatchMapping("/{postsId}")
