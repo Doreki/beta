@@ -59,12 +59,16 @@ class PageHandler {
     #page = 0;
     #maxPageNumber = 0;
     #pageNumberList = null;
+    #startIndex = 0;
+    #endIndex = 0;
 
     constructor(page,totalCount) {
-        this.#page = page;
+        this.#page = page+1;
         this.#maxPageNumber = totalCount / 10 == 0 ? (totalCount < 10 ? 1: Math.floor(totalCount / 10)) : Math.floor(totalCount / 10)+1;
         this.#pageNumberList = document.querySelector(".page-number-list");
         this.#pageNumberList.innerHTML = "";
+        this.#startIndex = this.findStartIndex();
+        this.#endIndex = this.findEndIndex();
         this.loadPageNumbers();
     }
 
@@ -77,9 +81,7 @@ class PageHandler {
     }
 
     createPreButton() {
-        const nowPage = this.#page+1;
-        const startIndex = nowPage % 10 ==0 ? (nowPage ==0 ? 1 : nowPage - 9) : nowPage - (nowPage % 10) + 1;
-            if(startIndex !=1) {
+            if(this.#startIndex !=1) {
                 this.#pageNumberList.innerHTML +=`
                 <a href="javascript:void(0)"><li>&#60;</li></a>
                 `;
@@ -87,21 +89,14 @@ class PageHandler {
     }
 
     createNumberButtons() {
-        const nowPage = this.#page+1;
-        const startIndex = nowPage % 10 ==0 ? (nowPage ==0 ? 1 : nowPage - 9) : nowPage - (nowPage % 10) + 1;
-        const endIndex = startIndex + 9 <= this.#maxPageNumber ? startIndex + 9 : this.#maxPageNumber;
-
-            for(let i = startIndex; i <= endIndex; i++) {
+            for(let i = this.#startIndex; i <= this.#endIndex; i++) {
                 this.#pageNumberList.innerHTML += `
                 <a href="javascript:void(0)"><li>${i}</li></a>
                 `;
         }
     }
     createNextButton() {
-        const nowPage = this.#page+1;
-        const startIndex = (nowPage % 10 ==0 ? (nowPage ==0 ? 1 : nowPage - 9) : nowPage - (nowPage % 10) + 1);
-        const endIndex = startIndex + 9 <= this.#maxPageNumber ? startIndex + 9 : this.#maxPageNumber;
-            if(endIndex != (this.#maxPageNumber/10*10)) {
+            if(this.#endIndex != (this.#maxPageNumber/10*10)) {
                 this.#pageNumberList.innerHTML +=`
                 <a href="javascript:void(0)"><li>&#62;</li></a>
                 `;
@@ -112,16 +107,15 @@ class PageHandler {
             const pageButtons = this.#pageNumberList.querySelectorAll("li");
             pageButtons.forEach(button => {
                 button.onclick = () => {
-                     const nowPage = Number(PostsService.getInstance().pageHandler.page);
-                     console.log(nowPage);
+                    const page = Number(this.#page);
                     if(button.textContent == "<") {
-                        PostsService.getInstance().pageHandler.page = ((nowPage+1)%10 == 0 ? Number(nowPage+1)-10 : (Math.floor(nowPage/10)*10))-1;
+                        PostsService.getInstance().pageHandler.page = (page % 10 == 0 ? page-10 : (Math.floor(page/10)*10))-1;
                         PostsService.getInstance().loadPostsList();
                     } else if (button.textContent == ">") {
-                        PostsService.getInstance().pageHandler.page = ((nowPage+1)%10 == 0 ? Number(nowPage+1) : (Math.floor(nowPage/10)*10+10));
+                        PostsService.getInstance().pageHandler.page = (page % 10 == 0 ? page : (Math.floor((page-1)/10)*10+10));
                         PostsService.getInstance().loadPostsList();
                     } else {
-                        if(button.textContent != nowPage+1) {
+                        if(button.textContent != this.#page) {
                             PostsService.getInstance().pageHandler.page = button.textContent-1;
                             PostsService.getInstance().loadPostsList();
                         }
@@ -138,7 +132,26 @@ class PageHandler {
             button.classList.add("page-button");
             }
         })
+    }
 
+    findStartIndex() {
+        if(this.#page % 10 == 0) {
+            if(this.#page == 0) {
+                return 1;
+            } else {
+                return this.#page - 9;
+            }
+        } else {
+            return this.#page - (this.#page % 10)+1;
+        }
+    }
+
+    findEndIndex() {
+        if(this.#startIndex + 9 <= this.#maxPageNumber) {
+             return this.#startIndex + 9;
+         } else {
+             return this.#maxPageNumber;
+         }
     }
 }
 
@@ -203,8 +216,7 @@ class PostsService {
             deleteButtons.forEach( deleteButton => {
             deleteButton.onclick = () => {
                     if(confirm("정말로 삭제하시겠습니까?")) {
-                        const postsApi = new PostsApi();
-                        postsApi.deletePosts(deleteButton.value);
+                        postsApi.getInstance().deletePosts(deleteButton.value);
                     }
                 }
             })
