@@ -232,7 +232,6 @@ public class PostsServiceTest {
         Page<Likes> page = new PageImpl<>(likesList);
 
         given(likesRepository.findLikesByMemberIdOrderByDesc(member.getId(),pageRequest)).willReturn(page);
-//        given(postsRepository.findLikedPostsByLatestOrder(any(List.class))).willReturn(postsList);
         //when
         List<LikedPostsResponseDto> postsResponseDtos = postsService.viewLikedPosts(member.getId(), pageRequest);
         //then
