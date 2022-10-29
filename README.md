@@ -12,7 +12,14 @@
 
 <a href = "https://github.com/Doreki"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 이 덕현 (모바일 애플리케이션 담당)</a>
 
-### 기능구현
+### 목차
+
+* 기능 소개
+* TDD와 단위테스트
+* 객체지향적 설계
+* 도메인 주도 설계
+
+### 기능 소개
 
 게시판의 기본적인 CRUD기능을 구현하였습니다. 사용자 편의성에 맞춰 좋아요 기능을 구현하였습니다.
 사용자에 따라 좋아요한 게시물 정보를 DB에 저장하고 좋아요한 게시물에 따라 하트 표시가 뜨도록 구현하였습니다.
@@ -249,4 +256,93 @@ public class KakaoJoinRequestDto extends JoinRequestDto {
 BasicJoinRequestDto의 경우 일반적인 회원가입이기 때문에 DB에 id와 password가 저장되어야 합니다. 반면에 KakaoJoinRequestDto의 경우는 authId만 저장되면 됩니다.
 그렇기에 공통적인 부분은 추상클래스로 빼놓고 toEntity 메서드를 오버라이딩을 통해 각자 따로 구현하였습니다. 
 
-### 클린코드를 향한 노력
+### 도메인 주도 설계
+
+도메인 주도 설계를 적용시켜 단위 테스트를 적용하기 쉽도록 설계하였습니다. 뿐만 아니라 도메인 객체가 스스로 할 수 있는 기능들은 최대한 스스로 할 수 있게 하므로써
+외부 객체와의 의존관계를 줄이고자 노력하였습니다. 이러한 설계를 통해 유지 보수에 유리한 설계를 만들고자 하였습니다.
+
+``` java
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
+@Entity
+public abstract class Member extends BaseTimeEntity {
+
+    @Id //pk
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
+    private Long id;
+    @Column(nullable = false)
+    private String nickname;
+    @Column(unique = true)
+    private String userTag;
+
+    @Enumerated(EnumType.STRING)
+    private Provider provider;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String createUserTag() {
+        String userTag = "";
+        if (id / 10 == 0) {
+            userTag = "000" + id;
+        } else if (id / 100 == 0) {
+            userTag = "00" + id;
+        } else if (id / 1000 == 0) {
+            userTag = "0" + id;
+        } else {
+            userTag = "" + id;
+        }
+        userTag = "#" + userTag;
+        this.userTag = userTag;
+
+        return userTag;
+    }
+
+}
+```
+
+저희 프로젝트에서는 멤버 정보를 저장할때 별도의 userTag를 만들어서 닉네임과 함께 저장합니다. 
+이때 다른 객체들과의 의존성을 없애고 member 객체 스스로 userTag의 기능을 수행하도록 하였습니다.
+다른 객체에 의존하는 것이 아무 것도 없기 때문에 단위 테스트를 가볍게 수행할 수 있다는 장점이 있습니다.
+
+``` java
+    @Test
+     public void 유저태그_생성() throws Exception{
+        //given
+        Member member1 = createMember(1L, "홍길동", "1");
+        Member member2 = createMember(10L, "홍길동", "1");
+        Member member3 = createMember(100L, "홍길동", "1");
+        Member member4 = createMember(1000L, "홍길동", "1");
+        Member member5 = createMember(10000L, "홍길동", "1");
+
+        String userTag1 = member1.createUserTag();
+        String userTag2 = member2.createUserTag();
+        String userTag3 = member3.createUserTag();
+        String userTag4 = member4.createUserTag();
+        String userTag5 = member5.createUserTag();
+        //when
+        assertThat(userTag1).isEqualTo("#0001");
+        assertThat(userTag2).isEqualTo("#0010");
+        assertThat(userTag3).isEqualTo("#0100");
+        assertThat(userTag4).isEqualTo("#1000");
+        assertThat(userTag5).isEqualTo("#10000");
+        //then
+    }
+```
+
+이렇게 userTag 정보에 대한 기능만 단위테스트를 진행하기 때문에 Mock 객체 조차도 만들지 않아도 되고 다른 의존성 객체들을 띄우지 않고 아주 빠르게 테스트를 진행할 수 있습니다.
+또한 코드가 변경 되었을 때도 해당 기능에 대한 테스트만 진행하면 된다는 장점이 있습니다.
+
+### 마무리
+해당 프로젝트를 진행하며 TDD와 단위테스트를 중점으로 두며 유연한 설계와 클린한 코드를 유지하려고 노력하였습니다.
+단순한 기능 구현에만 중점을 두지 않고 최적화와 유연한 설계를 위해 계속해서 스스로 고민하며 테스트 코드를 작성하고 꾸준하게 리팩토링을 진행하였습니다.
+이로 인해 많은 기능을 구현하지는 못했지만 개발 실력이 비약적으로 증가하며 코드가 개선되는 것을 느꼈습니다.
+이상으로 제 포트폴리오를 감상해주셔서 감사합니다.
