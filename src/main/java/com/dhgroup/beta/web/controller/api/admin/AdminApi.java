@@ -26,16 +26,6 @@ public class AdminApi {
     private final PostsService postsService;
     private final PostsRepository postsRepository;
 
-    @DeleteMapping("/posts/{postsId}")
-    public ResponseEntity<?> deletePosts(@PathVariable Long postsId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
-        if(isAdmin(principalDetails))
-            postsService.deletePosts(postsId);
-        else
-            throw new MemberMismatchException("권한이 없습니다.");
-
-        return ResponseEntity
-                .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));
-    }
 
     @GetMapping("/posts/list")
     public ResponseEntity<?> viewPosts(Pageable pageable) {
@@ -50,6 +40,16 @@ public class AdminApi {
                 .ok(CMResponseDto.createCMResponseDto(1, "게시글 목록이 성공적으로 불러와졌습니다.", map));
     }
 
+    @DeleteMapping("/posts/{postsId}")
+    public ResponseEntity<?> deletePosts(@PathVariable Long postsId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if(isAdmin(principalDetails))
+            postsService.deletePosts(postsId);
+        else
+            throw new MemberMismatchException("권한이 없습니다.");
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));
+    }
     private static boolean isAdmin(PrincipalDetails principalDetails) {
         return principalDetails.getRole() == Role.ADMIN;
     }

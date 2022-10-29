@@ -1,11 +1,10 @@
 # 청년부 미니 SNS
 ## 스프링부트 , JPA를 활용한 객체지향적인 설계 추구
 ### 프로젝트 소개
-위 프로젝트는 SNS 애플리케이션을 만들기 위한 프로젝트로 클라이언트 영역(안드로이드,ios)과 서버(자바,스프링) 영역을 분담하여 프로젝트를 진행하였습니다.
-서버의 경우 Spring boot와 JPA를 중점적으로 개발하였으며 Spring Security,Validation 등을 활용하였습니다. 
-모바일 어플리케이션의 특성상 주로 Api로 통신하였으며 Restful한 설계를 지향하였습니다.
-현재 버전은 베타버전으로 앞으로 계속해서 기능을 발전시켜 나갈 예정입니다. 
-
+* 위 프로젝트는 SNS 애플리케이션을 만들기 위한 프로젝트로 클라이언트 영역(안드로이드,ios)과 서버(자바,스프링) 영역을 분담하여 프로젝트를 진행하였습니다.
+* Spring boot와 JPA를 중점적으로 개발하였으며 Spring Security,Validation 등을 활용하였습니다. 
+* 모바일 어플리케이션의 특성상 주로 Api로 통신하였으며 Restful한 설계를 지향하였습니다.
+* 현재 버전은 베타버전으로 앞으로 계속해서 기능을 발전시켜 나갈 예정입니다.
 * 제작 기간은 2달 정도 소요됐으며, 구성원은 다음과 같습니다.
 
 <a href = "https://github.com/LDH0094"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 임 도현 (Api,Database 설계 & 구현, 관리자 페이지(웹)) </a>
@@ -21,9 +20,13 @@
 
 ### 기능 소개
 
-게시판의 기본적인 CRUD기능을 구현하였습니다. 사용자 편의성에 맞춰 좋아요 기능을 구현하였습니다.
-사용자에 따라 좋아요한 게시물 정보를 DB에 저장하고 좋아요한 게시물에 따라 하트 표시가 뜨도록 구현하였습니다.
-또한 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였으며 게시글이 작성된 시간 순서가 아닌 사용자가 좋아요를 누른 시간 순서대로 게시물이 뜨도록 하였습니다. 
+게시판의 기본적인 CRUD기능을 구현하였습니다. 하지만 어플리케이션의 모든 기능을 설명하지 않고 가장 핵심적인 기능 위주로 설명하겠습니다.
+
+#### 1. 좋아요 기능
+
+ 사용자 편의성에 맞춰 좋아요 기능을 구현하였습니다.
+사용자에 따라 좋아요한 게시물 정보를 DB에 저장하고 좋아요한 게시물에 따라 하트 표시가 나타도록 구현하였습니다.
+또한 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였으며 게시글이 작성된 시간 순서가 아닌 사용자가 좋아요를 누른 시간 순서대로 게시물이 로딩되도록 하였습니다. 
 
 <img src="src/main/resources/static/images/readme/write_like.gif" width="45%"><img src="src/main/resources/static/images/readme/like_button_clicked.gif" width="45%">
 
@@ -31,12 +34,16 @@
 
 좋아요 게시물(우)
 
+사용자에 따라 좋아요 누른 게시물에 하트 표시가 나타나도록 하는 기능을 구현하면서 마주 했던 가장 큰 문제는 n+1 문제였습니다.
+위 기능은 파라미터로 넘겨받은 memberId로 DB에서 Posts 엔티티를 가져오면서 페이징 처리를 하였습니다. 
+뿐만아니라 memberId와 memberId로 찾아온 Posts의 id값으로 이에 해당하는 Likes 엔티티가 존재하는지를 boolean값으로 반환해야 했습니다.
+여러 엔티티가 묶여있는 복잡한 쿼리였습니다.
+처음에는 람다와 스트림을 사용하여 PostsList를 반복문으로 Repository에 접근하여 boolean을 반환하도록 로직을 작성하였습니다.
+기능은 구현이 됐지만 로그를 살펴보니 쿼리문이 너무 많이 나가는 것이었습니다.
+제가 짠 로직을 자세히 살펴보니 스트림의 반복문이 한번 돌때마다 Repository의 메소드가 실행되며 쿼리문이 나가는 것이었습니다.
+그래서 쿼리문을 줄이고 최적화를 위한 방식으로 접근방법을 바꿨습니다.
+
 ``` java
-@Query(value = "select l from Likes l" +
-        " join fetch l.posts"+
-        " where l.member.id = :id order by l.id Desc",
-        countQuery = "select count(l) from Likes l")
-public Page<Likes> findLikesByMemberIdOrderByDesc(@Param("id") Long memberId, Pageable pageable);
 
 @Query("select l from Likes l" +
         " join fetch l.posts" +
@@ -45,8 +52,72 @@ public Page<Likes> findLikesByMemberIdOrderByDesc(@Param("id") Long memberId, Pa
 public List<Likes> findLikesByMemberIdAndPostsIds(@Param("memberId") Long memberId, @Param("postsIds")List<Long> postsIds);
 ```
 
-좋아요를 누른 순서대로 게시글 목록을 가져오기 위하여서 Likes 엔티티를 시간 순서대로 List에 담아서 가져오고 Likes 엔티티에 담겨져 있는 postId를 가져와서 Posts객체로 변환시켜줬습니다.
-위 과정에서 쿼리 최적화를 위해 in 절을 이용하여 파라미터를 List로 받아와서 n+1 문제를 해결하였습니다.
+문제를 해결하기 위하여 우선은 in 절을 이용하여 Likes 엔티티를 List로 가져왔습니다. 여기서 쿼리가 최대 10개가 나가던 것을 1개로 줄일 수 있었습니다.
+문제는 가져온 Likes객체를 어떻게 boolean으로 변환시키냐는 것이었습니다.
+
+``` java
+    public List<PostsResponseDto> viewPosts(Long memberId, Pageable pageable) {
+
+        Page<Posts> findPostsPage = postsRepository.findAllByOrderByIdDesc(pageable);
+        List<Long> findPostsIds = getPostsIds(findPostsPage.get());
+        List<Likes> findLikes = likesRepository.findLikesByMemberIdAndPostsIds(memberId,findPostsIds);
+        List<PostsResponseDto> postsList = toPostsDto(findPostsPage);
+
+        updateWhetherIsLiked(findLikes, postsList);
+
+        postsListSizeCheck(postsList);
+
+        return postsList;
+    }
+    
+     static void updateWhetherIsLiked(List<Likes> findLikes, List<? extends PostsResponseDto> findPostsList) {
+        Map<Long, Likes> likesMap = toLikesMapByPostsId(findLikes);
+        findPostsList.stream().filter(p -> likesMap.containsKey(p.getPostsId())).forEach(p -> p.updateIsLiked(true));
+    }
+    
+    private static Map<Long, Likes> toLikesMapByPostsId(List<Likes> findLikes) {
+        return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));
+    }
+```
+Likes에는 postsId와 memberId 두 값이 저장되어있습니다. 우선은 LikesList를  <postsId,Likes> 형태의 map으로 변환시켰습니다.
+이렇게 하면 postsId로 Likes엔티티가 존재하는지를 쉽게 파악할 수 있게 됩니다.
+또한 stream의 filter 메소드를 이용하면 Likes 엔티티가 존재하는 경우에만 true를 반환할 수 있게 로직을 작성할 수 있습니다.
+그리하여 postsId와 Likes가 매칭되는 Dto만 boolean값을 true로 저장되도록 하였습니다.
+결론적으로 DB커넥션이 여러번 타던 로직을 메모리에서 반복문을 여러번 돌리는 형식으로 로직을 수정한 것입니다.
+아무래도  DB커넥션을 여러번 타는 것 보다는 메모리에서 여러번 반복이 도는 것이 더 효율적이라고 생각했기 때문에 이렇게 로직을 수정하였습니다.
+
+#### 2. 관리자 페이지
+
+위 프로젝트는 모바일 어플리케이션 프로젝트이지만 게시글을 효율적으로 관리하기 위해 웹 페이지로 관리자 페이지를 구현하였습니다.
+
+<img src="src/main/resources/static/images/readme/Admin-paging.gif" width="100%">
+게시글 페이징처리
+
+스프링 시큐리티를 활용하여 관리자만 관리자페이지에 접근할 수 있도록 구현하였습니다.
+api통신을 활용하여 자바스크립트로 페이징 처리를 하였으며 http get method의 쿼리스트링을 파라미터로 받아서 페이지를 리로딩하지 않고 api 통신으로 필요한 데이터만 리로딩하여서 한정된 자원 내에서 최대한 자원을 효율적으로 사용하고자 하였습니다.
+
+
+<img src="src/main/resources/static/images/readme/Admin-delete.gif" width="100%">
+게시글 삭제기능
+
+``` java 
+    @DeleteMapping("/posts/{postsId}")
+    public ResponseEntity<?> deletePosts(@PathVariable Long postsId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        if(isAdmin(principalDetails))
+            postsService.deletePosts(postsId);
+        else
+            throw new MemberMismatchException("권한이 없습니다.");
+
+        return ResponseEntity
+                .ok(CMResponseDto.createCMResponseDto(1,"게시글이 삭제되었습니다.",null));
+    }
+    private static boolean isAdmin(PrincipalDetails principalDetails) {
+        return principalDetails.getRole() == Role.ADMIN;
+    }
+```
+스프링 시큐리티로 1차적으로 권한을 막았지만 api 해킹의 위험성을 예방하기 위해 세션 저장소에 저장되어있는 유저 정보의 Role이 Admin일때만 Delete문이 나가도록 구현하였습니다.
+
+
 
 ### TDD와 단위테스트
 
