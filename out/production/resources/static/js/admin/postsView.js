@@ -1,11 +1,11 @@
 'use strict';
 
-class PostsApi {
+class PostsViewApi {
     static #instance = null;
 
     static getInstance() {
         if(this.#instance == null) {
-            this.#instance = new PostsApi();
+            this.#instance = new PostsViewApi();
         }
         return this.#instance;
     }
@@ -30,28 +30,6 @@ class PostsApi {
             }
         });
         return responseResult;
-    }
-
-    deletePosts(postsId) {
-    let responseResult = null;
-
-            $.ajax({
-                async: false,
-                type: "delete",
-                url: "/api/v1/admin/posts/"+postsId,
-                dataType: "json",
-                success: (response) => {
-                    responseResult = response.msg;
-                    alert(responseResult);
-                    location.reload();
-                },
-                error: (error) => {
-                    responseResult = error.responseJSON.data.errMsg;
-                    alert(responseResult);
-                }
-            });
-
-
     }
 }
 
@@ -109,15 +87,15 @@ class PageHandler {
                 button.onclick = () => {
                     const page = Number(this.#page);
                     if(button.textContent == "<") {
-                        PostsService.getInstance().pageHandler.page = (page % 10 == 0 ? page-10 : (Math.floor(page/10)*10))-1;
-                        PostsService.getInstance().loadPostsList();
+                        PostsViewService.getInstance().pageable.page = (page % 10 == 0 ? page-10 : (Math.floor(page/10)*10))-1;
+                        PostsViewService.getInstance().loadPostsList();
                     } else if (button.textContent == ">") {
-                        PostsService.getInstance().pageHandler.page = (page % 10 == 0 ? page : (Math.floor((page-1)/10)*10+10));
-                        PostsService.getInstance().loadPostsList();
+                        PostsViewService.getInstance().pageable.page = (page % 10 == 0 ? page : (Math.floor((page-1)/10)*10+10));
+                        PostsViewService.getInstance().loadPostsList();
                     } else {
                         if(button.textContent != this.#page) {
-                            PostsService.getInstance().pageHandler.page = button.textContent-1;
-                            PostsService.getInstance().loadPostsList();
+                            PostsViewService.getInstance().pageable.page = button.textContent-1;
+                            PostsViewService.getInstance().loadPostsList();
                         }
                     }
                 }
@@ -126,7 +104,7 @@ class PageHandler {
 
     setColorButton() {
         const pageButtons = this.#pageNumberList.querySelectorAll("li");
-        const nowPage = PostsService.getInstance().pageHandler.page;
+        const nowPage = PostsViewService.getInstance().pageable.page;
         pageButtons.forEach(button => {
             if(button.textContent == nowPage+1) {
             button.classList.add("page-button");
@@ -155,29 +133,26 @@ class PageHandler {
     }
 }
 
-class PostsService {
+class PostsViewService {
     static #instance = null;
-
-    constructor() {
-    }
 
     static getInstance() {
         if(this.#instance == null) {
-            this.#instance = new PostsService();
+            this.#instance = new PostsViewService();
         }
         return this.#instance;
     }
 
-    pageHandler = {
+    pageable = {
         page: 0,
         totalCount: 0
     }
 
     loadPostsList() {
-        const responseData = PostsApi.getInstance().getPostsList(this.pageHandler.page);
-        this.pageHandler.totalCount = responseData.totalCount;
+        const responseData = PostsViewApi.getInstance().getPostsList(this.pageable.page);
+        this.pageable.totalCount = responseData.totalCount;
 
-        new PageHandler(this.pageHandler.page, this.pageHandler.totalCount);
+        new PageHandler(this.pageable.page, this.pageable.totalCount);
         this.getPostsList(responseData.postsResponseDtos);
     }
 
@@ -210,21 +185,4 @@ class PostsService {
         const time = date.toTimeString().split(" ")[0];
         return encodedDate+" "+time;
     }
-
-    setDeleteButton () {
-        const deleteButtons = document.querySelectorAll(".delete-button");
-            deleteButtons.forEach( deleteButton => {
-            deleteButton.onclick = () => {
-                    if(confirm("정말로 삭제하시겠습니까?")) {
-                        postsApi.getInstance().deletePosts(deleteButton.value);
-                    }
-                }
-            })
-    }
-}
-
-
-window.onload = () => {
-    PostsService.getInstance().loadPostsList();
-    PostsService.getInstance().setDeleteButton();
 }

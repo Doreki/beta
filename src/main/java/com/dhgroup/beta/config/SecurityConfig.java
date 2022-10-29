@@ -22,8 +22,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.httpBasic().disable(); //기본화면
         http.authorizeRequests() //권한에 관련된 모든 요청
-//                .antMatchers("/admin/**")//admin url 하위로 실행되는 모든 페이지는
-//                .hasAuthority(Role.ADMIN.name())//ADMIN 권한이 있어야함 시큐리티가 ROLE이 있는지 확인하고 검증함 ex)ROLE_ADMIN
+                .antMatchers("/admin/**")//admin url 하위로 실행되는 모든 페이지는
+                .hasAuthority(Role.ADMIN.name())//ADMIN 권한이 있어야함 시큐리티가 ROLE이 있는지 확인하고 검증함 ex)ROLE_ADMIN
                 .anyRequest()
                 .permitAll()
                 .and()
