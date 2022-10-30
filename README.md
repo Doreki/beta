@@ -25,8 +25,10 @@
 #### 1. 좋아요 기능
 
  사용자 편의성에 맞춰 좋아요 기능을 구현하였습니다.
-사용자에 따라 좋아요한 게시물 정보를 DB에 저장하고 좋아요한 게시물에 따라 하트 표시가 나타도록 구현하였습니다.
-또한 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였으며 게시글이 작성된 시간 순서가 아닌 사용자가 좋아요를 누른 시간 순서대로 게시물이 로딩되도록 하였습니다. 
+사용자에 따라 자신이 좋아요한 게시물에 하트 표시가 나타도록 구현하였습니다.
+로그아웃을 하고 다시 로그인을 한 경우에도 좋아요 정보가 남도록 Likes 엔티티를 만들어 DB에 저장하도록 하였습니다.
+또한 우측 마이페이지 버튼을 클릭하면 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였습니다.
+메인페이지는 최신글들이 올라올 수 있도록 하였고 마이페이지는 최신글 순서가 아닌 사용자가 사용자가 좋아요를 누른 시간 순서대로 게시물이 로딩되도록 하였습니다. 
 
 <img src="src/main/resources/static/images/readme/write_like.gif" width="45%"><img src="src/main/resources/static/images/readme/like_button_clicked.gif" width="45%">
 
@@ -35,13 +37,12 @@
 좋아요 게시물(우)
 
 사용자에 따라 좋아요 누른 게시물에 하트 표시가 나타나도록 하는 기능을 구현하면서 마주 했던 가장 큰 문제는 n+1 문제였습니다.
-위 기능은 파라미터로 넘겨받은 memberId로 DB에서 Posts 엔티티를 가져오면서 페이징 처리를 하였습니다. 
-뿐만아니라 memberId와 memberId로 찾아온 Posts의 id값으로 이에 해당하는 Likes 엔티티가 존재하는지를 boolean값으로 반환해야 했습니다.
-여러 엔티티가 묶여있는 복잡한 쿼리였습니다.
-처음에는 람다와 스트림을 사용하여 PostsList를 반복문으로 Repository에 접근하여 boolean을 반환하도록 로직을 작성하였습니다.
+위 기능은 memberId 하나의 값으로 Likes를 추적하고 Likes로 Posts의 존재여부를 추적해야했습니다.
+처음에는 exsist문을 활용하여 문제에 접근하였습니다.
 기능은 구현이 됐지만 로그를 살펴보니 쿼리문이 너무 많이 나가는 것이었습니다.
-제가 짠 로직을 자세히 살펴보니 스트림의 반복문이 한번 돌때마다 Repository의 메소드가 실행되며 쿼리문이 나가는 것이었습니다.
-그래서 쿼리문을 줄이고 최적화를 위한 방식으로 접근방법을 바꿨습니다.
+제가 짠 로직을 자세히 살펴보니 PostsList의 스트림이 한번 돌때마다 쿼리문이 나가는 것이었습니다.
+이유는 exist문은 단일 객체를 대상으로 boolean 값을 반환하기 때문이었는데 List에 담긴 객체 수만큼 쿼리문이 추가로 나가는 것이었습니다.
+그래서 쿼리문을 줄이기 위해 접근방식을 바꿨습니다.
 
 ``` java
 
@@ -79,10 +80,9 @@ public List<Likes> findLikesByMemberIdAndPostsIds(@Param("memberId") Long member
         return findLikes.stream().collect(Collectors.toMap(l -> l.getPosts().getId(), l -> l));
     }
 ```
-Likes에는 postsId와 memberId 두 값이 저장되어있습니다. 우선은 LikesList를  <postsId,Likes> 형태의 map으로 변환시켰습니다.
-이렇게 하면 postsId로 Likes엔티티가 존재하는지를 쉽게 파악할 수 있게 됩니다.
-또한 stream의 filter 메소드를 이용하면 Likes 엔티티가 존재하는 경우에만 true를 반환할 수 있게 로직을 작성할 수 있습니다.
-그리하여 postsId와 Likes가 매칭되는 Dto만 boolean값을 true로 저장되도록 하였습니다.
+우선은 LikesList를  <postsId,Likes> 형태의 map으로 변환시켰습니다.
+이렇게 하므로써 postsId를 키값으로 하여 Likes엔티티가 존재하는지를 쉽게 파악할 수 있게 되었습니다.
+그리고 stream의 filter 메소드를 이용하여 Posts와 Likes가 매칭이 되는 경우에만 Dto의 boolean값을 true로 저장되도록 하였습니다.
 결론적으로 DB커넥션이 여러번 타던 로직을 메모리에서 반복문을 여러번 돌리는 형식으로 로직을 수정한 것입니다.
 아무래도  DB커넥션을 여러번 타는 것 보다는 메모리에서 여러번 반복이 도는 것이 더 효율적이라고 생각했기 때문에 이렇게 로직을 수정하였습니다.
 
