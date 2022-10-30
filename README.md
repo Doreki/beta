@@ -30,11 +30,12 @@
 또한 우측 마이페이지 버튼을 클릭하면 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였습니다.
 메인페이지는 최신글들이 올라올 수 있도록 하였고 마이페이지는 최신글 순서가 아닌 사용자가 사용자가 좋아요를 누른 시간 순서대로 게시물이 로딩되도록 하였습니다. 
 
-<img src="src/main/resources/static/images/readme/write_like.gif" width="45%"><img src="src/main/resources/static/images/readme/like_button_clicked.gif" width="45%">
+글쓰기와 좋아요    |  좋아요 게시물
+:-------------------------:|:-------------------------:
+ <img src="src/main/resources/static/images/readme/write_like.gif"> |  <img src="src/main/resources/static/images/readme/like_button_clicked.gif"> 
 
-글쓰기와 좋아요(좌)
+<img src="" width="45%"><img src="" width="45%">
 
-좋아요 게시물(우)
 
 사용자에 따라 좋아요 누른 게시물에 하트 표시가 나타나도록 하는 기능을 구현하면서 마주 했던 가장 큰 문제는 n+1 문제였습니다.
 위 기능은 memberId 하나의 값으로 Likes를 추적하고 Likes로 Posts의 존재여부를 추적해야했습니다.
