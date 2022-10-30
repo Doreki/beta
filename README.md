@@ -30,7 +30,7 @@
 또한 우측 마이페이지 버튼을 클릭하면 사용자가 자신이 좋아요를 누른 게시물을 볼 수 있도록 하였습니다.
 메인페이지는 최신글들이 올라올 수 있도록 하였고 마이페이지는 최신글 순서가 아닌 사용자가 사용자가 좋아요를 누른 시간 순서대로 게시물이 로딩되도록 하였습니다. 
 
-글쓰기와 좋아요    |  좋아요 게시물
+글쓰기    |  좋아요 게시물
 :-------------------------:|:-------------------------:
  <img src="src/main/resources/static/images/readme/write_like.gif"> |  <img src="src/main/resources/static/images/readme/like_button_clicked.gif"> 
 
