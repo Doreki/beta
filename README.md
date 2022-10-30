@@ -7,9 +7,9 @@
 * 현재 버전은 베타버전으로 앞으로 계속해서 기능을 발전시켜 나갈 예정입니다.
 * 제작 기간은 2달 정도 소요됐으며, 구성원은 다음과 같습니다.
 
-<a href = "https://github.com/LDH0094"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 임 도현 (Api,Database 설계 & 구현, 관리자 페이지(웹)) </a>
+<a href = "https://github.com/Doreki"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 임 도현 (Api,Database 설계 & 구현, 관리자 페이지(웹)) </a>
 
-<a href = "https://github.com/Doreki"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 이 덕현 (모바일 애플리케이션 담당)</a>
+<a href = "https://github.com/LDH0094"><img alt="GitHub" src ="https://img.shields.io/badge/GitHub-181717.svg?&style=for-the-badge&logo=GitHub&logoColor=white"/> 이 덕현 (모바일 애플리케이션 담당)</a>
 
 ### 목차
 
@@ -41,7 +41,7 @@
 처음에는 exsist문을 활용하여 문제에 접근하였습니다.
 기능은 구현이 됐지만 로그를 살펴보니 쿼리문이 너무 많이 나가는 것이었습니다.
 제가 짠 로직을 자세히 살펴보니 PostsList의 스트림이 한번 돌때마다 쿼리문이 나가는 것이었습니다.
-이유는 exist문은 단일 객체를 대상으로 boolean 값을 반환하기 때문이었는데 List에 담긴 객체 수만큼 쿼리문이 추가로 나가는 것이었습니다.
+이유는 exsist문은 단일 객체를 대상으로 boolean 값을 반환하기 때문이었는데 List에 담긴 객체 수만큼 쿼리문이 추가로 나가는 것이었습니다.
 그래서 쿼리문을 줄이기 위해 접근방식을 바꿨습니다.
 
 ``` java
@@ -416,4 +416,3 @@ public abstract class Member extends BaseTimeEntity {
 해당 프로젝트를 진행하며 TDD와 단위테스트를 중점으로 두며 유연한 설계와 클린한 코드를 유지하려고 노력하였습니다.
 단순한 기능 구현에만 중점을 두지 않고 최적화와 유연한 설계를 위해 계속해서 스스로 고민하며 테스트 코드를 작성하고 꾸준하게 리팩토링을 진행하였습니다.
 이로 인해 많은 기능을 구현하지는 못했지만 개발 실력이 비약적으로 증가하며 코드가 개선되는 것을 느꼈습니다.
-이상으로 제 포트폴리오를 감상해주셔서 감사합니다.
